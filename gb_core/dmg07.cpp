@@ -166,6 +166,8 @@ void dmg07::handle_answer(int i, byte dat)
 						transfer_speed = 5928 * 3;
 					else if (dat == 0xA0)	// Jinsei Game Densetsz
 						transfer_speed = 5928 * 4;
+					else if(dat == 0x85) // Top Rank Tennis
+						transfer_speed = 512 * 8;
 					else {
 						char ping_speed_multiplayer = dat & 0x0F;
 						if (ping_speed_multiplayer)
@@ -329,7 +331,7 @@ void dmg07::send_sync_bytes()
 	
 	if (!master_is_synced)
 	{	
-		if (transfer_rate != 0xA0)	// Jinsei Game Densetsi speed Hack
+		if (transfer_rate != 0xA0 && transfer_rate != 0x85)	// Jinsei Game Densetsi and Top Rank Tennis
 			transfer_speed = 70216;
 
 		broadcast_byte(0xCC);
