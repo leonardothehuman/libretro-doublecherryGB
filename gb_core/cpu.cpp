@@ -23,11 +23,14 @@
 
 #include "gb.h"
 #include <string.h>
+#include <fstream>
 
 #define Z_FLAG 0x40
 #define H_FLAG 0x10
 #define N_FLAG 0x02
 #define C_FLAG 0x01
+
+extern bool logging_allowed; 
 
 cpu::cpu(gb *ref)
 {
@@ -65,7 +68,7 @@ void cpu::reset()
 	halt=false;
 	speed=false;
 	speed_change=false;
-	dma_executing=false;
+	dma_executing=false; 
 	b_dma_first=false;
 	gdma_rest=0;
 
@@ -237,6 +240,7 @@ byte cpu::io_read(word adr)
 		return ref_gb->get_regs()->SB;
 	case 0xFF02://SC(シリアルコントロール) // SC (serial control)
 //		fprintf(file,"Read SC %02X\n",ref_gb->get_regs()->SC);
+		if (this->m_dmg07) return ref_gb->get_regs()->SC & net_id;
 		return (ref_gb->get_regs()->SC&0x83)|0x7C;
 	case 0xFF04://DIV(ディバイダー?) // DIV (divider?)
 		return ref_gb->get_regs()->DIV;
@@ -291,7 +295,9 @@ byte cpu::io_read(word adr)
 	case 0xFF56://RP(赤外線) // RP (infrared)
 		if (ref_gb->get_target()){
 			if ((ref_gb->get_cregs()->RP&0xC0)==0xC0){
-				dword *que=ref_gb->get_target()->get_cpu()->rp_que;
+				
+				gb* g = dynamic_cast<gb*>(ref_gb->get_target());
+				dword *que=g->get_cpu()->rp_que;
 				int que_cnt=0;
 				int cur;
 				while((que[que_cnt]&0xffff)>rest_clock)	cur=que[que_cnt++]>>16;
@@ -384,7 +390,11 @@ void cpu::io_write(word adr,byte dat)
 			return;
 		case 0xFF02://SC(コントロール) // SC (control)
 			if (ref_gb->get_rom()->get_info()->gb_type==1){
-				ref_gb->get_regs()->SC=dat&0x81;
+				
+				//if (this->m_dmg07)  ref_gb->get_regs()->SC = dat & net_id;
+				//else 
+				ref_gb->get_regs()->SC = dat & 0x81;
+
 				if ((dat&0x80)&&(dat&1)) // 送信開始 // Transmission start
 					seri_occer=total_clock+512;
 			}
@@ -834,16 +844,44 @@ byte cpu::seri_send(byte dat)
 //	if ((!(ref_gb->get_regs()->IE&INT_SERIAL))||(ref_gb->get_regs()->IF&INT_SERIAL))
 //		return 0xFF;
 
-	if ((ref_gb->get_regs()->SC&0x81)==0x80){
-//		fprintf(file,"seri_recv my:%02X tar:%02X state SC:%02X\n",ref_gb->get_regs()->SB,dat,ref_gb->get_regs()->SC);
-		byte ret=ref_gb->get_regs()->SB;
-		ref_gb->get_regs()->SB=dat;
-		ref_gb->get_regs()->SC&=1;
-		irq(INT_SERIAL);
-		return ret;
+
+	if ((ref_gb->get_regs()->SC & 0x81) == 0x80) {
+			//		fprintf(file,"seri_recv my:%02X tar:%02X state SC:%02X\n",ref_gb->get_regs()->SB,dat,ref_gb->get_regs()->SC);
+			byte ret = ref_gb->get_regs()->SB;
+
+			log_link_traffic(dat, ret);
+
+			ref_gb->get_regs()->SB = dat;
+			ref_gb->get_regs()->SC &= 1;
+			irq(INT_SERIAL);
+			return ret;
+		}
+		else
+			return 0xFF;
+	
+}
+
+void cpu::log_link_traffic(byte a, byte b)
+{
+	
+	if (logging_allowed)
+	{
+		std::string filePath = "./2p_link_log.txt";
+		std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
+
+		int clocks_occer = total_clock - clocks_since_last_serial;
+		std::string tabs = clocks_occer < 1000000 ? "\t\t\t" : "\t\t";
+
+		ofs << "" << clocks_occer << tabs;
+		ofs << "" << std::hex << (int)a << "\t";
+		ofs << "" << std::hex << (int)b << "";
+
+		ofs << std::endl;
+		ofs.close();
+
+		clocks_since_last_serial = total_clock;
 	}
-	else
-		return 0xFF;
+
 }
 
 void cpu::irq(int irq_type)
@@ -975,10 +1013,16 @@ void cpu::exec(int clocks)
 			div_clock&=0xff;
 		}
 
+
+		
+	
+	
 		if (total_clock>seri_occer){
 			seri_occer=0x7fffffff;
 			if (ref_gb->get_target()){
-				byte ret=ref_gb->get_target()->get_cpu()->seri_send(ref_gb->get_regs()->SB);
+				gb* g = dynamic_cast<gb*>(ref_gb->get_target());
+				byte ret=g->get_cpu()->seri_send(ref_gb->get_regs()->SB);
+				//byte ret = ref_gb->get_target()->send_byte(ref_gb->get_regs()->SB);
 				ref_gb->get_regs()->SB=ret;
 				ref_gb->get_regs()->SC&=3;
 			}
@@ -986,15 +1030,31 @@ void cpu::exec(int clocks)
 				if (ref_gb->hook_ext){ // フックします // Hook
 					byte ret=ref_gb->hook_proc.send(ref_gb->get_regs()->SB);
 					ref_gb->get_regs()->SB=ret;
-					ref_gb->get_regs()->SC&=3;
+					ref_gb->get_regs()->SC&= ~0x80;
 				}
 				else{
 					ref_gb->get_regs()->SB=0xff;
-					ref_gb->get_regs()->SC&=3;
+					ref_gb->get_regs()->SC&= ~0x80;
 				}
 			}
 			irq(INT_SERIAL);
 		}
+
+		/*
+		if (this->m_dmg07 && this->is_clock_giver) {
+
+			if (total_clock > m_dmg07->seri_occer) {
+				this->m_dmg07->process();
+				ref_gb->get_regs()->SC &= 3;
+				m_dmg07->seri_occer = total_clock + m_dmg07->transfer_speed;
+			}
+
+		}
+		*/
+		
+
+		
+
 	}
 }
 
@@ -1042,5 +1102,10 @@ void cpu::serialize(serializer &s)
 
 	// undocumented registers:
 	s_VAR(_ff6c); s_VAR(_ff72); s_VAR(_ff73); s_VAR(_ff74); s_VAR(_ff75);
+}
+
+void cpu::set_is_seri_master(bool enable) {
+	
+	this->is_clock_giver = enable;
 }
 

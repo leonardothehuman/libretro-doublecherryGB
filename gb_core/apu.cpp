@@ -321,12 +321,22 @@ void apu_snd::process(word adr,byte dat)
 	}
 }
 
+/*
 static int sq_wav_dat[4][8]={
 	{0,1,0,0,0,0,0,0},
 	{1,1,0,0,0,0,0,0},
 	{1,1,1,1,0,0,0,0},
 	{0,0,1,1,1,1,1,1}
 };
+*/
+
+static int sq_wav_dat[4][8] = {
+	{1,0,0,0,0,0,0,0},
+	{1,1,0,0,0,0,0,0},
+	{1,1,1,1,0,0,0,0},
+	{1,1,1,1,1,1,1,1}
+};
+
 
 inline short apu_snd::sq1_produce(int freq)
 {
@@ -387,7 +397,9 @@ inline short apu_snd::wav_produce(int freq,bool interpolation)
 		return (mem[0x20]>>4)*4000-30000;
 
 	if (freq){
-		if (interpolation){
+
+		if (interpolation)
+		{
 			ret=((cur_sample*2500-15000)*wav_cur_pos+(bef_sample*2500-15000)*(0x10000-wav_cur_pos))/0x10000;
 		}
 		else{

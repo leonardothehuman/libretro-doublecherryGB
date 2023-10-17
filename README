@@ -1,16 +1,34 @@
-TGB Dual is an open source (GPLv2) GB/GBC emulator with game link cable support.
+MultiTGB is an open source (GPLv2) GB/GBC emulator with 4-player-adapter (dmg07) link cable support.
 
-This is a port of it to libretro.  To emulate two units side by side, use
-the core options in your frontend.  In older frontends, you'll need to use
-your frontend's "Sufami Turbo" interface, placing the ROMs in "slots" A and B.
-The Sufami Turbo BIOS itself can be any file; it is ignored by the emulator.
-Use the Player 1 and Player 2 controllers to control each unit.
+This is a fork of the TGB Dual libreto port.
 
-In addition, some of the Japanese comments in the source code have been run
-through Google Translate to English, and CP932 and EUC-JP encoded files have
-been converted to UTF-8.
+At the moment only Yoshi's Cookie is playable with 4 players.
+I'm looking for help to get more games working.
+
+Thanks to Shonumi for doing the research, documentation and inspiration for this project.
+https://shonumi.github.io/index.html
+
+You can emulate up to 4 Gameboy via split screen (change in the core-options):
+- real multiplayer 4 player adapter emulation (only Yoshi’s cookie working)
+- 2x 2-player link cable
+- simultaneous 4 Single-Player without link-cable Emulation (Speedrun challenge ;D )
+
+Goals:
+- get DMG07-Emulation right so that every multiplayer game is working
+- if that the case, create a GB Studio template to create new games with 4 Player Support
+- create or find someone to create a 4-Player shader like the GB2Player Duimon Mega Bezel
+- improve performance (multithreading) and clean the code
+- get netplay working and testing
+- maybe more Pokémon-feature...
+
+If you are a geek like me and want to buy me a coffee ;)
+https://www.paypal.com/paypalme/geeklikeme
+
+
 
 Original sources from
+https://github.com/libretro/tgbdual-libretro
 http://gigo.retrogames.com/download.html#tgb-dual
 http://shinh.skr.jp/tgbdualsdl/
+
 

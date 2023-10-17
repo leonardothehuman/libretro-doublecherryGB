@@ -7,82 +7,23 @@
 #include "libretro.h"
 #include "../gb_core/gb.h"
 #include "dmy_renderer.h"
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "libretro.h"
 
-#define RETRO_MEMORY_GAMEBOY_1_SRAM ((1 << 8) | RETRO_MEMORY_SAVE_RAM)
-#define RETRO_MEMORY_GAMEBOY_1_RTC ((2 << 8) | RETRO_MEMORY_RTC)
-#define RETRO_MEMORY_GAMEBOY_2_SRAM ((3 << 8) | RETRO_MEMORY_SAVE_RAM)
-#define RETRO_MEMORY_GAMEBOY_2_RTC ((3 << 8) | RETRO_MEMORY_RTC)
 
-#define RETRO_GAME_TYPE_GAMEBOY_LINK_2P 0x101
+#include "inline/inline_variables.h"
+#include "inline/inline_functions.h"
 
-static const struct retro_variable vars_single[] = {
-    { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
-    { NULL, NULL },
-};
 
-static const struct retro_variable vars_dual[] = {
-    { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
-    { "tgbdual_screen_placement", "Screen layout; left-right|top-down" },
-    { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
-    { "tgbdual_single_screen_mp", "Show player screens; both players|player 1 only|player 2 only" },
-    { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2" },
-    { NULL, NULL },
-};
-
-static const struct retro_subsystem_memory_info gb1_memory[] = {
-    { "srm", RETRO_MEMORY_GAMEBOY_1_SRAM },
-    { "rtc", RETRO_MEMORY_GAMEBOY_1_RTC },
-};
-
-static const struct retro_subsystem_memory_info gb2_memory[] = {
-    { "srm", RETRO_MEMORY_GAMEBOY_2_SRAM },
-    { "rtc", RETRO_MEMORY_GAMEBOY_2_RTC },
-};
-
-static const struct retro_subsystem_rom_info gb_roms[] = {
-    { "GameBoy #1", "gb|gbc", false, false, false, gb1_memory, 1 },
-    { "GameBoy #2", "gb|gbc", false, false, false, gb2_memory, 1 },
-};
-
-   static const struct retro_subsystem_info subsystems[] = {
-      { "2 Player Game Boy Link", "gb_link_2p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
-      { NULL },
-};
-
-enum mode{
-    MODE_SINGLE_GAME,
-    MODE_SINGLE_GAME_DUAL,
-    MODE_DUAL_GAME
-};
-
-static enum mode mode = MODE_SINGLE_GAME;
-
-gb *g_gb[2];
-dmy_renderer *render[2];
-
-retro_log_printf_t log_cb;
-retro_video_refresh_t video_cb;
-retro_audio_sample_batch_t audio_batch_cb;
-retro_environment_t environ_cb;
-retro_input_poll_t input_poll_cb;
-retro_input_state_t input_state_cb;
-
-extern bool _screen_2p_vertical;
-extern bool _screen_switched;
-extern int _show_player_screens;
-static size_t _serialize_size[2]         = { 0, 0 };
-
-bool gblink_enable                       = false;
-int audio_2p_mode                        = 0;
-// used to make certain core options only take effect once on core startup
-bool already_checked_options             = false;
-bool libretro_supports_persistent_buffer = false;
-bool libretro_supports_bitmasks          = false;
-struct retro_system_av_info *my_av_info  = (retro_system_av_info*)malloc(sizeof(*my_av_info));
+static void check_variables(void);
 
 void retro_get_system_info(struct retro_system_info *info)
 {
-   info->library_name     = "TGB Dual";
+   info->library_name     = "Multi TGB";
 #ifndef GIT_VERSION
 #define GIT_VERSION ""
 #endif
@@ -93,31 +34,43 @@ void retro_get_system_info(struct retro_system_info *info)
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-   int w = 160, h = 144;
-   info->geometry.max_width = w * 2;
-   info->geometry.max_height = h * 2;
+   
+    //TODO FIX 4-Player Splitscreen at start
 
-   if (g_gb[1] && _show_player_screens == 2)
+   int w = 160, h = 144;
+   info->geometry.max_width = w * 4; // changed w * 4
+   info->geometry.max_height = h * 4; // chaned w * 4
+
+
+   if (emulated_gbs > 1 && _show_player_screens == 2)
    {
       // screen orientation for dual gameboy mode
-      if(_screen_2p_vertical)
-         h *= 2;
-      else
-         w *= 2;
+       if (emulated_gbs > 2 && _screen_4p_split)
+       {
+           h *= 2;
+           w *= 2; 
+       }
+       else if(_screen_vertical)
+         h *= emulated_gbs;
+        else
+         w *= emulated_gbs;
    }
 
+   
    info->timing.fps            = 4194304.0 / 70224.0;
    info->timing.sample_rate    = 44100.0f;
+
    info->geometry.base_width   = w;
    info->geometry.base_height  = h;
    info->geometry.aspect_ratio = float(w) / float(h);
    memcpy(my_av_info, info, sizeof(*my_av_info));
+   
 }
-
 
 
 void retro_init(void)
 {
+
    unsigned level = 4;
    struct retro_log_callback log;
 
@@ -137,192 +90,194 @@ void retro_deinit(void)
    libretro_supports_bitmasks          = false;
 }
 
-static void check_variables(void)
+bool retro_load_game(const struct retro_game_info* info)
 {
-   struct retro_variable var;
+    size_t rom_size;
+    byte* rom_data;
+    const struct retro_game_info_ext* info_ext = NULL;
+    environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_single);
+    //environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_quad);
+        check_variables();
 
-   // check whether link cable mode is enabled
-   var.key = "tgbdual_gblink_enable";
-   var.value = NULL;
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   mode = MODE_SINGLE_GAME;
+
+    unsigned i;
+
+    struct retro_input_descriptor desc[] = {
+       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+
+       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+       { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+
+       { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 0 },
+    };
+
+    if (!info)
+        return false;
+
+
+    v_gb.clear();
+    render.clear();
+
+    environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
+
+
+    switch (emulated_gbs)
+    {
+    case 1: environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_single); break;
+    case 2: environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_dual); break;
+    case 3: environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_tripple); break;
+    case 4: environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_quad); break;
+
+    }
+
+
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &info_ext) &&
+        info_ext->persistent_data)
+    {
+        rom_data = (byte*)info_ext->data;
+        rom_size = info_ext->size;
+        libretro_supports_persistent_buffer = true;
+    }
+    else
+    {
+        rom_data = (byte*)info->data;
+        rom_size = info->size;
+    }
+
+
+    //create gameboy instances
+    for (byte i = 0; i < emulated_gbs; i++)
+    {
+        render.emplace_back(new dmy_renderer(i));
+        v_gb.emplace_back(new gb(render[i], true, true));
+    }
+
+
+    for (i = 0; i < emulated_gbs; i++)
+        _serialize_size[i] = 0;
+
+    size_t* save_size;
+   char* save_file[2];
+  // save_file[0] = read_file_to_buffer("C:\\Users\\TimZen\\Downloads\\RetroArch\\RetroArch-Win64\\saves\\Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size);
+   //save_file[1] = read_file_to_buffer("C:\\Users\\TimZen\\Downloads\\RetroArch\\RetroArch-Win64\\saves\\Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size);
+ //  save_file[1] = read_file_to_buffer("..//saves//Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size[1]);
+
+   if (v_gb.size() > 2)
+       auto_config_4p_hack(rom_data);
+
+   // load roms
+   for (byte i = 0; i < emulated_gbs; i++)
    {
-      if (!already_checked_options) { // only apply this setting on init
-         if (!strcmp(var.value, "disabled"))
-            gblink_enable = false;
-         else if (!strcmp(var.value, "enabled"))
-            gblink_enable = true;
-      }
-   }
-   else
-      gblink_enable = false;
-
-   // check whether screen placement is horz (side-by-side) or vert
-   var.key = "tgbdual_screen_placement";
-   var.value = NULL;
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
-      if (!strcmp(var.value, "left-right"))
-         _screen_2p_vertical = false;
-      else if (!strcmp(var.value, "top-down"))
-         _screen_2p_vertical = true;
-   }
-   else
-      _screen_2p_vertical = false;
-
-   // check whether player 1 and 2's screen placements are swapped
-   var.key = "tgbdual_switch_screens";
-   var.value = NULL;
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
-      if (!strcmp(var.value, "normal"))
-         _screen_switched = false;
-      else if (!strcmp(var.value, "switched"))
-         _screen_switched = true;
-   }
-   else
-      _screen_switched = false;
-
-   // check whether to show both players' screens, p1 only, or p2 only
-   var.key = "tgbdual_single_screen_mp";
-   var.value = NULL;
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
-      if (!strcmp(var.value, "both players"))
-         _show_player_screens = 2;
-      else if (!strcmp(var.value, "player 1 only"))
-         _show_player_screens = 0;
-      else if (!strcmp(var.value, "player 2 only"))
-         _show_player_screens = 1;
-   }
-   else
-      _show_player_screens = 2;
-
-   int screenw = 160, screenh = 144;
-   if (gblink_enable && _show_player_screens == 2)
-   {
-      if (_screen_2p_vertical)
-         screenh *= 2;
-      else
-         screenw *= 2;
-   }
-   my_av_info->geometry.base_width = screenw;
-   my_av_info->geometry.base_height = screenh;
-   my_av_info->geometry.aspect_ratio = float(screenw) / float(screenh);
-
-   already_checked_options = true;
-   environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, my_av_info);
-
-   // check whether player 1 and 2's screen placements are swapped
-   var.key = "tgbdual_audio_output";
-   var.value = NULL;
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
-      if (!strcmp(var.value, "Game Boy #1"))
-         audio_2p_mode = 0;
-      else if (!strcmp(var.value, "Game Boy #2"))
-         audio_2p_mode = 1;
-   }
-   else
-      _screen_switched = false;
-}
-
-
-bool retro_load_game(const struct retro_game_info *info)
-{
-   size_t rom_size;
-   byte *rom_data;
-   const struct retro_game_info_ext *info_ext = NULL;
-   environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void *)vars_single);
-   check_variables();
-
-   unsigned i;
-
-   struct retro_input_descriptor desc[] = {
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
-
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
-
-      { 0 },
-   };
-
-   if (!info)
-      return false;
-
-   for (i = 0; i < 2; i++)
-   {
-      g_gb[i]   = NULL;
-      render[i] = NULL;
-   }
-
-   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
-
-   render[0] = new dmy_renderer(0);
-   g_gb[0]   = new gb(render[0], true, true);
-
-   if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &info_ext) &&
-       info_ext->persistent_data)
-   {
-      rom_data                            = (byte*)info_ext->data;
-      rom_size                            = info_ext->size;
-      libretro_supports_persistent_buffer = true;
-   }
-   else
-   {
-      rom_data                            = (byte*)info->data;
-      rom_size                            = info->size;
-   }
-
-   if (!g_gb[0]->load_rom(rom_data, rom_size, NULL, 0,
-            libretro_supports_persistent_buffer))
-      return false;
-
-   for (i = 0; i < 2; i++)
-      _serialize_size[i] = 0;
-
-   if (gblink_enable)
-   {
-      mode      = MODE_SINGLE_GAME_DUAL;
-      environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void *)vars_dual);
-
-      render[1] = new dmy_renderer(1);
-      g_gb[1]   = new gb(render[1], true, true);
-
-      if (!g_gb[1]->load_rom(rom_data, rom_size, NULL, 0,
+       //if (!save_file[i])
+       if (false)
+       {
+           if (!v_gb[i]->load_rom(rom_data, rom_size, (byte*)save_file[i], *save_size,
                libretro_supports_persistent_buffer))
-         return false;
-
-      // for link cables and IR:
-      g_gb[0]->set_target(g_gb[1]);
-      g_gb[1]->set_target(g_gb[0]);
+               return false;
+       }
+       else
+       {
+           if (!v_gb[i]->load_rom(rom_data, rom_size, NULL, 0,
+               libretro_supports_persistent_buffer))
+               return false;
+       }
+ 
    }
-   else
-      mode = MODE_SINGLE_GAME;
 
-   check_variables();
+   //master_link = new dmg07(v_gb);
+
+   
+   //set link connections
+   switch (v_gb.size())
+   {
+       case 1: mode = MODE_SINGLE_GAME; break;
+       case 2:
+       {
+           //mode = MODE_DUAL_GAME;
+           // for link cables and IR:
+           if (gblink_enable) {
+               v_gb[0]->set_target(v_gb[1]);
+               v_gb[1]->set_target(v_gb[0]);
+           }
+           break;
+
+       }
+       case 3:
+       {
+           mode = MODE_SINGLE_GAME_DUAL;
+           //master_link = new dmg07(v_gb); 
+           //master_link = new tetris_4p_hack(v_gb);
+           break;
+       }
+
+       case 4:
+       {
+           mode = MODE_SINGLE_GAME_DUAL;
+           //master_link = new tetris_4p_hack(v_gb);
+           
+           if (!master_link)   //master_link = new dmg07(v_gb);
+           //else if (use_tetris_4p_hack)  master_link = new tetris_4p_hack(v_gb);
+           //else
+           {
+               v_gb[0]->set_target(v_gb[1]);
+               v_gb[1]->set_target(v_gb[0]);
+               v_gb[2]->set_target(v_gb[3]);
+               v_gb[3]->set_target(v_gb[2]);
+           }
+           
+           break;
+       }
+   }
+
+     check_variables();
 
    return true;
 }
 
-
 bool retro_load_game_special(unsigned type, const struct retro_game_info *info, size_t num_info)
 {
+
+    
     if (type != RETRO_GAME_TYPE_GAMEBOY_LINK_2P)
         return false; /* all other types are unhandled for now */
 
+
+    // implement for 3 - 4 Player
+
+    
    environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void *)vars_dual);
    unsigned i;
 
@@ -357,7 +312,7 @@ bool retro_load_game_special(unsigned type, const struct retro_game_info *info, 
 
    for (i = 0; i < 2; i++)
    {
-      g_gb[i]   = NULL;
+      v_gb[i]   = NULL;
       render[i] = NULL;
    }
 
@@ -366,8 +321,8 @@ bool retro_load_game_special(unsigned type, const struct retro_game_info *info, 
    environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
    render[0] = new dmy_renderer(0);
-   g_gb[0]   = new gb(render[0], true, true);
-   if (!g_gb[0]->load_rom((byte*)info[0].data, info[0].size, NULL, 0, false))
+   v_gb[0]   = new gb(render[0], true, true);
+   if (!v_gb[0]->load_rom((byte*)info[0].data, info[0].size, NULL, 0, false))
       return false;
 
    for (i = 0; i < 2; i++)
@@ -376,31 +331,32 @@ bool retro_load_game_special(unsigned type, const struct retro_game_info *info, 
    if (gblink_enable)
    {
       render[1] = new dmy_renderer(1);
-      g_gb[1] = new gb(render[1], true, true);
+      v_gb[1] = new gb(render[1], true, true);
 
-      if (!g_gb[1]->load_rom((byte*)info[1].data, info[1].size, NULL, 0,
+      if (!v_gb[1]->load_rom((byte*)info[1].data, info[1].size, NULL, 0,
                false))
          return false;
 
       // for link cables and IR:
-      g_gb[0]->set_target(g_gb[1]);
-      g_gb[1]->set_target(g_gb[0]);
+      v_gb[0]->set_target(v_gb[1]);
+      v_gb[1]->set_target(v_gb[0]);
    }
 
    mode = MODE_DUAL_GAME;
    return true;
-}
 
+   
+}
 
 void retro_unload_game(void)
 {
    unsigned i;
-   for(i = 0; i < 2; ++i)
+   for(i = 0; i < v_gb.size(); ++i) 
    {
-      if (g_gb[i])
+      if (v_gb[i])
       {
-         delete g_gb[i];
-         g_gb[i] = NULL;
+         delete v_gb[i];
+         v_gb[i] = NULL;
          delete render[i];
          render[i] = NULL;
       }
@@ -411,10 +367,10 @@ void retro_unload_game(void)
 
 void retro_reset(void)
 {
-   for(int i = 0; i < 2; ++i)
+   for(int i = 0; i < v_gb.size(); ++i)
    {
-      if (g_gb[i])
-         g_gb[i]->reset();
+      if (v_gb[i])
+         v_gb[i]->reset();
    }
 }
 
@@ -427,15 +383,50 @@ void retro_run(void)
 
    input_poll_cb();
 
-   for (int line = 0;line < 154; line++)
+    
+   for (int line = 0; line < 154; line++)
    {
-      if (g_gb[0])
-         g_gb[0]->run();
-      if (g_gb[1])
-         g_gb[1]->run();
+       for (int i = 0; i < emulated_gbs; i++)
+       {
+           v_gb[i]->run();
+       }
+       if (master_link) master_link->process();
    }
-}
+  
+   /*
+   //GBREMIXER test condition link collectef first ruppee
+   if (v_gb[0]->get_cpu()->get_ram()[0x1B5E] == 1)
+   {
+      
+       //open new save savestate test
+       // open the file
+       const char* savestate_filename = "C:\\Users\\TimZen\\Downloads\\RetroArch\\RetroArch-Win64\\\\states\\Legend of Zelda, The - Link's Awakening DX (USA, Europe) (Rev 2) (SGB Enhanced) (GB Compatible).state2";
+       size_t state_size;
 
+       // Read the savestate into a buffer
+       char* state_buffer = read_file_to_buffer(savestate_filename, &state_size);
+       if (state_buffer == NULL) {
+           return;
+       }
+       retro_reset();
+     
+       // Unserialize the savestate using Libretro API
+       if (!retro_unserialize(state_buffer, retro_serialize_size())) {
+           printf("Failed to unserialize the savestate\n");
+           free(state_buffer);
+           return;
+       }
+
+       // Successfully unserialized the savestate, now you can proceed with emulation
+
+       // Free the allocated buffer
+       free(state_buffer);
+       
+      
+     
+   }
+   */
+}
 
 
 void *retro_get_memory_data(unsigned id)
@@ -448,13 +439,13 @@ void *retro_get_memory_data(unsigned id)
             switch(id)
             {
                 case RETRO_MEMORY_SAVE_RAM:
-                    return g_gb[0]->get_rom()->get_sram();
+                    return v_gb[id]->get_rom()->get_sram();
                 case RETRO_MEMORY_RTC:
-                    return &(render[0]->fixed_time);
+                    return &(render[id]->fixed_time);
                 case RETRO_MEMORY_VIDEO_RAM:
-                    return g_gb[0]->get_cpu()->get_vram();
+                    return v_gb[id]->get_cpu()->get_vram();
                 case RETRO_MEMORY_SYSTEM_RAM:
-                    return g_gb[0]->get_cpu()->get_ram();
+                    return v_gb[id]->get_cpu()->get_ram();
                 default:
                     break;
             }
@@ -464,13 +455,13 @@ void *retro_get_memory_data(unsigned id)
             switch(id)
             {
                 case RETRO_MEMORY_GAMEBOY_1_SRAM:
-                    return g_gb[0]->get_rom()->get_sram();
+                    return v_gb[id]->get_rom()->get_sram();
                 case RETRO_MEMORY_GAMEBOY_1_RTC:
-                    return &(render[0]->fixed_time);
+                    return &(render[id]->fixed_time);
                 case RETRO_MEMORY_GAMEBOY_2_SRAM:
-                    return g_gb[1]->get_rom()->get_sram();
+                    return v_gb[id]->get_rom()->get_sram();
                 case RETRO_MEMORY_GAMEBOY_2_RTC:
-                    return &(render[1]->fixed_time);
+                    return &(render[id]->fixed_time);
                 default:
                     break;
             }
@@ -489,15 +480,15 @@ size_t retro_get_memory_size(unsigned id)
             switch(id)
             {
                 case RETRO_MEMORY_SAVE_RAM:
-                    return g_gb[0]->get_rom()->get_sram_size();
+                    return v_gb[id]->get_rom()->get_sram_size();
                 case RETRO_MEMORY_RTC:
-                    return sizeof(render[0]->fixed_time);
+                    return sizeof(render[id]->fixed_time);
                 case RETRO_MEMORY_VIDEO_RAM:
-                    if (g_gb[0]->get_rom()->get_info()->gb_type >= 3)
+                    if (v_gb[id]->get_rom()->get_info()->gb_type >= 3)
                         return 0x2000*2; //sizeof(cpu::vram);
                     return 0x2000;
                 case RETRO_MEMORY_SYSTEM_RAM:
-                    if (g_gb[0]->get_rom()->get_info()->gb_type >= 3)
+                    if (v_gb[id]->get_rom()->get_info()->gb_type >= 3)
                         return 0x2000*4; //sizeof(cpu::ram);
                     return 0x2000;
                 default:
@@ -509,13 +500,13 @@ size_t retro_get_memory_size(unsigned id)
             switch(id)
             {
                 case RETRO_MEMORY_GAMEBOY_1_SRAM:
-                    return g_gb[0]->get_rom()->get_sram_size();
+                    return v_gb[id]->get_rom()->get_sram_size();
                 case RETRO_MEMORY_GAMEBOY_1_RTC:
-                    return sizeof(render[0]->fixed_time);
+                    return sizeof(render[id]->fixed_time);
                 case RETRO_MEMORY_GAMEBOY_2_SRAM:
-                    return g_gb[1]->get_rom()->get_sram_size();
+                    return v_gb[id]->get_rom()->get_sram_size();
                 case RETRO_MEMORY_GAMEBOY_2_RTC:
-                    return sizeof(render[1]->fixed_time);
+                    return sizeof(render[id]->fixed_time);
                 default:
                     break;
             }
@@ -534,10 +525,10 @@ size_t retro_serialize_size(void)
    {
       unsigned i;
 
-      for(i = 0; i < 2; ++i)
+      for(i = 0; i < v_gb.size(); ++i)
       {
-         if (g_gb[i])
-            _serialize_size[i] = g_gb[i]->get_state_size();
+         if (v_gb[i])
+            _serialize_size[i] = v_gb[i]->get_state_size();
       }
    }
    return _serialize_size[0] + _serialize_size[1];
@@ -550,11 +541,11 @@ bool retro_serialize(void *data, size_t size)
       unsigned i;
       uint8_t *ptr = (uint8_t*)data;
 
-      for(i = 0; i < 2; ++i)
+      for(i = 0; i < v_gb.size(); ++i)
       {
-         if (g_gb[i])
+         if (v_gb[i])
          {
-            g_gb[i]->save_state_mem(ptr);
+            v_gb[i]->save_state_mem(ptr);
             ptr += _serialize_size[i];
          }
       }
@@ -571,11 +562,11 @@ bool retro_unserialize(const void *data, size_t size)
       unsigned i;
       uint8_t *ptr = (uint8_t*)data;
 
-      for(i = 0; i < 2; ++i)
+      for(i = 0; i < v_gb.size(); ++i)
       {
-         if (g_gb[i])
+         if (v_gb[i])
          {
-            g_gb[i]->restore_state_mem(ptr);
+            v_gb[i]->restore_state_mem(ptr);
             ptr += _serialize_size[i];
          }
       }
@@ -584,14 +575,12 @@ bool retro_unserialize(const void *data, size_t size)
    return false;
 }
 
-
-
 void retro_cheat_reset(void)
 {
-   for(int i=0; i<2; ++i)
+   for(int i=0; i< v_gb.size(); ++i)
    {
-      if(g_gb[i])
-         g_gb[i]->get_cheat()->clear();
+      if(v_gb[i])
+         v_gb[i]->get_cheat()->clear();
    }
 }
 

@@ -25,6 +25,10 @@
 #include "gb_types.h"
 #include "renderer.h"
 #include "serializer.h"
+#include <vector>
+#include <queue>
+#include <map>
+
 
 #define INT_VBLANK 1
 #define INT_LCDC 2
@@ -40,6 +44,8 @@ class apu_snd;
 class rom;
 class mbc;
 class cheat;
+
+
 
 struct ext_hook{
 	byte (*send)(byte);
@@ -162,13 +168,27 @@ struct rom_info {
 	int gb_type;
 };
 
-class gb
+class link_target {
+	friend class gb; 
+
+public:
+	virtual byte seri_send(byte);
+};
+
+class gb : public link_target
 {
 friend class cpu;
+friend class link_target; 
+
 public:
 	gb(renderer *ref,bool b_lcd,bool b_apu);
 	~gb();
 
+	/*
+	byte seri_send(byte data) {
+		return this->get_cpu()->seri_send(data);
+	}
+	*/
 	cpu *get_cpu() { return m_cpu; }
 	lcd *get_lcd() { return m_lcd; }
 	apu *get_apu() { return m_apu; }
@@ -176,7 +196,7 @@ public:
 	mbc *get_mbc() { return m_mbc; }
 	renderer *get_renderer() { return m_renderer; }
 	cheat *get_cheat() { return m_cheat; }
-	gb *get_target() { return target; }
+	link_target* get_target() { return target; }
 	gb_regs *get_regs() { return &regs; }
 	gbc_regs *get_cregs() { return &c_regs; }
 
@@ -196,7 +216,8 @@ public:
 
 	void refresh_pal();
 
-	void set_target(gb *tar) { target=tar; }
+	void set_target(link_target* tar) { target = tar; }
+	byte seri_send(byte data);
 
 	void hook_extport(ext_hook *ext);
 	void unhook_extport();
@@ -207,11 +228,13 @@ private:
 	apu *m_apu;
 	rom *m_rom;
 	mbc *m_mbc;
+	
 	renderer *m_renderer;
 
 	cheat *m_cheat;
 
-	gb *target;
+	//gb* target;
+	link_target* target;
 
 	gb_regs regs;
 	gbc_regs c_regs;
@@ -457,6 +480,7 @@ public:
 	bool load_rom(byte *buf,int size,byte *ram,int ram_size, bool persistent);
 
 	void serialize(serializer &s);
+	void log_info(char* info);
 private:
 	rom_info info;
 
@@ -469,9 +493,197 @@ private:
    bool b_persistent;
 };
 
+
+enum dmg07_state
+{
+	PING_PHASE,
+	SYNC_PHASE,
+	TRANSMISSION_PHASE,
+};
+
+struct dmg07_speed_values {
+	int ping_speed;
+	int transmission_speed;
+};
+
+class link_master_device {
+public:
+	virtual void process();
+public:
+	int transfer_speed = 512 * 8;
+	int seri_occer = 2048 * 2048 * 2048;
+
+};
+
+class dmg07 : public link_master_device, public link_target{
+
+	friend class cpu;
+public:
+
+	dmg07(std::vector<gb*> g_gb);
+	
+	void process();
+	bool is_ready_to_process();
+
+	byte seri_send(byte);
+
+private:
+
+
+	void get_all_SC_reg_data();
+	void get_all_SB_reg_data();
+	bool is_expected_data(byte data);
+	bool all_IE_are_handled();
+
+
+	void handle_answer(int i, byte dat);
+	void restart_pingphase();
+	void log_traffic(byte id, byte b);
+
+	void send_byte(byte which, byte dat);
+	void broadcast_byte(byte dat);
+	void send_sync_bytes();
+	void send_each_ping_byte();
+	void send_ping_byte(byte which);
+
+	void fill_buffer_for_less_than_4p();
+	void clear_all_buffers();
+
+	void init_speed_map();
+
+
+	std::vector<gb*> v_gb;
+
+	dmg07_state current_state = PING_PHASE;
+
+	int transfer_count = 0;
+	int phase_byte_count = 0;
+
+	int last_trans_nr[4];
+	int restart_in = 0;
+	byte enter_status = 0x00;
+
+	byte packet_size = 0;
+	byte transfer_rate = 0x00;
+	
+	int first_aa_trans_nr = 0;
+	int sync_trans_nr = 0;
+
+	int delay = 0;
+	int buffer_start_point = 0;
+
+	int process_counter = 0;
+	int process_occer = 4;
+
+	bool ready_to_sync_master = false; 
+	bool master_is_synced = false;
+	bool ready_to_sync_others = false;
+	bool others_are_synced = false; 
+
+	byte in_data_buffer[4];
+
+	std::vector<byte> trans_buffer[4];
+	std::vector<byte> ans_buffer[4];
+	std::queue<byte> bytes_to_send;
+	std::map<char[18], dmg07_speed_values> speed_map;
+
+};
+
+enum tetris_4p_hack_state
+{
+	TITLE_SCREEN,
+	MUSIC_SELECT,
+	HEIGHT_SELECT,
+	IN_GAME,
+	WINNER_SCREEN,
+	START_NEXT
+};
+
+enum tetris_4p_hack_player_state
+{
+	IS_ALIVE,
+	IS_KO,
+	IS_SENDING_LINES,
+	IS_WINNER,
+	IS_LOOSER,
+	IS_IN_WINNER_SCREEN
+	
+};
+
+struct tetris_4p_hack_lines_packet {
+	byte lines;
+	int from;
+};
+
+class tetris_4p_hack : public link_master_device {
+
+	friend class cpu;
+	public:
+
+	tetris_4p_hack(std::vector<gb*> g_gb);
+
+	void process();
+	bool is_ready_to_process();
+
+	private:
+	void log_traffic(byte id, byte b);
+	void init_send_data_queue();
+
+	void generate_height_blocks();
+	void generate_falling_blocks();
+
+	void get_all_SC_reg_data();
+	void get_all_SB_reg_data();
+	bool is_expected_data(byte data);
+	bool all_IE_are_handled();
+
+	void broadcast_byte(byte data);
+	void send_byte(byte which, byte data);
+
+	void send_ingame_bytes();
+	void handle_ingame_data();
+	void update_ingame_states();
+	int check_winner_id();
+	bool all_are_in_winnerscreen();
+	void reset(); 
+
+	byte in_data_buffer[4];
+	std::vector<gb*> v_gb;
+	std::queue<byte> out_height_blocks_queue;
+	std::queue<byte> out_falling_blocks_queue;
+	std::queue<byte> send_data_queue;
+	std::queue<tetris_4p_hack_lines_packet> lines_queue;
+
+	byte falling_block_choice[10] = {
+		0x00,
+		0x04,	
+		0x04,
+		0x08,	
+		0x08,
+		0x0c,
+		0x0c,
+		0x10,
+		0x14,
+		0x18
+	};
+
+	tetris_4p_hack_state tetris_state = TITLE_SCREEN;
+	tetris_4p_hack_player_state players_state[4]; 
+	byte current_max_height = 0;
+	int lines_from_player_id = 0;
+	byte lines_to_send[4] = { 0,0,0,0 };
+	byte next_bytes_to_send[4] = { 0,0,0,0 };
+	int process_counter = 0;
+	int process_occer = 5;
+};
+
+
+
 class cpu
 {
 friend class gb;
+friend class dmg07;
+friend class tetris_4p_hack;
 public:
 	cpu(gb *ref);
 	~cpu();
@@ -511,6 +723,12 @@ public:
 	void restore_state_ex(int *dat);
 
 	void serialize(serializer &s);
+
+	void set_is_seri_master(bool enable);
+	void log_link_traffic(byte a, byte b);
+
+	byte net_id = 0x00;
+
 private:
 	byte inline io_read(word adr);
 	void inline io_write(word adr,byte dat);
@@ -537,7 +755,7 @@ private:
 	dword rp_que[256];
 	int que_cur;
 //	word org_pal[16][4];
-	int total_clock,rest_clock,sys_clock,seri_occer,div_clock;
+	int total_clock, rest_clock, sys_clock, seri_occer, div_clock;
 	bool halt,speed,speed_change,dma_executing;
 	bool b_trace;
 	int dma_src;
@@ -553,4 +771,11 @@ private:
 	byte *dma_dest_bank;
 
 	byte _ff6c,_ff72,_ff73,_ff74,_ff75;
+
+	dmg07* m_dmg07 = NULL;
+	tetris_4p_hack* tetris_hack = NULL; 
+	int clocks_since_last_serial = 0;
+	bool is_clock_giver = false; 
+	
+
 };

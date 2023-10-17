@@ -103,6 +103,11 @@ void gb::unhook_extport()
 	hook_ext=false;
 }
 
+byte gb::seri_send(byte data)
+{
+	return get_cpu()->seri_send(data);
+}
+
 void gb::set_skip(int frame)
 {
 	skip_buf=frame;
@@ -305,6 +310,7 @@ void gb::refresh_pal()
 	for (int i=0;i<64;i++)
 		m_lcd->get_mapped_pal(i>>2)[i&3]=m_renderer->map_color(m_lcd->get_pal(i>>2)[i&3]);
 }
+
 
 void gb::run()
 {
