@@ -1,30 +1,34 @@
-MultiTGB is an open source (GPLv2) GB/GBC emulator with 4-player-adapter (dmg07) link cable support.
+## DoubleCherryGB
 
-This is a fork of the TGB Dual libreto port.
-
-At the moment only Yoshi's Cookie is playable with 4 players.
-I'm looking for help to get more games working.
-
-Thanks to Shonumi for doing the research, documentation and inspiration for this project.
-https://shonumi.github.io/index.html
-
-You can emulate up to 4 Gameboy via split screen (change in the core-options):
-- real multiplayer 4 player adapter emulation (only Yoshi’s cookie working)
-- 2x 2-player link cable
-- simultaneous 4 Single-Player without link-cable Emulation (Speedrun challenge ;D )
-
-Goals:
-- get DMG07-Emulation right so that every multiplayer game is working
-- if that the case, create a GB Studio template to create new games with 4 Player Support
-- create or find someone to create a 4-Player shader like the GB2Player Duimon Mega Bezel
-- improve performance (multithreading) and clean the code
-- get netplay working and testing
-- maybe more Pokémon-feature...
-
-If you are a geek like me and want to buy me a coffee ;)
-https://www.paypal.com/paypalme/geeklikeme
+![](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2Fba5a6352-f757-4285-9482-a4f5c7fd591e%2Ff501d4ae-dea2-4d8f-ab4a-acb7b4ed4b5b%2F606a425b-bb48-46b2-a778-2a9c25353a0c_variated.png?table=block&id=a3fd7ecc-2c31-44b5-9739-28f3e196ce9e&spaceId=ba5a6352-f757-4285-9482-a4f5c7fd591e&width=250&userId=aee64779-d116-4477-811e-34382ae0f601&cache=v2)
 
 
+author: Tim Oelrichs        
+website: [timoelrichs.is-a.dev](https://timoelrichs.is-a.dev)
+
+DoubleCherryGB is an open source (GPLv2) GB/GBC emulator with 4 Player support, based on the TGBDual libretro core by GIGO and Hii.
+
+It emulates the GAMEBOY 4 PLAYER ADAPTER (DMG-07) and also adds 4 Player Link Hacks.
+
+See my [website](https://timoelrichs.is-a.dev) for more information and compatibility list.
+
+### Features
+
+- DMG-07 Emulation
+- Tetris 4Player Hack
+
+Currently only for local multiplayer. I want to support netplay in a future release.
+
+### How to
+
+Download the core from the github release page. 
+This is an early pre-alpha. I want to add the core to the official Libretro infrastructure soon.
+
+To emulate up to four units, use the core options in your frontend.  
+
+Thanks to
+- Shonumi for doing the research, documentation and inspiration for this project https://shonumi.github.io/index.html
+- GIGO and Hii for making TGBDual
 
 Original sources from
 https://github.com/libretro/tgbdual-libretro
@@ -32,3 +36,4 @@ http://gigo.retrogames.com/download.html#tgb-dual
 http://shinh.skr.jp/tgbdualsdl/
 
 
+![](https://file.notion.so/f/f/ba5a6352-f757-4285-9482-a4f5c7fd591e/0e2787f8-1238-4d06-baab-b0e070fe4672/Faceball_2000_(USA)-231010-213235.png?id=9aced095-97c3-45bb-a662-3927eed694cb&table=block&spaceId=ba5a6352-f757-4285-9482-a4f5c7fd591e&expirationTimestamp=1697637600000&signature=wJoAtGYIKBx4dqRPrpEBFJoeN3kphdDQWnVb_o-T6dc&downloadName=Faceball+2000+%28USA%29-231010-213235.png)

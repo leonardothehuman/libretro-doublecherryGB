@@ -2,9 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\gb_core",
-    "\\jni",
-    "\\libretro"
+    "\\libretro\\inline",
+    "\\release\\info"
   ],
-  "SelectedNode": "\\gb_core\\dmg07.cpp",
+  "SelectedNode": "\\README",
   "PreviewInSolutionExplorer": false
 }
