@@ -1,3 +1,25 @@
+/*--------------------------------------------------
+
+   DoubleCherryGB - Gameboy Emulator - 4Players (based on TGBDual)
+  Copyright (C) 2023  Tim Oelrichs
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License
+   as published by the Free Software Foundation; either version 2
+   of the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
+
+//-------------------------------------------------
+
 
 #include "gb.h"
 #include <vector>
@@ -140,9 +162,21 @@ void dmg07::handle_answer(int i, byte dat)
 					transfer_rate = dat;
 					
 					/* Hack to get my assumed ping speedrate*/
-					char ping_speed_multiplayer = dat & 0x0F;
-					if(ping_speed_multiplayer)
-						transfer_speed = 512 * ping_speed_multiplayer;
+					if (dat == 0xF0)  // Janshiro Games
+						transfer_speed = 5928 * 3;
+					else if (dat == 0xA0)	// Jinsei Game Densetsz
+						transfer_speed = 5928 * 4;
+					else {
+						char ping_speed_multiplayer = dat & 0x0F;
+						if (ping_speed_multiplayer)
+						{
+							if (ping_speed_multiplayer == 1 || ping_speed_multiplayer == 0)
+								transfer_speed = 512 * 16;
+							else
+								transfer_speed = 512 * ping_speed_multiplayer;
+						}
+					}
+						
 				
 					
 					/*
@@ -295,7 +329,9 @@ void dmg07::send_sync_bytes()
 	
 	if (!master_is_synced)
 	{	
-		transfer_speed = 70216;
+		if (transfer_rate != 0xA0)	// Jinsei Game Densetsi speed Hack
+			transfer_speed = 70216;
+
 		broadcast_byte(0xCC);
 		master_is_synced = transfer_count % 4 == 3;
 		return;
@@ -316,9 +352,15 @@ void dmg07::send_sync_bytes()
 		11 = 5928 * 4
 		*/
 	
-		byte speed_multiplier = ((transfer_rate & 0x80) >> 7) | ((transfer_rate & 0x40) >> 5);
-
-		transfer_speed = 5928 * ((int)speed_multiplier + 1);
+		if (transfer_rate == 0xF0)  //Janshiro Games
+			transfer_speed = 5928 * 3;
+		else if (transfer_rate == 0xA0)	// Jinsei Game Densetsi
+			transfer_speed = 5928 * 4;
+		else {
+			byte speed_multiplier = ((transfer_rate & 0x80) >> 7) | ((transfer_rate & 0x40) >> 5);
+			transfer_speed = 5928 * ((int)speed_multiplier + 1);
+		}
+	
 		/*
 		v_gb[0]->get_regs()->SC = transfer_rate;
 		v_gb[0]->get_cpu()->seri_occer = seri_occer = 0x7fffffff;

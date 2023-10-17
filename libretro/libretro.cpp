@@ -23,11 +23,11 @@ static void check_variables(void);
 
 void retro_get_system_info(struct retro_system_info *info)
 {
-   info->library_name     = "Multi TGB";
+   info->library_name     = "DoubleCherryGB";
 #ifndef GIT_VERSION
 #define GIT_VERSION ""
 #endif
-   info->library_version  = "v0.8.3" GIT_VERSION;
+   info->library_version  = "v0.1.0" GIT_VERSION;
    info->need_fullpath    = false;
    info->valid_extensions = "gb|dmg|gbc|cgb|sgb";
 }
