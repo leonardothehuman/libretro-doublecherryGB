@@ -1,7 +1,8 @@
 ## DoubleCherryGB
 
-![](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2Fba5a6352-f757-4285-9482-a4f5c7fd591e%2Ff501d4ae-dea2-4d8f-ab4a-acb7b4ed4b5b%2F606a425b-bb48-46b2-a778-2a9c25353a0c_variated.png?table=block&id=a3fd7ecc-2c31-44b5-9739-28f3e196ce9e&spaceId=ba5a6352-f757-4285-9482-a4f5c7fd591e&width=250&userId=aee64779-d116-4477-811e-34382ae0f601&cache=v2)
+![](/screenshots/logo.png)
 
+![](/screenshots/F-1%20Race.png)
 
 author: Tim Oelrichs        
 website: [timoelrichs.is-a.dev](https://timoelrichs.is-a.dev)
@@ -27,8 +28,8 @@ This is an early pre-alpha. I want to add the core to the official Libretro infr
 To emulate up to four units, use the core options in your frontend.  
 
 Thanks to
-- Shonumi for doing the research, documentation and inspiration for this project https://shonumi.github.io/index.html
-- GIGO and Hii for making TGBDual
+- Shonumi for doing the research and documentation on the dmg-07  https://shonumi.github.io/index.html
+- GIGO and Hii for making TGBDual and zhe libretro port
 
 Original sources from
 https://github.com/libretro/tgbdual-libretro
@@ -36,4 +37,5 @@ http://gigo.retrogames.com/download.html#tgb-dual
 http://shinh.skr.jp/tgbdualsdl/
 
 
-![](https://file.notion.so/f/f/ba5a6352-f757-4285-9482-a4f5c7fd591e/0e2787f8-1238-4d06-baab-b0e070fe4672/Faceball_2000_(USA)-231010-213235.png?id=9aced095-97c3-45bb-a662-3927eed694cb&table=block&spaceId=ba5a6352-f757-4285-9482-a4f5c7fd591e&expirationTimestamp=1697637600000&signature=wJoAtGYIKBx4dqRPrpEBFJoeN3kphdDQWnVb_o-T6dc&downloadName=Faceball+2000+%28USA%29-231010-213235.png)
+![](/screenshots/Faceball%202000.png)
+![](/screenshots/Tetris.png.png)
