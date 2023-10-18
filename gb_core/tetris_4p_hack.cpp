@@ -46,6 +46,31 @@ tetris_4p_hack::tetris_4p_hack(std::vector<gb*> g_gb) {
 	init_send_data_queue();
 }
 
+void tetris_4p_hack::clear_data_for_next_round()
+{
+	for (size_t i = 0; i < v_gb.size(); i++)
+	{
+		players_state[i] = IS_ALIVE;
+		cpu* cpu = v_gb[i]->get_cpu();
+		in_data_buffer[i] = 0;
+		next_bytes_to_send[i] = 0;
+	}
+}
+
+void tetris_4p_hack::reset()
+{
+
+	tetris_state = TITLE_SCREEN;
+
+	this->seri_occer = 4096 * 1024 * 4;
+	this->transfer_speed = 4096 * 1024 / 16;
+
+	clear_data_for_next_round();
+	send_data_queue = std::queue<byte>();
+	init_send_data_queue();
+}
+
+
 void tetris_4p_hack::init_send_data_queue() {
 
 	//send_data_queue.push(0x29);   //start connection
@@ -85,18 +110,6 @@ void tetris_4p_hack::init_send_data_queue() {
 	send_data_queue.push(0x29);   //start sending height blocks
 }
 
-void tetris_4p_hack::reset() {
-
-	for (size_t i = 0; i < v_gb.size(); i++)
-	{
-		players_state[i] = IS_ALIVE;
-		in_data_buffer[i] = 0;
-		next_bytes_to_send[i] = 0;
-	}
-	while (!lines_queue.empty()) lines_queue.pop();
-
-	
-}
 
 void tetris_4p_hack::log_traffic(byte id, byte b)
 {
@@ -255,7 +268,7 @@ void tetris_4p_hack::process() {
 		send_data_queue.push(0x79);    
 		//send_data_queue.push(0x29);   //start sending height blocks
 
-		reset();
+		clear_data_for_next_round();
 		tetris_state = START_NEXT;
 
 		break;

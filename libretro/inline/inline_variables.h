@@ -8,7 +8,6 @@
 
 static const struct retro_variable vars_single[] = {
     { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4" },
-    { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
     { NULL, NULL },
 };
 
@@ -80,7 +79,7 @@ enum mode {
     MODE_DUAL_GAME
 };
 
-static enum mode mode = MODE_SINGLE_GAME_DUAL;
+static enum mode mode = MODE_SINGLE_GAME;
 
 
 std::vector<gb*> v_gb;
@@ -99,10 +98,10 @@ retro_environment_t environ_cb;
 retro_input_poll_t input_poll_cb;
 retro_input_state_t input_state_cb;
 
-bool _screen_vertical;
-bool _screen_4p_split;
-bool _screen_switched;
-int _show_player_screens;
+bool _screen_vertical = false;
+bool _screen_4p_split = false;
+bool _screen_switched = false;
+int _show_player_screens = 1;
 static size_t _serialize_size[4] = { 0, 0,0,0 };
 
 bool gblink_enable = false;

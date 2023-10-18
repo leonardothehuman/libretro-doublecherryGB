@@ -509,6 +509,7 @@ struct dmg07_speed_values {
 class link_master_device {
 public:
 	virtual void process();
+	virtual void reset();
 public:
 	int transfer_speed = 512 * 8;
 	int seri_occer = 2048 * 2048 * 2048;
@@ -524,7 +525,7 @@ public:
 	
 	void process();
 	bool is_ready_to_process();
-
+	void reset();
 	byte seri_send(byte);
 
 private:
@@ -548,8 +549,6 @@ private:
 
 	void fill_buffer_for_less_than_4p();
 	void clear_all_buffers();
-
-	void init_speed_map();
 
 
 	std::vector<gb*> v_gb;
@@ -585,7 +584,6 @@ private:
 	std::vector<byte> trans_buffer[4];
 	std::vector<byte> ans_buffer[4];
 	std::queue<byte> bytes_to_send;
-	std::map<char[18], dmg07_speed_values> speed_map;
 
 };
 
@@ -624,10 +622,12 @@ class tetris_4p_hack : public link_master_device {
 
 	void process();
 	bool is_ready_to_process();
+	void reset();
 
 	private:
 	void log_traffic(byte id, byte b);
 	void init_send_data_queue();
+	void clear_data_for_next_round();
 
 	void generate_height_blocks();
 	void generate_falling_blocks();
@@ -645,7 +645,7 @@ class tetris_4p_hack : public link_master_device {
 	void update_ingame_states();
 	int check_winner_id();
 	bool all_are_in_winnerscreen();
-	void reset(); 
+
 
 	byte in_data_buffer[4];
 	std::vector<gb*> v_gb;

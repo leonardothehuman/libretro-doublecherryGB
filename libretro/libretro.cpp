@@ -59,7 +59,6 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    
    info->timing.fps            = 4194304.0 / 70224.0;
    info->timing.sample_rate    = 44100.0f;
-
    info->geometry.base_width   = w;
    info->geometry.base_height  = h;
    info->geometry.aspect_ratio = float(w) / float(h);
@@ -186,11 +185,11 @@ bool retro_load_game(const struct retro_game_info* info)
     }
 
 
-    for (i = 0; i < emulated_gbs; i++)
+    for (i = 0; i < v_gb.size(); i++)
         _serialize_size[i] = 0;
 
-    size_t* save_size;
-   char* save_file[2];
+   // size_t* save_size;
+  // char* save_file[2];
   // save_file[0] = read_file_to_buffer("C:\\Users\\TimZen\\Downloads\\RetroArch\\RetroArch-Win64\\saves\\Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size);
    //save_file[1] = read_file_to_buffer("C:\\Users\\TimZen\\Downloads\\RetroArch\\RetroArch-Win64\\saves\\Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size);
  //  save_file[1] = read_file_to_buffer("..//saves//Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size[1]);
@@ -199,8 +198,9 @@ bool retro_load_game(const struct retro_game_info* info)
        auto_config_4p_hack(rom_data);
 
    // load roms
-   for (byte i = 0; i < emulated_gbs; i++)
+   for (byte i = 0; i < v_gb.size(); i++)
    {
+       /*
        //if (!save_file[i])
        if (false)
        {
@@ -208,7 +208,7 @@ bool retro_load_game(const struct retro_game_info* info)
                libretro_supports_persistent_buffer))
                return false;
        }
-       else
+       else*/
        {
            if (!v_gb[i]->load_rom(rom_data, rom_size, NULL, 0,
                libretro_supports_persistent_buffer))
@@ -270,9 +270,9 @@ bool retro_load_game(const struct retro_game_info* info)
 bool retro_load_game_special(unsigned type, const struct retro_game_info *info, size_t num_info)
 {
 
-    
+    /*
     if (type != RETRO_GAME_TYPE_GAMEBOY_LINK_2P)
-        return false; /* all other types are unhandled for now */
+        return false; // all other types are unhandled for now 
 
 
     // implement for 3 - 4 Player
@@ -345,6 +345,7 @@ bool retro_load_game_special(unsigned type, const struct retro_game_info *info, 
    mode = MODE_DUAL_GAME;
    return true;
 
+   */
    
 }
 
@@ -370,8 +371,9 @@ void retro_reset(void)
    for(int i = 0; i < v_gb.size(); ++i)
    {
       if (v_gb[i])
-         v_gb[i]->reset();
+         v_gb[i]->reset(); 
    }
+   if (master_link) master_link->reset();
 }
 
 void retro_run(void)
@@ -386,7 +388,7 @@ void retro_run(void)
     
    for (int line = 0; line < 154; line++)
    {
-       for (int i = 0; i < emulated_gbs; i++)
+       for (int i = 0; i < v_gb.size(); i++)
        {
            v_gb[i]->run();
        }
@@ -523,8 +525,11 @@ size_t retro_serialize_size(void)
 {
    if (!(_serialize_size[0] + _serialize_size[1]))
    {
-      unsigned i;
+       _serialize_size[0] = v_gb[0]->get_state_size();
+       _serialize_size[1] = v_gb[0]->get_state_size();
 
+      unsigned i;
+     
       for(i = 0; i < v_gb.size(); ++i)
       {
          if (v_gb[i])

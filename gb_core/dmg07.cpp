@@ -41,6 +41,45 @@ dmg07::dmg07(std::vector<gb*> g_gb) {
 
 }
 
+void dmg07::reset() 
+{
+	current_state = PING_PHASE;
+	transfer_count = 0;
+	phase_byte_count = 0;
+
+	restart_in = 0;
+	enter_status = 0x00;
+
+	packet_size = 0;
+	transfer_rate = 0x00;
+	transfer_speed = 512 * 8;
+
+	first_aa_trans_nr = 0;
+	sync_trans_nr = 0;
+
+	delay = 0;
+	buffer_start_point = 0;
+
+	process_counter = 0;
+	process_occer = 4;
+
+	ready_to_sync_master = false;
+	master_is_synced = false;
+	ready_to_sync_others = false;
+	others_are_synced = false;
+
+	bytes_to_send = std::queue<byte>();
+
+	for (byte i = 0; i < dmg07::v_gb.size(); i++)
+	{
+		in_data_buffer[i] = 0;
+		trans_buffer[i].clear();
+		ans_buffer[i].clear();
+		last_trans_nr[i] = 0;
+		last_trans_nr[i] = 0;
+	}
+}
+
 void dmg07::log_traffic(byte id, byte b)
 {
 	if (logging_allowed)
@@ -70,7 +109,7 @@ void dmg07::restart_pingphase()
 	enter_status = 0x00;
 	packet_size = 0;
 	transfer_rate = 0x00;
-	transfer_speed = 70220 / 2;
+	//transfer_speed = 70220 / 2;
 	//seri_occer = 2042 * 16;
 	phase_byte_count = 0;
 	delay = 0;

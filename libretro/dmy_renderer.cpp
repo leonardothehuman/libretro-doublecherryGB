@@ -110,7 +110,7 @@ void dmy_renderer::refresh() {
    static int16_t stream[SAMPLES_PER_FRAME*2];
 
    //if (v_gb[1] && gblink_enable)
-    if (v_gb[1])
+    if (v_gb.size() > 1)
    {
       // if dual gb mode
       if (audio_2p_mode == 2)

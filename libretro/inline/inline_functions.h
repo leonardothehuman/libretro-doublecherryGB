@@ -74,7 +74,10 @@ static void check_variables(void)
         //int old_value = emulated_gbs; 
         if (!already_checked_options) { // only apply this setting on init
             if (!strcmp(var.value, "1"))
+            {
                 emulated_gbs = 1;
+                mode = MODE_SINGLE_GAME;
+            }
             else if (!strcmp(var.value, "2"))
                 emulated_gbs = 2;
             else if (!strcmp(var.value, "3"))
@@ -113,20 +116,7 @@ static void check_variables(void)
     }
 
 
-    // check whether link cable mode is enabled
-    var.key = "tgbdual_gblink_enable";
-    var.value = NULL;
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        if (!already_checked_options) { // only apply this setting on init
-            if (!strcmp(var.value, "disabled"))
-                gblink_enable = false;
-            else if (!strcmp(var.value, "enabled"))
-                gblink_enable = true;
-        }
-    }
-    else
-        gblink_enable = false;
+  
 
 
     if (emulated_gbs == 2)
@@ -175,90 +165,121 @@ static void check_variables(void)
     }
 
     // check whether screen placement is horz (side-by-side) or vert
-    var.key = "tgbdual_screen_placement";
-    var.value = NULL;
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    if (emulated_gbs > 1)
     {
-        if (!strcmp(var.value, "left-right"))
+        // check whether link cable mode is enabled
+        var.key = "tgbdual_gblink_enable";
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
-            _screen_vertical = false;
-            _screen_4p_split = false;
+            if (!already_checked_options) { // only apply this setting on init
+                if (!strcmp(var.value, "disabled"))
+                    gblink_enable = false;
+                else if (!strcmp(var.value, "enabled"))
+                    gblink_enable = true;
+            }
         }
-        else if (!strcmp(var.value, "top-down"))
-        {
-            _screen_vertical = true;
-            _screen_4p_split = false;
-        }
-        else if (!strcmp(var.value, "4-Player Splitscreen"))
-        {
-            _screen_vertical = false;
-            _screen_4p_split = true;
-        }
-    }
-    else
-        _screen_vertical = false;
-
-    // check whether player 1 and 2's screen placements are swapped
-    var.key = "tgbdual_switch_screens";
-    var.value = NULL;
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        if (!strcmp(var.value, "normal"))
-            _screen_switched = false;
-        else if (!strcmp(var.value, "switched"))
-            _screen_switched = true;
-    }
-    else
-        _screen_switched = false;
-
-    // check whether to show both players' screens, p1 only, or p2 only
-    var.key = "tgbdual_single_screen_mp";
-    var.value = NULL;
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        if (!strcmp(var.value, "both players"))
-            _show_player_screens = 2;
-        else if (!strcmp(var.value, "player 1 only"))
-            _show_player_screens = 0;
-        else if (!strcmp(var.value, "player 2 only"))
-            _show_player_screens = 1;
-    }
-    else
-        _show_player_screens = 2;
-
-
-    int screenw = 160, screenh = 144;
-
-    if (_screen_4p_split) {
-        screenw *= 2;
-        screenh *= 2;
-    }
-    else if (emulated_gbs > 1 && _show_player_screens == 2)
-    {
-        if (_screen_vertical)
-            screenh *= emulated_gbs;
         else
-            screenw *= emulated_gbs;
+            gblink_enable = false;
+
+        var.key = "tgbdual_screen_placement";
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+        {
+            if (!strcmp(var.value, "left-right"))
+            {
+                _screen_vertical = false;
+                _screen_4p_split = false;
+            }
+            else if (!strcmp(var.value, "top-down"))
+            {
+                _screen_vertical = true;
+                _screen_4p_split = false;
+            }
+            else if (!strcmp(var.value, "4-Player Splitscreen"))
+            {
+                _screen_vertical = false;
+                _screen_4p_split = true;
+            }
+        }
+        else
+            _screen_vertical = false;
+
+        // check whether player 1 and 2's screen placements are swapped
+        var.key = "tgbdual_switch_screens";
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+        {
+            if (!strcmp(var.value, "normal"))
+                _screen_switched = false;
+            else if (!strcmp(var.value, "switched"))
+                _screen_switched = true;
+        }
+        else
+            _screen_switched = false;
+
+        // check whether to show both players' screens, p1 only, or p2 only
+        var.key = "tgbdual_single_screen_mp";
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+        {
+            if (!strcmp(var.value, "both players"))
+                _show_player_screens = 2;
+            else if (!strcmp(var.value, "player 1 only"))
+                _show_player_screens = 0;
+            else if (!strcmp(var.value, "player 2 only"))
+                _show_player_screens = 1;
+        }
+        else
+            _show_player_screens = 2;
+
+
+        int screenw = 160, screenh = 144;
+
+        if (_screen_4p_split) {
+            screenw *= 2;
+            screenh *= 2;
+        }
+        else if (emulated_gbs > 1 && _show_player_screens == 2)
+        {
+            if (_screen_vertical)
+                screenh *= emulated_gbs;
+            else
+                screenw *= emulated_gbs;
+        }
+
+
+        my_av_info->geometry.base_width = screenw;
+        my_av_info->geometry.base_height = screenh;
+        my_av_info->geometry.aspect_ratio = float(screenw) / float(screenh);
+
+        already_checked_options = true;
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, my_av_info);
+
+
+        // check whether player 1 and 2's screen placements are swapped
+        var.key = "tgbdual_audio_output";
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+        {
+            if (!strcmp(var.value, "Game Boy #1"))
+                audio_2p_mode = 0;
+            else if (!strcmp(var.value, "Game Boy #2"))
+                audio_2p_mode = 1;
+        }
+        else
+            _screen_switched = false;
+
     }
+    else {
 
+        int screenw = 160, screenh = 144;
 
-    my_av_info->geometry.base_width = screenw;
-    my_av_info->geometry.base_height = screenh;
-    my_av_info->geometry.aspect_ratio = float(screenw) / float(screenh);
+        my_av_info->geometry.base_width = screenw;
+        my_av_info->geometry.base_height = screenh;
+        my_av_info->geometry.aspect_ratio = float(screenw) / float(screenh);
 
-    already_checked_options = true;
-    environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, my_av_info);
-
-    // check whether player 1 and 2's screen placements are swapped
-    var.key = "tgbdual_audio_output";
-    var.value = NULL;
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        if (!strcmp(var.value, "Game Boy #1"))
-            audio_2p_mode = 0;
-        else if (!strcmp(var.value, "Game Boy #2"))
-            audio_2p_mode = 1;
+        already_checked_options = true;
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, my_av_info);
     }
-    else
-        _screen_switched = false;
 }
