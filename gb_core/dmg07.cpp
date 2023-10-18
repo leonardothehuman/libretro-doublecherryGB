@@ -53,6 +53,7 @@ void dmg07::reset()
 	packet_size = 0;
 	transfer_rate = 0x00;
 	transfer_speed = 512 * 8;
+	seri_occer = 2048 * 2048;
 
 	first_aa_trans_nr = 0;
 	sync_trans_nr = 0;
