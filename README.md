@@ -1,6 +1,6 @@
 ## DoubleCherryGB
 
-<img align="left" src="/screenshots/logo.png" height="250">
+<img src="/screenshots/logo.png" height="250">
 
 
 
@@ -22,7 +22,7 @@ Check my [website](https://timoelrichs.is-a.dev) for more information, planned f
 - DMG-07 Emulation
 - Tetris 4Player Hack
 
-Currently only for local multiplayer. I want to support netplay in a future release.
+Netplay is now working. Make sure to have all the same amount of emulated gameboys in your core-config.
 
 ![](/screenshots/F-1%20Race.png)
 
