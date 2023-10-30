@@ -20,6 +20,20 @@
 //--------------------------------------------------
 // GB クラス定義部,その他
 
+#include "../Third-Party/cereal/archives/binary.hpp"
+#include "../Third-Party/cereal/types/array.hpp"
+#include "../Third-Party/cereal/types/vector.hpp"
+#include "../Third-Party/cereal/types/queue.hpp"
+#include <sstream>
+
+#include <vector>
+#include <array>
+#include <queue>
+#include <deque>
+
+#include <iostream>
+
+
 #include <list>
 
 #include "gb_types.h"
@@ -510,13 +524,90 @@ class link_master_device {
 public:
 	virtual void process();
 	virtual void reset();
+	virtual void save_mem_state(void* buf);
+	virtual void restore_mem_state(void* buf);
+	virtual size_t get_state_size();
 public:
 	int transfer_speed = 512 * 8;
 	int seri_occer = 2048 * 2048 * 2048;
 
 };
 
-class dmg07 : public link_master_device, public link_target{
+struct dmg07_mem_state {
+
+	dmg07_state current_state = PING_PHASE;
+
+	int transfer_speed = 512 * 8;
+	int seri_occer = 2048 * 2048 * 2048;
+
+	int transfer_count = 0;
+	int phase_byte_count = 0;
+
+	int last_trans_nr[4];
+	int restart_in = 0;
+	byte enter_status = 0x00;
+
+	byte packet_size = 0;
+	byte transfer_rate = 0x00;
+
+	int first_aa_trans_nr = 0;
+	int sync_trans_nr = 0;
+
+	int delay = 0;
+	bool ready_to_sync_master = false;
+	bool master_is_synced = false;
+	
+
+	byte in_data_buffer[4];
+
+	std::vector<byte> trans_buffer[4];
+	std::vector<byte> ans_buffer[4];
+	std::queue<byte> bytes_to_send;
+
+
+
+	// This method lets cereal know which data members to serialize
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			current_state,
+			transfer_speed,
+			seri_occer,
+			transfer_count,
+			phase_byte_count,
+			restart_in,
+			enter_status,
+			packet_size,
+			transfer_rate,
+			first_aa_trans_nr,
+			sync_trans_nr,
+			delay,
+			ready_to_sync_master,
+			master_is_synced,
+			in_data_buffer,
+			trans_buffer,
+			ans_buffer,
+			bytes_to_send
+		); // serialize things by passing them to the archive
+	}
+
+
+};
+
+struct dmg07_mem_state_size {
+	size_t size;
+	// This method lets cereal know which data members to serialize
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			size
+		); // serialize things by passing them to the archive
+	}
+
+};
+class dmg07 : public link_master_device{
 
 	friend class cpu;
 public:
@@ -526,16 +617,17 @@ public:
 	void process();
 	bool is_ready_to_process();
 	void reset();
-	byte seri_send(byte);
+	void save_mem_state(void* buf);
+	void restore_mem_state(void* buf);
+	size_t get_state_size();
+	void log_save_state(char* data, size_t size);
 
 private:
-
 
 	void get_all_SC_reg_data();
 	void get_all_SB_reg_data();
 	bool is_expected_data(byte data);
 	bool all_IE_are_handled();
-
 
 	void handle_answer(int i, byte dat);
 	void restart_pingphase();
@@ -551,40 +643,9 @@ private:
 	void clear_all_buffers();
 
 
+
 	std::vector<gb*> v_gb;
-
-	dmg07_state current_state = PING_PHASE;
-
-	int transfer_count = 0;
-	int phase_byte_count = 0;
-
-	int last_trans_nr[4];
-	int restart_in = 0;
-	byte enter_status = 0x00;
-
-	byte packet_size = 0;
-	byte transfer_rate = 0x00;
-	
-	int first_aa_trans_nr = 0;
-	int sync_trans_nr = 0;
-
-	int delay = 0;
-	int buffer_start_point = 0;
-
-	int process_counter = 0;
-	int process_occer = 4;
-
-	bool ready_to_sync_master = false; 
-	bool master_is_synced = false;
-	bool ready_to_sync_others = false;
-	bool others_are_synced = false; 
-
-	byte in_data_buffer[4];
-
-	std::vector<byte> trans_buffer[4];
-	std::vector<byte> ans_buffer[4];
-	std::queue<byte> bytes_to_send;
-
+	dmg07_mem_state mem{};
 };
 
 enum tetris_4p_hack_state
@@ -611,6 +672,74 @@ enum tetris_4p_hack_player_state
 struct tetris_4p_hack_lines_packet {
 	byte lines;
 	int from;
+
+	// This method lets cereal know which data members to serialize
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			lines,
+			from
+		); // serialize things by passing them to the archive
+	}
+
+};
+
+struct tetris_4p_hack_mem_state {
+
+	int transfer_speed = 512 * 8;
+	int seri_occer = 2048 * 2048 * 2048;
+
+	byte in_data_buffer[4];
+	std::queue<byte> out_height_blocks_queue;
+	std::queue<byte> out_falling_blocks_queue;
+	std::queue<byte> send_data_queue;
+	std::queue<tetris_4p_hack_lines_packet> lines_queue;
+
+	byte falling_block_choice[10] = {
+		0x00,
+		0x04,
+		0x04,
+		0x08,
+		0x08,
+		0x0c,
+		0x0c,
+		0x10,
+		0x14,
+		0x18
+	};
+
+	tetris_4p_hack_state tetris_state = TITLE_SCREEN;
+	tetris_4p_hack_player_state players_state[4];
+	byte current_max_height = 0;
+	int lines_from_player_id = 0;
+	byte lines_to_send[4] = { 0,0,0,0 };
+	byte next_bytes_to_send[4] = { 0,0,0,0 };
+	int process_counter = 0;
+	int process_occer = 5;
+
+	// This method lets cereal know which data members to serialize
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			in_data_buffer,
+			out_height_blocks_queue,
+			out_falling_blocks_queue,
+			send_data_queue,
+			lines_queue,
+			falling_block_choice,
+			tetris_state,
+			players_state,
+			current_max_height,
+			lines_from_player_id,
+			lines_to_send,
+			next_bytes_to_send,
+			process_counter,
+			process_occer
+		); // serialize things by passing them to the archive
+	}
+
 };
 
 class tetris_4p_hack : public link_master_device {
@@ -623,6 +752,9 @@ class tetris_4p_hack : public link_master_device {
 	void process();
 	bool is_ready_to_process();
 	void reset();
+	void save_mem_state(void* buf);
+	void restore_mem_state(void* buf);
+	size_t get_state_size();
 
 	private:
 	void log_traffic(byte id, byte b);
@@ -646,35 +778,9 @@ class tetris_4p_hack : public link_master_device {
 	int check_winner_id();
 	bool all_are_in_winnerscreen();
 
-
-	byte in_data_buffer[4];
 	std::vector<gb*> v_gb;
-	std::queue<byte> out_height_blocks_queue;
-	std::queue<byte> out_falling_blocks_queue;
-	std::queue<byte> send_data_queue;
-	std::queue<tetris_4p_hack_lines_packet> lines_queue;
+	tetris_4p_hack_mem_state mem{};
 
-	byte falling_block_choice[10] = {
-		0x00,
-		0x04,	
-		0x04,
-		0x08,	
-		0x08,
-		0x0c,
-		0x0c,
-		0x10,
-		0x14,
-		0x18
-	};
-
-	tetris_4p_hack_state tetris_state = TITLE_SCREEN;
-	tetris_4p_hack_player_state players_state[4]; 
-	byte current_max_height = 0;
-	int lines_from_player_id = 0;
-	byte lines_to_send[4] = { 0,0,0,0 };
-	byte next_bytes_to_send[4] = { 0,0,0,0 };
-	int process_counter = 0;
-	int process_occer = 5;
 };
 
 

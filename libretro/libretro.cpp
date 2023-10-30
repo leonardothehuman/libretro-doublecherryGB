@@ -178,15 +178,15 @@ bool retro_load_game(const struct retro_game_info* info)
 
 
     //create gameboy instances
-    for (byte i = 0; i < emulated_gbs; i++)
+    for (byte i = 0; i < 4; i++)
     {
         render.emplace_back(new dmy_renderer(i));
         v_gb.emplace_back(new gb(render[i], true, true));
+        _serialize_size[i] = 0;
     }
 
 
-    for (i = 0; i < v_gb.size(); i++)
-        _serialize_size[i] = 0;
+ 
 
    // size_t* save_size;
   // char* save_file[2];
@@ -194,11 +194,11 @@ bool retro_load_game(const struct retro_game_info* info)
    //save_file[1] = read_file_to_buffer("C:\\Users\\TimZen\\Downloads\\RetroArch\\RetroArch-Win64\\saves\\Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size);
  //  save_file[1] = read_file_to_buffer("..//saves//Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size[1]);
 
-   if (v_gb.size() > 2)
+   if (emulated_gbs > 2)
        auto_config_4p_hack(rom_data);
 
    // load roms
-   for (byte i = 0; i < v_gb.size(); i++)
+   for (byte i = 0; i < 4; i++)
    {
        /*
        //if (!save_file[i])
@@ -221,7 +221,7 @@ bool retro_load_game(const struct retro_game_info* info)
 
    
    //set link connections
-   switch (v_gb.size())
+   switch (emulated_gbs)
    {
        case 1: mode = MODE_SINGLE_GAME; break;
        case 2:
@@ -352,7 +352,7 @@ bool retro_load_game_special(unsigned type, const struct retro_game_info *info, 
 void retro_unload_game(void)
 {
    unsigned i;
-   for(i = 0; i < v_gb.size(); ++i) 
+   for(i = 0; i < emulated_gbs; ++i) 
    {
       if (v_gb[i])
       {
@@ -368,7 +368,7 @@ void retro_unload_game(void)
 
 void retro_reset(void)
 {
-   for(int i = 0; i < v_gb.size(); ++i)
+   for(int i = 0; i < emulated_gbs; ++i)
    {
       if (v_gb[i])
          v_gb[i]->reset(); 
@@ -388,7 +388,7 @@ void retro_run(void)
     
    for (int line = 0; line < 154; line++)
    {
-       for (int i = 0; i < v_gb.size(); i++)
+       for (int i = 0; i < emulated_gbs; i++)
        {
            v_gb[i]->run();
        }
@@ -523,30 +523,54 @@ size_t retro_get_memory_size(unsigned id)
 // answer: yes, it's most likely needed to sync up netplay and for bsv records.
 size_t retro_serialize_size(void)
 {
+    /*
    if (!(_serialize_size[0] + _serialize_size[1]))
    {
        _serialize_size[0] = v_gb[0]->get_state_size();
        _serialize_size[1] = v_gb[0]->get_state_size();
-
-      unsigned i;
-     
-      for(i = 0; i < v_gb.size(); ++i)
+*/
+      //unsigned i;
+    size_t _all_size = 0;
+      //for(i = 0; i < emulated_gbs; ++i)
+    //for(i = 0; i < emulated_gbs; ++i)
+    for(int i = 0; i < 4; ++i)
       {
-         if (v_gb[i])
+        if (v_gb[i]) {
             _serialize_size[i] = v_gb[i]->get_state_size();
+            _all_size += _serialize_size[i];
+        }
       }
-   }
-   return _serialize_size[0] + _serialize_size[1];
+   //}
+   //return _serialize_size[0] + _serialize_size[1];
+    return _all_size + 0x300;
 }
+
+void log_save_state(uint8_t* data, size_t size)
+{
+    //if (logging_allowed)
+    {
+        std::string filePath = "./dmg07_savesate_log.bin";
+        std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
+
+        for (int i = 0; i < size; i++)
+        {
+            ofs << data[i];
+        }
+       
+        ofs.close();
+    }
+}
+
+
 
 bool retro_serialize(void *data, size_t size)
 {
-   if (size == retro_serialize_size())
+ // if (size == retro_serialize_size())
    {
       unsigned i;
       uint8_t *ptr = (uint8_t*)data;
-
-      for(i = 0; i < v_gb.size(); ++i)
+    
+      for(int i = 0; i < 4; ++i)
       {
          if (v_gb[i])
          {
@@ -554,6 +578,8 @@ bool retro_serialize(void *data, size_t size)
             ptr += _serialize_size[i];
          }
       }
+      
+      if(master_link) master_link->save_mem_state(ptr);
 
       return true;
    }
@@ -562,12 +588,13 @@ bool retro_serialize(void *data, size_t size)
 
 bool retro_unserialize(const void *data, size_t size)
 {
-   if (size == retro_serialize_size())
+   
+  //if (size == retro_serialize_size())
    {
       unsigned i;
       uint8_t *ptr = (uint8_t*)data;
-
-      for(i = 0; i < v_gb.size(); ++i)
+     
+      for(i = 0; i < 4; ++i)
       {
          if (v_gb[i])
          {
@@ -575,6 +602,8 @@ bool retro_unserialize(const void *data, size_t size)
             ptr += _serialize_size[i];
          }
       }
+   
+      if(master_link) master_link->restore_mem_state(ptr);
       return true;
    }
    return false;
@@ -582,7 +611,7 @@ bool retro_unserialize(const void *data, size_t size)
 
 void retro_cheat_reset(void)
 {
-   for(int i=0; i< v_gb.size(); ++i)
+   for(int i=0; i< emulated_gbs; ++i)
    {
       if(v_gb[i])
          v_gb[i]->get_cheat()->clear();
