@@ -29,7 +29,7 @@ static const struct retro_variable vars_tripple[] = {
      { "tgbdual_screen_placement", "Screen layout; left-right|4-Player Splitscreen|top-down" },
     { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
     { "tgbdual_single_screen_mp", "Show player screens; both players|player 1 only|player 2 only" },
-    { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2" },
+    { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2|Game Boy #3" },
      { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
     { NULL, NULL },
 };
@@ -41,7 +41,7 @@ static const struct retro_variable vars_quad[] = {
      { "tgbdual_screen_placement", "Screen layout; 4-Player Splitscreen|left-right|top-down" },
     { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
     { "tgbdual_single_screen_mp", "Show player screens; both players|player 1 only|player 2 only" },
-    { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2" },
+     { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2|Game Boy #3|Game Boy #4" },
     { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
     { NULL, NULL },
 };

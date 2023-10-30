@@ -85,38 +85,8 @@ static void check_variables(void)
             else if (!strcmp(var.value, "4"))
                 emulated_gbs = 4;
 
-            /* trying to change numer of emulated gbs on the fly
-            if (old_value < emulated_gbs)
-            {
-                for (int i = v_gb.size(); i <= emulated_gbs; i++)
-                {
-                    render.emplace_back(new dmy_renderer(i));
-                    v_gb.emplace_back(new gb(render[i], true, true));
-                }
-            }
-            if (old_value > emulated_gbs)
-            {
-                for (int i = v_gb.size(); i > old_value; i--)
-                {
-
-
-                    delete v_gb[i];
-                    v_gb[i] = NULL;
-                    delete render[i];
-                    render[i] = NULL;
-
-                    v_gb.erase(v_gb.begin() + i);
-                    render.erase(render.begin() + i);
-
-                }
-            }
-         */
-
         }
     }
-
-
-  
 
 
     if (emulated_gbs == 2)
@@ -130,7 +100,6 @@ static void check_variables(void)
                 logging_allowed = true;
             else  logging_allowed = false;
 
-            //TODO IMPLEMENT LOG-TURN OFF IN CPU SERI_SEND
         }
 
     }
@@ -257,7 +226,7 @@ static void check_variables(void)
         environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, my_av_info);
 
 
-        // check whether player 1 and 2's screen placements are swapped
+        // check whether which audio should play
         var.key = "tgbdual_audio_output";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -266,6 +235,10 @@ static void check_variables(void)
                 audio_2p_mode = 0;
             else if (!strcmp(var.value, "Game Boy #2"))
                 audio_2p_mode = 1;
+            else if (!strcmp(var.value, "Game Boy #3"))
+                audio_2p_mode = 2;
+            else if (!strcmp(var.value, "Game Boy #4"))
+                audio_2p_mode = 3;
         }
         else
             _screen_switched = false;

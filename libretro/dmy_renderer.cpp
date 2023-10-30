@@ -111,8 +111,9 @@ void dmy_renderer::refresh() {
    static int16_t stream[SAMPLES_PER_FRAME*2];
 
    //if (v_gb[1] && gblink_enable)
-    if (v_gb.size() > 1)
+    if (emulated_gbs > 1)
    {
+        /*
       // if dual gb mode
       if (audio_2p_mode == 2)
       {
@@ -126,16 +127,18 @@ void dmy_renderer::refresh() {
          }
       }
       else if (audio_2p_mode == which_gb)
+      */
+        if (audio_2p_mode == which_gb)
       {
          // only play gb 0 or 1
          this->snd_render->render(stream, SAMPLES_PER_FRAME);
       }
-      if (which_gb == 1)
+      if (which_gb == emulated_gbs-1)
       {
          // only do audio callback after both gb's are rendered.
          audio_batch_cb(stream, SAMPLES_PER_FRAME);
 
-         audio_2p_mode &= 3;
+         //audio_2p_mode &= 3;
          memset(stream, 0, sizeof(stream));
       }
    }
