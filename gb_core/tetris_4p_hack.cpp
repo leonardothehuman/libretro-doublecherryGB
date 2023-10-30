@@ -31,16 +31,15 @@ tetris_4p_hack::tetris_4p_hack(std::vector<gb*> g_gb) {
 
 	v_gb.insert(v_gb.begin(), std::begin(g_gb), std::end(g_gb));
 
-	tetris_state = TITLE_SCREEN;
+	mem.tetris_state = TITLE_SCREEN;
 
-	this->seri_occer = 4096 * 1024 * 4;
-	this->transfer_speed = 4096 * 1024 / 16;
+	mem.seri_occer = 4096 * 1024 * 4;
+	mem.transfer_speed = 4096 * 1024 / 16;
 
 	for (size_t i = 0; i < v_gb.size(); i++)
 	{
-		players_state[i] = IS_ALIVE;
-		cpu* cpu = v_gb[i]->get_cpu();
-
+		mem.players_state[i] = IS_ALIVE;
+		//cpu* cpu = v_gb[i]->get_cpu();
 	}
 		
 	init_send_data_queue();
@@ -50,64 +49,64 @@ void tetris_4p_hack::clear_data_for_next_round()
 {
 	for (size_t i = 0; i < v_gb.size(); i++)
 	{
-		players_state[i] = IS_ALIVE;
-		cpu* cpu = v_gb[i]->get_cpu();
-		in_data_buffer[i] = 0;
-		next_bytes_to_send[i] = 0;
+		mem.players_state[i] = IS_ALIVE;
+		//cpu* cpu = v_gb[i]->get_cpu();
+		mem.in_data_buffer[i] = 0;
+		mem.next_bytes_to_send[i] = 0;
 	}
 }
 
 void tetris_4p_hack::reset()
 {
 
-	tetris_state = TITLE_SCREEN;
+	mem.tetris_state = TITLE_SCREEN;
 
-	this->seri_occer = 4096 * 1024 * 4;
-	this->transfer_speed = 4096 * 1024 / 16;
+	mem.seri_occer = 4096 * 1024 * 4;
+	mem.transfer_speed = 4096 * 1024 / 16;
 
 	clear_data_for_next_round();
-	send_data_queue = std::queue<byte>();
+	mem.send_data_queue = std::queue<byte>();
 	init_send_data_queue();
 }
 
 
 void tetris_4p_hack::init_send_data_queue() {
 
-	//send_data_queue.push(0x29);   //start connection
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x50);   //confirm music selection
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x60);   //confirm height selection
-	send_data_queue.push(0x29);   //start sending height blocks
+	//mem.send_data_queue.push(0x29);   //start connection
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x1c);   //music a is selected 
+	mem.send_data_queue.push(0x50);   //confirm music selection
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x0);    //height 0 is selected
+	mem.send_data_queue.push(0x60);   //confirm height selection
+	mem.send_data_queue.push(0x29);   //start sending height blocks
 }
 
 
@@ -149,15 +148,15 @@ bool tetris_4p_hack::all_IE_are_handled()
 void tetris_4p_hack::process() {
 
 
-	if (tetris_state != WINNER_SCREEN) {
+	if (mem.tetris_state != WINNER_SCREEN) {
 
-		if (v_gb[0]->get_cpu()->total_clock < this->seri_occer) return;
-		this->seri_occer = v_gb[0]->get_cpu()->total_clock + this->transfer_speed;
+		if (v_gb[0]->get_cpu()->total_clock < mem.seri_occer) return;
+		mem.seri_occer = v_gb[0]->get_cpu()->total_clock + mem.transfer_speed;
 		if (!is_ready_to_process()) return;
-		//process_counter = 0;
+	
 	}
 	
-	switch (this->tetris_state)
+	switch (mem.tetris_state)
 	{
 	case TITLE_SCREEN:
 	{
@@ -168,7 +167,7 @@ void tetris_4p_hack::process() {
 		if (is_expected_data(0x55))
 		{
 			broadcast_byte(0x29);
-			this->tetris_state = MUSIC_SELECT;
+			mem.tetris_state = MUSIC_SELECT;
 		}
 		
 	
@@ -191,14 +190,14 @@ void tetris_4p_hack::process() {
 		*/
 		//if (!is_ready_to_process()) return;
 
-		if (!send_data_queue.empty())
+		if (!mem.send_data_queue.empty())
 		{
-			byte data = send_data_queue.front();
-			send_data_queue.pop();
+			byte data = mem.send_data_queue.front();
+			mem.send_data_queue.pop();
 			broadcast_byte(data);
-			if (send_data_queue.empty())
+			if (mem.send_data_queue.empty())
 			{
-				tetris_state = HEIGHT_SELECT;
+				mem.tetris_state = HEIGHT_SELECT;
 				generate_height_blocks();
 			}
 	
@@ -211,27 +210,27 @@ void tetris_4p_hack::process() {
 		if (++process_counter < 5 && !is_ready_to_process()) return 0;
 		process_counter = 0;
 		*/
-		this->transfer_speed = 4096;
+		mem.transfer_speed = 4096;
 		
-		if (!out_height_blocks_queue.empty())
+		if (!mem.out_height_blocks_queue.empty())
 		{
-			byte data = out_height_blocks_queue.front();
-			out_height_blocks_queue.pop();
+			byte data = mem.out_height_blocks_queue.front();
+			mem.out_height_blocks_queue.pop();
 			broadcast_byte(data);
-			if (out_height_blocks_queue.empty())
+			if (mem.out_height_blocks_queue.empty())
 			{
 				generate_falling_blocks();
 			}
 			break;
 		}
-		if (!out_falling_blocks_queue.empty())
+		if (!mem.out_falling_blocks_queue.empty())
 		{
-			byte data = out_falling_blocks_queue.front();
-			out_falling_blocks_queue.pop();
+			byte data = mem.out_falling_blocks_queue.front();
+			mem.out_falling_blocks_queue.pop();
 			broadcast_byte(data);
-			if (out_falling_blocks_queue.empty())
+			if (mem.out_falling_blocks_queue.empty())
 			{
-				tetris_state = IN_GAME;
+				mem.tetris_state = IN_GAME;
 			}
 			break;
 		}
@@ -240,7 +239,7 @@ void tetris_4p_hack::process() {
 	case IN_GAME:
 	{
 
-		this->transfer_speed = 4096 * 1024 / 8;
+		mem.transfer_speed = 4096 * 1024 / 8;
 		/*
 		if (++process_counter < 5) return 0;
 		process_counter = 0;
@@ -257,19 +256,19 @@ void tetris_4p_hack::process() {
 	{
 		
 		//wait 5 Seconds
-		if (++process_counter < 154 * 60 * 5) return;
-		process_counter = 0;
+		if (++mem.process_counter < 154 * 60 * 5) return;
+		mem.process_counter = 0;
 	
 		// would be better to handle actually answers
-		send_data_queue.push(0x60);   
-		send_data_queue.push(0x02);   
-		send_data_queue.push(0x02);   
-		send_data_queue.push(0x02);
-		send_data_queue.push(0x79);    
-		//send_data_queue.push(0x29);   //start sending height blocks
+		mem.send_data_queue.push(0x60);   
+		mem.send_data_queue.push(0x02);   
+		mem.send_data_queue.push(0x02);   
+		mem.send_data_queue.push(0x02);
+		mem.send_data_queue.push(0x79);    
+		//mem.send_data_queue.push(0x29);   //start sending height blocks
 
 		clear_data_for_next_round();
-		tetris_state = START_NEXT;
+		mem.tetris_state = START_NEXT;
 
 		break;
 	}
@@ -280,10 +279,10 @@ void tetris_4p_hack::process() {
 		process_counter = 0;
 		*/
 
-		if (!send_data_queue.empty())
+		if (!mem.send_data_queue.empty())
 		{
-			byte data = send_data_queue.front();
-			send_data_queue.pop();
+			byte data = mem.send_data_queue.front();
+			mem.send_data_queue.pop();
 			broadcast_byte(data);
 		
 			break; 
@@ -295,7 +294,7 @@ void tetris_4p_hack::process() {
 		if (is_expected_data(0x55))
 		{
 			
-			tetris_state = HEIGHT_SELECT;
+			mem.tetris_state = HEIGHT_SELECT;
 			generate_height_blocks();
 	
 		}
@@ -318,30 +317,30 @@ void tetris_4p_hack::generate_height_blocks()
 	//for now create just empty blocks
 	for (int i = 0; i < 100; i++)
 	{
-		out_height_blocks_queue.push(0x2f); // 0x2f empty block
+		mem.out_height_blocks_queue.push(0x2f); // 0x2f empty block
 	}
-	out_height_blocks_queue.push(0x29); // start sending fallingblocks
+	mem.out_height_blocks_queue.push(0x29); // start sending fallingblocks
 };
 
 void tetris_4p_hack::generate_falling_blocks()
 {
 	std::srand(std::time(0));
-	int size_of_choice = sizeof(falling_block_choice) / sizeof(byte);
+	int size_of_choice = sizeof(mem.falling_block_choice) / sizeof(byte);
 
 	for (int i = 0; i < 256; ++i) 
 	{
 		int randomIndex = std::rand() % size_of_choice;
-		out_falling_blocks_queue.push(falling_block_choice[randomIndex]);
+		mem.out_falling_blocks_queue.push(mem.falling_block_choice[randomIndex]);
 	}
-	out_falling_blocks_queue.push(0x30);    //finished sending blocks
-	out_falling_blocks_queue.push(0x00);
-	out_falling_blocks_queue.push(0x02);
-	out_falling_blocks_queue.push(0x02);
-	out_falling_blocks_queue.push(0x20);   //start in_game
-	out_falling_blocks_queue.push(0x0);
-	out_falling_blocks_queue.push(0x0);
-	out_falling_blocks_queue.push(0x0);
-	out_falling_blocks_queue.push(0x0);
+	mem.out_falling_blocks_queue.push(0x30);    //finished sending blocks
+	mem.out_falling_blocks_queue.push(0x00);
+	mem.out_falling_blocks_queue.push(0x02);
+	mem.out_falling_blocks_queue.push(0x02);
+	mem.out_falling_blocks_queue.push(0x20);   //start in_game
+	mem.out_falling_blocks_queue.push(0x0);
+	mem.out_falling_blocks_queue.push(0x0);
+	mem.out_falling_blocks_queue.push(0x0);
+	mem.out_falling_blocks_queue.push(0x0);
 	
 };
 
@@ -350,7 +349,7 @@ void tetris_4p_hack::get_all_SC_reg_data()
 	for (int i = 0; i < v_gb.size(); i++)
 	{
 		byte data = v_gb[i]->get_regs()->SC;
-		in_data_buffer[i] = data;
+		mem.in_data_buffer[i] = data;
 	}
 };
 
@@ -359,7 +358,7 @@ void tetris_4p_hack::get_all_SB_reg_data()
 	for (int i = 0; i < v_gb.size(); i++)
 	{
 		byte data = v_gb[i]->get_regs()->SB;
-		in_data_buffer[i] = data;
+		mem.in_data_buffer[i] = data;
 	}
 };
 
@@ -367,7 +366,7 @@ bool tetris_4p_hack::is_expected_data(byte data)
 {
 	for (int i = 0; i < v_gb.size(); i++)
 	{
-		if (in_data_buffer[i] != data) return false; 
+		if (mem.in_data_buffer[i] != data) return false; 
 	}
 	return true;
 }
@@ -403,7 +402,7 @@ int tetris_4p_hack::check_winner_id()
 
 	for (int i = 0; i < v_gb.size(); i++)
 	{
-		if (players_state[i] == IS_ALIVE)
+		if (mem.players_state[i] == IS_ALIVE)
 		{
 			alive_count++;
 			last_alive_id = i + 1;
@@ -417,40 +416,40 @@ int tetris_4p_hack::check_winner_id()
 
 void tetris_4p_hack::update_ingame_states()
 {
-	current_max_height = 0;
+	mem.current_max_height = 0;
 
 	for (int i = 0; i < v_gb.size(); i++)
 	{
-		switch (players_state[i])
+		switch (mem.players_state[i])
 		{
 		case IS_WINNER:
 		{
 
-			if (in_data_buffer[i] == 0x34)
+			if (mem.in_data_buffer[i] == 0x34)
 			{
-				players_state[i] = IS_LOOSER; // ;D need new states
-				next_bytes_to_send[i] = 0x43;
+				mem.players_state[i] = IS_LOOSER; // ;D need new states
+				mem.next_bytes_to_send[i] = 0x43;
 			}
 			else {
-				next_bytes_to_send[i] = 0x34;
+				mem.next_bytes_to_send[i] = 0x34;
 
 			}
 			break; 
 		}
 		case IS_LOOSER:
 		{
-			players_state[i] = IS_IN_WINNER_SCREEN;
+			mem.players_state[i] = IS_IN_WINNER_SCREEN;
 			break; 
 		}
 		case IS_KO:
 		{
-			if (in_data_buffer[i] == 0x34)
+			if (mem.in_data_buffer[i] == 0x34)
 			{
-				players_state[i] = IS_LOOSER;
-				next_bytes_to_send[i] = 0x43;
+				mem.players_state[i] = IS_LOOSER;
+				mem.next_bytes_to_send[i] = 0x43;
 			}
 			else {
-				next_bytes_to_send[i] = 0xaa;
+				mem.next_bytes_to_send[i] = 0xaa;
 
 			}
 			break;
@@ -458,39 +457,39 @@ void tetris_4p_hack::update_ingame_states()
 		case IS_ALIVE:
 		{
 
-			if (in_data_buffer[i] == 0x44) // not ready yet
+			if (mem.in_data_buffer[i] == 0x44) // not ready yet
 			{
-				next_bytes_to_send[i] = 0x20;
+				mem.next_bytes_to_send[i] = 0x20;
 				break; 
 			}
 
-			if (in_data_buffer[i] == 0xaa) // 0xaa is ko
+			if (mem.in_data_buffer[i] == 0xaa) // 0xaa is ko
 			{
-				players_state[i] = IS_KO;
-				next_bytes_to_send[i] = 0xaa; // send ko for draw, cause only winning counts
+				mem.players_state[i] = IS_KO;
+				mem.next_bytes_to_send[i] = 0xaa; // send ko for draw, cause only winning counts
 				break;
 			}
 
-			if (in_data_buffer[i] == 0x34)
+			if (mem.in_data_buffer[i] == 0x34)
 			{
-				players_state[i] = IS_WINNER;
-				next_bytes_to_send[i] = 0x43;
+				mem.players_state[i] = IS_WINNER;
+				mem.next_bytes_to_send[i] = 0x43;
 				break;
 			}
 
 
-			if ((in_data_buffer[i] & (byte)0x80) == (byte)0x80) // 0x8x send lines
+			if ((mem.in_data_buffer[i] & (byte)0x80) == (byte)0x80) // 0x8x send lines
 			{
-				if (in_data_buffer[i] != (byte)0x80) {
+				if (mem.in_data_buffer[i] != (byte)0x80) {
 					tetris_4p_hack_lines_packet lines;
-					lines.lines = in_data_buffer[i];
+					lines.lines = mem.in_data_buffer[i];
 					lines.from = i;
-					lines_queue.push(lines);
+					mem.lines_queue.push(lines);
 				}
 				break; 
 			}
 
-			current_max_height = current_max_height < in_data_buffer[i] ? in_data_buffer[i] : current_max_height;
+			mem.current_max_height = mem.current_max_height < mem.in_data_buffer[i] ? mem.in_data_buffer[i] : mem.current_max_height;
 			break; 
 		}
 
@@ -499,7 +498,7 @@ void tetris_4p_hack::update_ingame_states()
 		}
 	}
 
-	if (all_are_in_winnerscreen()) tetris_state = WINNER_SCREEN;
+	if (all_are_in_winnerscreen()) mem.tetris_state = WINNER_SCREEN;
 
 }
 
@@ -507,7 +506,7 @@ bool tetris_4p_hack::all_are_in_winnerscreen() {
 
 	for (int i = 0; i < v_gb.size(); i++)
 	{
-		if (players_state[i] != IS_IN_WINNER_SCREEN) return false;
+		if (mem.players_state[i] != IS_IN_WINNER_SCREEN) return false;
 	}
 	return true; 
 }
@@ -516,30 +515,59 @@ void tetris_4p_hack::send_ingame_bytes()
 {
 	int winner = check_winner_id();
 	if (winner && winner != -1) {
-		next_bytes_to_send[winner - 1] = 0xaa;
-		players_state[winner - 1] = IS_WINNER;
+		mem.next_bytes_to_send[winner - 1] = 0xaa;
+		mem.players_state[winner - 1] = IS_WINNER;
 	}
 	
 
-	if (!lines_queue.empty())
+	if (!mem.lines_queue.empty())
 	{
-		tetris_4p_hack_lines_packet next = lines_queue.front();
-		lines_queue.pop();
+		tetris_4p_hack_lines_packet next = mem.lines_queue.front();
+		mem.lines_queue.pop();
 		for (int i = 0; i < v_gb.size(); i++)
 		{
-			if (players_state[i] == IS_IN_WINNER_SCREEN) continue;
+			if (mem.players_state[i] == IS_IN_WINNER_SCREEN) continue;
 			if (next.from == i) continue;
-			if (!next_bytes_to_send[i]) next_bytes_to_send[i] = next.lines; // ?? do lines get lost??
+			if (!mem.next_bytes_to_send[i]) mem.next_bytes_to_send[i] = next.lines; // ?? do lines get lost??
 		}
 	}
 
 	for (int i = 0; i < v_gb.size(); i++)
 	{
-		if (!next_bytes_to_send[i]) next_bytes_to_send[i] = current_max_height;
-		if (players_state[i] != IS_IN_WINNER_SCREEN) 	send_byte(i, next_bytes_to_send[i]);
+		if (!mem.next_bytes_to_send[i]) mem.next_bytes_to_send[i] = mem.current_max_height;
+		if (mem.players_state[i] != IS_IN_WINNER_SCREEN) 	send_byte(i, mem.next_bytes_to_send[i]);
 	
-		next_bytes_to_send[i] = 0;
+		mem.next_bytes_to_send[i] = 0;
 	}
+
+}
+
+void tetris_4p_hack::save_mem_state(void* buf) 
+{
+	std::stringstream ss; // any stream can be used
+	cereal::BinaryOutputArchive oarchive(ss); // Create an output archive
+	oarchive(this->mem); // Write the data to the archive
 	
+	/*
+	dmg07_mem_state_size mem_size{};
+	mem_size.size = ss.str().length();
+	oarchive(mem_size);
+
+*/
+	serializer s(buf, serializer::SAVE_BUF);
+	s.process((void*)ss.str().data(), ss.str().length());
+	buf += ss.str().length();
+}
+void tetris_4p_hack::restore_mem_state(void* buf)
+{
+	std::stringstream ss2;
+	ss2.write((const char*)buf, 248);
+
+	cereal::BinaryInputArchive iarchive(ss2); // Create an input archive
+	iarchive(this->mem);
+
+}
+
+size_t tetris_4p_hack::get_state_size() {
 
 }

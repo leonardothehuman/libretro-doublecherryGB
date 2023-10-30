@@ -29,6 +29,7 @@
 #include "libretro.h"
 
 extern std::vector<gb* > v_gb;
+extern int emulated_gbs;
 
 extern retro_log_printf_t log_cb;
 extern retro_video_refresh_t video_cb;
@@ -185,7 +186,7 @@ void dmy_renderer::render_screen(byte* buf, int width, int height, int depth)
         switched_gb = 1 - switched_gb;
 
     // are we running two gb's?
-    switch (v_gb.size())
+    switch (emulated_gbs)
     {
     case 1: video_cb(buf, width, height, pitch); break;
     case 2:

@@ -71,7 +71,7 @@ static void check_variables(void)
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
     {
-        //int old_value = emulated_gbs; 
+       
         if (!already_checked_options) { // only apply this setting on init
             if (!strcmp(var.value, "1"))
             {
