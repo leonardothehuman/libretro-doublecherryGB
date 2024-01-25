@@ -1,10 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\gb_core",
-    "\\libretro",
-    "\\Third-Party\\cereal"
+    "\\libretro"
   ],
-  "SelectedNode": "\\gb_core\\gb.h",
+  "SelectedNode": "\\.gitlab-ci.yml",
   "PreviewInSolutionExplorer": false
 }
