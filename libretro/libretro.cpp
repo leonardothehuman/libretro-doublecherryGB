@@ -227,11 +227,12 @@ bool retro_load_game(const struct retro_game_info* info)
        case 2:
        {
            //mode = MODE_DUAL_GAME;
+           mode = MODE_SINGLE_GAME_DUAL;
            // for link cables and IR:
-           if (gblink_enable) {
+           //if (gblink_enable) {
                v_gb[0]->set_target(v_gb[1]);
                v_gb[1]->set_target(v_gb[0]);
-           }
+           //}
            break;
 
        }

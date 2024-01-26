@@ -88,7 +88,6 @@ static void check_variables(void)
         }
     }
 
-
     if (emulated_gbs == 2)
     {
         var.key = "tgbdual_log_link";
@@ -150,6 +149,17 @@ static void check_variables(void)
         }
         else
             gblink_enable = false;
+
+        // check whether link cable mode is enabled
+        var.key = "tgbdual_log_link";
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+        {
+            if (!strcmp(var.value, "On"))
+                logging_allowed = true;
+            else logging_allowed = false; 
+        }
+
 
         var.key = "tgbdual_screen_placement";
         var.value = NULL;
