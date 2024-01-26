@@ -4,5 +4,5 @@
 *.exe
 tgbdual
 .goutputstream-*
-.github
-.vs
+/.github/*
+/.vs/*
