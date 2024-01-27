@@ -29,12 +29,6 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/linux-i686.yml'
     
-
-  #################################### MISC ##################################
-  # Emscripten
-  - project: 'libretro-infrastructure/ci-templates'
-    file: '/emscripten-static.yml'
-
 # Stages for building
 stages:
   - build-prepare
@@ -69,12 +63,4 @@ libretro-build-linux-x64:
 libretro-build-linux-i686:
   extends:
     - .libretro-linux-i686-make-default
-    - .core-defs
-
-
-#################################### MISC ##################################
-# Emscripten
-libretro-build-emscripten:
-  extends:
-    - .libretro-emscripten-static-retroarch-master
     - .core-defs
