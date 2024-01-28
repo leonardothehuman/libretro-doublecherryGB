@@ -129,23 +129,26 @@ void dmy_renderer::refresh() {
       else if (audio_2p_mode == which_gb)
       */
         if (audio_2p_mode == which_gb)
-      {
+         {
          // only play gb 0 or 1
          this->snd_render->render(stream, SAMPLES_PER_FRAME);
+         audio_batch_cb(stream, SAMPLES_PER_FRAME);
       }
       if (which_gb == emulated_gbs-1)
       {
          // only do audio callback after both gb's are rendered.
-         audio_batch_cb(stream, SAMPLES_PER_FRAME);
+         //audio_batch_cb(stream, SAMPLES_PER_FRAME);
 
          //audio_2p_mode &= 3;
-         memset(stream, 0, sizeof(stream));
+         //memset(stream, 0, sizeof(stream));
       }
    }
    else
    {
+        
       this->snd_render->render(stream, SAMPLES_PER_FRAME);
       audio_batch_cb(stream, SAMPLES_PER_FRAME);
+      
    }
    fixed_time = time(NULL);
 }

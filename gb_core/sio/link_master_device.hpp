@@ -17,11 +17,11 @@ public:
 	size_t virtual get_state_size() = 0;
 	
 	int transfer_speed = 512 * 8;
-	int seri_occer = 2048 * 2048 * 2048; //0x7fffffff;
+	int seri_occer = 0x7fffffff;
 
 protected:
-	byte send_byte(byte which, byte dat);
-	void broadcast_byte(byte dat);
+	virtual byte send_byte(byte which, byte dat);
+	virtual void broadcast_byte(byte dat);
 	void log_traffic(byte id, byte b);
 
 	bool gbs_are_ready_to_process();

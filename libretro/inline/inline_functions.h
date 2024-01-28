@@ -88,20 +88,7 @@ static void check_variables(void)
         }
     }
 
-    if (emulated_gbs == 2)
-    {
-        var.key = "tgbdual_log_link";
-        var.value = NULL;
-        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-        {
 
-            if (!strcmp(var.value, "On"))
-                logging_allowed = true;
-            else  logging_allowed = false;
-
-        }
-
-    }
 
     //TODO FOR 3PLAYERS
     if (emulated_gbs > 2) {

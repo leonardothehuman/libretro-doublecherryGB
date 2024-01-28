@@ -126,11 +126,10 @@ private:
 	void restart_pingphase();
 	//void log_traffic(byte id, byte b);
 
-	/*
-	void send_byte(byte which, byte dat);
-	void broadcast_byte(byte dat);
-	*/
-
+	
+	byte send_byte(byte which, byte dat) override;
+	// void broadcast_byte(byte dat);
+	
 	void send_sync_bytes();
 	void send_each_ping_byte();
 	byte send_ping_byte(byte which);

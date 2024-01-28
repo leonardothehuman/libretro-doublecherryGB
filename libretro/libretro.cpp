@@ -162,8 +162,7 @@ bool retro_load_game(const struct retro_game_info* info)
 
     }
 
-
-
+ 
     if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &info_ext) &&
         info_ext->persistent_data)
     {

@@ -3,8 +3,9 @@
     "",
     "\\gb_core",
     "\\gb_core\\sio",
-    "\\libretro"
+    "\\libretro",
+    "\\libretro\\inline"
   ],
-  "SelectedNode": "\\gb_core\\sio",
+  "SelectedNode": "\\libretro\\dmy_renderer.cpp",
   "PreviewInSolutionExplorer": false
 }

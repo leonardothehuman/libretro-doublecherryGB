@@ -321,21 +321,14 @@ void apu_snd::process(word adr,byte dat)
 	}
 }
 
-/*
+
 static int sq_wav_dat[4][8]={
 	{0,1,0,0,0,0,0,0},
 	{1,1,0,0,0,0,0,0},
 	{1,1,1,1,0,0,0,0},
 	{0,0,1,1,1,1,1,1}
 };
-*/
 
-static int sq_wav_dat[4][8] = {
-	{1,0,0,0,0,0,0,0},
-	{1,1,0,0,0,0,0,0},
-	{1,1,1,1,0,0,0,0},
-	{1,1,1,1,1,1,1,1}
-};
 
 
 inline short apu_snd::sq1_produce(int freq)

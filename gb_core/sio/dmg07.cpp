@@ -359,9 +359,9 @@ void dmg07::handle_answer(int i, byte dat)
 	}
 }
 
-/*
 
-void dmg07::send_byte(byte which, byte dat)
+
+byte dmg07::send_byte(byte which, byte dat)
 {
 	byte ret = v_gb[which]->get_cpu()->seri_send(dat);
 
@@ -369,8 +369,11 @@ void dmg07::send_byte(byte which, byte dat)
 	log_traffic(which + 1, ret);
 
 	handle_answer(which, ret);
+
+	return ret; 
 }
 
+/*
 void dmg07::broadcast_byte(byte dat)
 {
 	for (byte i = 0x00; i < (byte)dmg07::v_gb.size(); i++)
@@ -453,7 +456,7 @@ byte dmg07::send_ping_byte(byte which)
 void dmg07::send_each_ping_byte()
 {
 	for (byte i = 0x00; i < (byte)dmg07::v_gb.size(); i++)
-		handle_answer(i, send_ping_byte(i));
+		send_ping_byte(i);
 
 	
 }
@@ -526,7 +529,7 @@ void dmg07::fill_buffer_for_less_than_4p()
 void dmg07::process()
 {
 
-	//if (!is_ready_for_next_tik() || !gbs_are_ready_to_process()) return;
+	//if (!is_ready_for_next_tik() || !all_IE_are_handled()) return;
 	if (!is_ready_for_next_tik()) return;
 	update_seri_occer();
 
