@@ -1,4 +1,4 @@
-
+#pragma once
 /*--------------------------------------------------
    TGB Dual - Gameboy Emulator -
    Copyright (C) 2001  Hii
@@ -22,12 +22,6 @@
 // GB クラス定義部,その他
 
 
-#include "../Third-Party/cereal/archives/binary.hpp"
-#include "../Third-Party/cereal/types/array.hpp"
-#include "../Third-Party/cereal/types/vector.hpp"
-#include "../Third-Party/cereal/types/queue.hpp"
-#include <sstream>
-
 #include <vector>
 #include <array>
 #include <queue>
@@ -43,7 +37,6 @@
 #include "gb_types.h"
 #include "renderer.h"
 #include "serializer.h"
-#include "link_cable_devices/link_cable_devices.h"
 
 
 #define INT_VBLANK 1
@@ -512,8 +505,8 @@ private:
 class cpu
 {
 friend class gb;
-friend class dmg07;
-friend class tetris_4p_hack;
+friend class link_master_device;
+
 public:
 	cpu(gb *ref);
 	~cpu();
@@ -602,10 +595,12 @@ private:
 
 	byte _ff6c,_ff72,_ff73,_ff74,_ff75;
 
+	/*   DELETE?
 	dmg07* m_dmg07 = NULL;
 	tetris_4p_hack* tetris_hack = NULL; 
-	int clocks_since_last_serial = 0;
 	bool is_clock_giver = false; 
-	
+	*/
+
+	int clocks_since_last_serial = 0;
 
 };

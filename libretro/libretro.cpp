@@ -14,9 +14,10 @@
 #include <stdlib.h>
 #include "libretro.h"
 
-
+#include "../gb_core/sio/sio_devices.hpp"
 #include "inline/inline_variables.h"
 #include "inline/inline_functions.h"
+
 
 
 static void check_variables(void);
@@ -580,7 +581,7 @@ bool retro_serialize(void *data, size_t size)
          }
       }
       
-      if(master_link) master_link->save_mem_state(ptr);
+      if(master_link) master_link->save_state_mem(ptr);
 
       return true;
    }
@@ -604,7 +605,7 @@ bool retro_unserialize(const void *data, size_t size)
          }
       }
    
-      if(master_link) master_link->restore_mem_state(ptr);
+      if(master_link) master_link->restore_state_mem(ptr);
       return true;
    }
    return false;

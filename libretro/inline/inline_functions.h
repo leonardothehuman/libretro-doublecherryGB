@@ -8,7 +8,7 @@ void auto_config_4p_hack(byte* rombuf)
 
     if (! strcmp(cart_name, "TETRIS"))
     {
-        master_link = new tetris_4p_hack(v_gb);
+        master_link = new hack_4p_tetris(v_gb);
     }
 };
 
@@ -125,7 +125,7 @@ static void check_variables(void)
             {
                 use_multi_adapter = false;
                 use_tetris_4p_hack = true;
-                if (!master_link)  master_link = new tetris_4p_hack(v_gb);
+                if (!master_link)  master_link = new hack_4p_tetris(v_gb);
             }
         }
         else
