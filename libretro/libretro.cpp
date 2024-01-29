@@ -14,9 +14,10 @@
 #include <stdlib.h>
 #include "libretro.h"
 
-
+#include "../gb_core/sio/sio_devices.hpp"
 #include "inline/inline_variables.h"
 #include "inline/inline_functions.h"
+
 
 
 static void check_variables(void);
@@ -82,6 +83,9 @@ void retro_init(void)
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
       libretro_supports_bitmasks = true;
+
+   environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_quad);
+   check_variables();
 }
 
 void retro_deinit(void)
@@ -94,7 +98,7 @@ bool retro_load_game(const struct retro_game_info* info)
     size_t rom_size;
     byte* rom_data;
     const struct retro_game_info_ext* info_ext = NULL;
-    environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_single);
+    //environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_single);
     //environ_cb(RETRO_ENVIRONMENT_SET_VARIABLES, (void*)vars_quad);
         check_variables();
 
@@ -161,8 +165,7 @@ bool retro_load_game(const struct retro_game_info* info)
 
     }
 
-
-
+ 
     if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &info_ext) &&
         info_ext->persistent_data)
     {
@@ -217,7 +220,7 @@ bool retro_load_game(const struct retro_game_info* info)
  
    }
 
-   //master_link = new dmg07(v_gb);
+//   master_link = new dmg07(v_gb);
 
    
    //set link connections
@@ -227,17 +230,19 @@ bool retro_load_game(const struct retro_game_info* info)
        case 2:
        {
            //mode = MODE_DUAL_GAME;
+           mode = MODE_SINGLE_GAME_DUAL;
            // for link cables and IR:
-           if (gblink_enable) {
+           //if (gblink_enable) {
                v_gb[0]->set_target(v_gb[1]);
                v_gb[1]->set_target(v_gb[0]);
-           }
+           //}
            break;
 
        }
        case 3:
        {
            mode = MODE_SINGLE_GAME_DUAL;
+           if (!master_link)  master_link = new dmg07(v_gb);
            //master_link = new dmg07(v_gb); 
            //master_link = new tetris_4p_hack(v_gb);
            break;
@@ -248,9 +253,8 @@ bool retro_load_game(const struct retro_game_info* info)
            mode = MODE_SINGLE_GAME_DUAL;
            //master_link = new tetris_4p_hack(v_gb);
            
-           if (!master_link)   //master_link = new dmg07(v_gb);
-           //else if (use_tetris_4p_hack)  master_link = new tetris_4p_hack(v_gb);
-           //else
+           if (use_multi_adapter) master_link = new dmg07(v_gb);
+           else
            {
                v_gb[0]->set_target(v_gb[1]);
                v_gb[1]->set_target(v_gb[0]);
@@ -547,7 +551,7 @@ size_t retro_serialize_size(void)
 
 void log_save_state(uint8_t* data, size_t size)
 {
-    //if (logging_allowed)
+    if (logging_allowed)
     {
         std::string filePath = "./dmg07_savesate_log.bin";
         std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
@@ -560,6 +564,7 @@ void log_save_state(uint8_t* data, size_t size)
         ofs.close();
     }
 }
+
 
 
 
@@ -579,7 +584,7 @@ bool retro_serialize(void *data, size_t size)
          }
       }
       
-      if(master_link) master_link->save_mem_state(ptr);
+      if(master_link) master_link->save_state_mem(ptr);
 
       return true;
    }
@@ -603,7 +608,7 @@ bool retro_unserialize(const void *data, size_t size)
          }
       }
    
-      if(master_link) master_link->restore_mem_state(ptr);
+      if(master_link) master_link->restore_state_mem(ptr);
       return true;
    }
    return false;

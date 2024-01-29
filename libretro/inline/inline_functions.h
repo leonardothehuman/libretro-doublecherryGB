@@ -6,9 +6,9 @@ void auto_config_4p_hack(byte* rombuf)
     cart_name[16] = '\0';
     cart_name[17] = '\0';
 
-    if (! strcmp(cart_name, "TETRIS"))
+    if (!strcmp(cart_name, "TETRIS"))
     {
-        master_link = new tetris_4p_hack(v_gb);
+        master_link = new hack_4p_tetris(v_gb);
     }
 };
 
@@ -89,20 +89,6 @@ static void check_variables(void)
     }
 
 
-    if (emulated_gbs == 2)
-    {
-        var.key = "tgbdual_log_link";
-        var.value = NULL;
-        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-        {
-
-            if (!strcmp(var.value, "On"))
-                logging_allowed = true;
-            else  logging_allowed = false;
-
-        }
-
-    }
 
     //TODO FOR 3PLAYERS
     if (emulated_gbs > 2) {
@@ -126,7 +112,7 @@ static void check_variables(void)
             {
                 use_multi_adapter = false;
                 use_tetris_4p_hack = true;
-                if (!master_link)  master_link = new tetris_4p_hack(v_gb);
+                if (!master_link)  master_link = new hack_4p_tetris(v_gb);
             }
         }
         else
@@ -150,6 +136,17 @@ static void check_variables(void)
         }
         else
             gblink_enable = false;
+
+        // check whether link cable mode is enabled
+        var.key = "tgbdual_log_link";
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+        {
+            if (!strcmp(var.value, "On"))
+                logging_allowed = true;
+            else logging_allowed = false; 
+        }
+
 
         var.key = "tgbdual_screen_placement";
         var.value = NULL;

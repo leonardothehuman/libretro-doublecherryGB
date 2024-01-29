@@ -2,9 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\gb_core",
+    "\\gb_core\\sio",
     "\\libretro",
-    "\\Third-Party\\cereal"
+    "\\libretro\\inline"
   ],
-  "SelectedNode": "\\gb_core\\gb.h",
+  "SelectedNode": "\\libretro\\libretro.cpp",
   "PreviewInSolutionExplorer": false
 }

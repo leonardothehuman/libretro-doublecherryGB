@@ -116,7 +116,7 @@ apu_snd::apu_snd(apu *papu)
 	ref_apu=papu;
 	b_enable[0]=b_enable[1]=b_enable[2]=b_enable[3]=true;
 	b_echo=false;
-	b_lowpass=false;
+	b_lowpass=true;
 }
 
 apu_snd::~apu_snd()
@@ -321,21 +321,14 @@ void apu_snd::process(word adr,byte dat)
 	}
 }
 
-/*
+
 static int sq_wav_dat[4][8]={
 	{0,1,0,0,0,0,0,0},
 	{1,1,0,0,0,0,0,0},
 	{1,1,1,1,0,0,0,0},
 	{0,0,1,1,1,1,1,1}
 };
-*/
 
-static int sq_wav_dat[4][8] = {
-	{1,0,0,0,0,0,0,0},
-	{1,1,0,0,0,0,0,0},
-	{1,1,1,1,0,0,0,0},
-	{1,1,1,1,1,1,1,1}
-};
 
 
 inline short apu_snd::sq1_produce(int freq)

@@ -240,7 +240,7 @@ byte cpu::io_read(word adr)
 		return ref_gb->get_regs()->SB;
 	case 0xFF02://SC(シリアルコントロール) // SC (serial control)
 //		fprintf(file,"Read SC %02X\n",ref_gb->get_regs()->SC);
-		if (this->m_dmg07) return ref_gb->get_regs()->SC & net_id;
+		//if (this->m_dmg07) return ref_gb->get_regs()->SC & net_id;
 		return (ref_gb->get_regs()->SC&0x83)|0x7C;
 	case 0xFF04://DIV(ディバイダー?) // DIV (divider?)
 		return ref_gb->get_regs()->DIV;
@@ -1106,6 +1106,6 @@ void cpu::serialize(serializer &s)
 
 void cpu::set_is_seri_master(bool enable) {
 	
-	this->is_clock_giver = enable;
+	//this->is_clock_giver = enable;
 }
 

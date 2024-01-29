@@ -16,5 +16,6 @@ SOURCES_CXX := $(CORE_DIR)/gb_core/apu.cpp \
 	$(CORE_DIR)/gb_core/rom.cpp \
 	$(CORE_DIR)/libretro/dmy_renderer.cpp \
 	$(CORE_DIR)/libretro/libretro.cpp \
-	$(CORE_DIR)/gb_core/dmg07.cpp \
-	$(CORE_DIR)/gb_core/tetris_4p_hack.cpp \
+	$(CORE_DIR)/gb_core/sio/link_master_device.cpp \
+	$(CORE_DIR)/gb_core/sio/dmg07.cpp \
+	$(CORE_DIR)/gb_core/sio/hack_4p_tetris.cpp \
