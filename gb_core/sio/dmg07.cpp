@@ -22,6 +22,8 @@
 
 
 #include "dmg07.hpp"
+#include "serializer.h"
+#include <iostream>
 #include <vector>
 #include <queue>
 #include <string>
@@ -62,7 +64,7 @@ void dmg07::reset()
 	//ready_to_sync_others = false;
 	//others_are_synced = false;
 
-	bytes_to_send = std::queue<byte>();
+	bytes_to_send = std::vector<byte>();
 
 	for (byte i = 0; i < dmg07::v_gb.size(); i++)
 	{
@@ -128,7 +130,7 @@ void dmg07::restart_pingphase()
 	delay = 0;
 	//ready_to_sync_others = false; 
 
-	bytes_to_send = std::queue<byte>();
+	bytes_to_send = std::vector<byte>();
 
 	for (byte i = 0; i < dmg07::v_gb.size(); i++)
 	{
@@ -324,7 +326,7 @@ void dmg07::handle_answer(int i, byte dat)
 				{
 
 					ans_buffer[i].clear();
-					bytes_to_send = std::queue<byte>();
+					bytes_to_send = std::vector<byte>();
 					restart_in = packet_size * 4;
 
 					for (int i = 0; i < (packet_size * 4); i++)
@@ -584,27 +586,97 @@ void dmg07::process()
 
 /* netplay support functions*/
 	
-/*
+
 size_t dmg07::get_state_size(void)
 {
 	size_t ret = 0;
 	serializer s(&ret, serializer::COUNT);
+
+	int size;
+	for (size_t i = 0; i < 4; i++)
+	{
+		size = trans_buffer[i].size();
+		s_VAR(size);
+		s_ARRAY(trans_buffer[i].data());
+		size = ans_buffer[i].size();
+		s_VAR(size);
+		s_ARRAY(ans_buffer[i].data());
+	}
+
+	size = bytes_to_send.size();
+	s_VAR(size);
+	s_ARRAY(bytes_to_send.data());
+
+
 	serialize(s);
 	return ret;
 }
 
+
 void dmg07::save_state_mem(void* buf)
 {
 	serializer s(buf, serializer::SAVE_BUF);
+
+	int size;
+	for (size_t i = 0; i < 4; i++)
+	{
+		size = trans_buffer[i].size();
+		s_VAR(size);
+		s_ARRAY(trans_buffer[i].data());
+		size = ans_buffer[i].size();
+		s_VAR(size);
+		s_ARRAY(ans_buffer[i].data());
+	}
+	size = bytes_to_send.size();
+	s_VAR(size);
+	s_ARRAY(bytes_to_send.data());
+
 	serialize(s);
 }
 
 void dmg07::restore_state_mem(void* buf)
 {
 	serializer s(buf, serializer::LOAD_BUF);
+
+	int size;
+	byte* tmp;
+	for (int i = 0; i < 4; i++)
+	{
+		s_VAR(size);
+		tmp = new byte[size];
+		s_ARRAY(tmp);
+		trans_buffer[i] = std::vector<byte>();
+		for (int j = 0; j < size; j++)
+		{
+			trans_buffer[i].emplace_back(tmp[j]);
+		}
+
+		s_VAR(size);
+		tmp = new byte[size];
+		s_ARRAY(tmp);
+
+		ans_buffer[i] = std::vector<byte>();
+		for (int k = 0; k < size; k++)
+		{
+			ans_buffer[i].emplace_back(tmp[k]);
+		};
+
+	}
+
+	s_VAR(size);
+	tmp = new byte[size];
+	s_ARRAY(tmp);
+
+	bytes_to_send = std::vector<byte>();
+	for (size_t i = 0; i < size; i++)
+	{
+		bytes_to_send.emplace_back(tmp[i]);
+	};
+
+	delete tmp; 
 	serialize(s);
 }
-*/
+
 
 
 void dmg07::serialize(serializer& s) 
@@ -616,7 +688,7 @@ void dmg07::serialize(serializer& s)
 	s_VAR(transfer_count);
 	s_VAR(phase_byte_count);
 	s_VAR(restart_in);
-	s_VAR(enter_statu
+	s_VAR(enter_status);
 	s_VAR(packet_size);
 	s_VAR(transfer_rate);
 	s_VAR(first_aa_trans_nr);
@@ -624,11 +696,6 @@ void dmg07::serialize(serializer& s)
 	s_VAR(delay);
 	s_VAR(ready_to_sync_master);
 	s_VAR(master_is_synced);
-
 	s_ARRAY(in_data_buffer);
-	s_ARRAY(trans_buffer.data());
-	s_ARRAY(ans_buffer.data());
-	s_ARRAY(bytes_to_send.data());
 
-	
 }
