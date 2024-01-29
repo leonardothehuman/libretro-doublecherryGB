@@ -101,19 +101,16 @@ static void check_variables(void)
             if (!strcmp(var.value, "4-player adapter"))
             {
                 use_multi_adapter = true;
-                if (!master_link) master_link = new dmg07(v_gb);
+              
             }
             else if (!strcmp(var.value, "2x2 - player link"))
             {
                 use_multi_adapter = false;
+                if(master_link) delete master_link; 
                 master_link = NULL;
+
             }
-            else if (!strcmp(var.value, "tetris multiplayer hack"))
-            {
-                use_multi_adapter = false;
-                use_tetris_4p_hack = true;
-                if (!master_link)  master_link = new hack_4p_tetris(v_gb);
-            }
+     
         }
         else
             _screen_vertical = false;

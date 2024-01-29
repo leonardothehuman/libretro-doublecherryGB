@@ -197,9 +197,7 @@ bool retro_load_game(const struct retro_game_info* info)
    //save_file[1] = read_file_to_buffer("C:\\Users\\TimZen\\Downloads\\RetroArch\\RetroArch-Win64\\saves\\Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size);
  //  save_file[1] = read_file_to_buffer("..//saves//Pokemon - Red Version (USA, Europe) (SGB Enhanced).srm", save_size[1]);
 
-   if (emulated_gbs > 2)
-       auto_config_4p_hack(rom_data);
-
+ 
    // load roms
    for (byte i = 0; i < 4; i++)
    {
@@ -243,6 +241,8 @@ bool retro_load_game(const struct retro_game_info* info)
        {
            mode = MODE_SINGLE_GAME_DUAL;
            if (!master_link)  master_link = new dmg07(v_gb);
+            auto_config_4p_hack(rom_data);
+
            //master_link = new dmg07(v_gb); 
            //master_link = new tetris_4p_hack(v_gb);
            break;
@@ -251,10 +251,11 @@ bool retro_load_game(const struct retro_game_info* info)
        case 4:
        {
            mode = MODE_SINGLE_GAME_DUAL;
-           //master_link = new tetris_4p_hack(v_gb);
-           
-           if (use_multi_adapter) master_link = new dmg07(v_gb);
-           else
+        
+           if (use_multi_adapter && !master_link) master_link = new dmg07(v_gb);
+           auto_config_4p_hack(rom_data);
+
+           if (!use_multi_adapter && gblink_enable) 
            {
                v_gb[0]->set_target(v_gb[1]);
                v_gb[1]->set_target(v_gb[0]);
