@@ -42,7 +42,7 @@ hack_4p_tetris::hack_4p_tetris(std::vector<gb*> g_gb) {
 		//cpu* cpu = v_gb[i]->get_cpu();
 	}
 		
-	init_send_data_queue();
+	init_send_data_vec();
 }
 
 void hack_4p_tetris::clear_data_for_next_round()
@@ -65,49 +65,48 @@ void hack_4p_tetris::reset()
 	transfer_speed = 4096 * 1024 / 16;
 
 	clear_data_for_next_round();
-	send_data_queue = std::queue<byte>();
-	init_send_data_queue();
+	send_data_vec = std::vector<byte>();
+	init_send_data_vec();
 }
 
-void hack_4p_tetris::init_send_data_queue() {
+void hack_4p_tetris::init_send_data_vec() {
 
-	//send_data_queue.push(0x29);   //start connection
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x1c);   //music a is selected 
-	send_data_queue.push(0x50);   //confirm music selection
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x0);    //height 0 is selected
-	send_data_queue.push(0x60);   //confirm height selection
-	send_data_queue.push(0x29);   //start sending height blocks
+	//send_data_vec.emplace_back(0x29);   //start connection
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x1c);   //music a is selected 
+	send_data_vec.emplace_back(0x50);   //confirm music selection
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x0);    //height 0 is selected
+	send_data_vec.emplace_back(0x60);   //confirm height selection
+	send_data_vec.emplace_back(0x29);   //start sending height blocks
 }
-
 
 void hack_4p_tetris::log_traffic(byte id, byte b)
 {
@@ -191,12 +190,12 @@ void hack_4p_tetris::process() {
 		*/
 		//if (!is_ready_to_process()) return;
 
-		if (!send_data_queue.empty())
+		if (!send_data_vec.empty())
 		{
-			byte data = send_data_queue.front();
-			send_data_queue.pop();
+			byte data = send_data_vec.front();
+			send_data_vec.erase(send_data_vec.begin());
 			broadcast_byte(data);
-			if (send_data_queue.empty())
+			if (send_data_vec.empty())
 			{
 				tetris_state = HEIGHT_SELECT;
 				generate_height_blocks();
@@ -213,23 +212,25 @@ void hack_4p_tetris::process() {
 		*/
 		transfer_speed = 4096;
 		
-		if (!out_height_blocks_queue.empty())
+		if (!out_height_blocks.empty())
 		{
-			byte data = out_height_blocks_queue.front();
-			out_height_blocks_queue.pop();
+			byte data = out_height_blocks.front();
+			out_height_blocks.erase(out_height_blocks.begin());
+
 			broadcast_byte(data);
-			if (out_height_blocks_queue.empty())
+			if (out_height_blocks.empty())
 			{
 				generate_falling_blocks();
 			}
 			break;
 		}
-		if (!out_falling_blocks_queue.empty())
+		if (!out_falling_blocks.empty())
 		{
-			byte data = out_falling_blocks_queue.front();
-			out_falling_blocks_queue.pop();
+			byte data = out_falling_blocks.front();
+			out_falling_blocks.erase(out_falling_blocks.begin());
+
 			broadcast_byte(data);
-			if (out_falling_blocks_queue.empty())
+			if (out_falling_blocks.empty())
 			{
 				tetris_state = IN_GAME;
 			}
@@ -261,12 +262,12 @@ void hack_4p_tetris::process() {
 		process_counter = 0;
 	
 		// would be better to handle actually answers
-		send_data_queue.push(0x60);   
-		send_data_queue.push(0x02);   
-		send_data_queue.push(0x02);   
-		send_data_queue.push(0x02);
-		send_data_queue.push(0x79);    
-		//send_data_queue.push(0x29);   //start sending height blocks
+		send_data_vec.emplace_back(0x60);   
+		send_data_vec.emplace_back(0x02);   
+		send_data_vec.emplace_back(0x02);   
+		send_data_vec.emplace_back(0x02);
+		send_data_vec.emplace_back(0x79);    
+		//send_data_vec.emplace_back(0x29);   //start sending height blocks
 
 		clear_data_for_next_round();
 		tetris_state = START_NEXT;
@@ -280,10 +281,10 @@ void hack_4p_tetris::process() {
 		process_counter = 0;
 		*/
 
-		if (!send_data_queue.empty())
+		if (!send_data_vec.empty())
 		{
-			byte data = send_data_queue.front();
-			send_data_queue.pop();
+			byte data = send_data_vec.front();
+			send_data_vec.erase(send_data_vec.begin());
 			broadcast_byte(data);
 		
 			break; 
@@ -319,9 +320,9 @@ void hack_4p_tetris::generate_height_blocks()
 	//for now create just empty blocks
 	for (int i = 0; i < 100; i++)
 	{
-		out_height_blocks_queue.push(0x2f); // 0x2f empty block
+		out_height_blocks.emplace_back(0x2f); // 0x2f empty block
 	}
-	out_height_blocks_queue.push(0x29); // start sending fallingblocks
+	out_height_blocks.emplace_back(0x29); // start sending fallingblocks
 };
 
 void hack_4p_tetris::generate_falling_blocks()
@@ -332,17 +333,17 @@ void hack_4p_tetris::generate_falling_blocks()
 	for (int i = 0; i < 256; ++i) 
 	{
 		int randomIndex = std::rand() % size_of_choice;
-		out_falling_blocks_queue.push(falling_block_choice[randomIndex]);
+		out_falling_blocks.emplace_back(falling_block_choice[randomIndex]);
 	}
-	out_falling_blocks_queue.push(0x30);    //finished sending blocks
-	out_falling_blocks_queue.push(0x00);
-	out_falling_blocks_queue.push(0x02);
-	out_falling_blocks_queue.push(0x02);
-	out_falling_blocks_queue.push(0x20);   //start in_game
-	out_falling_blocks_queue.push(0x0);
-	out_falling_blocks_queue.push(0x0);
-	out_falling_blocks_queue.push(0x0);
-	out_falling_blocks_queue.push(0x0);
+	out_falling_blocks.emplace_back(0x30);    //finished sending blocks
+	out_falling_blocks.emplace_back(0x00);
+	out_falling_blocks.emplace_back(0x02);
+	out_falling_blocks.emplace_back(0x02);
+	out_falling_blocks.emplace_back(0x20);   //start in_game
+	out_falling_blocks.emplace_back(0x0);
+	out_falling_blocks.emplace_back(0x0);
+	out_falling_blocks.emplace_back(0x0);
+	out_falling_blocks.emplace_back(0x0);
 	
 };
 
@@ -492,7 +493,7 @@ void hack_4p_tetris::update_ingame_states()
 					hack_4p_tetris_lines_packet lines;
 					lines.lines = in_data_buffer[i];
 					lines.from = i;
-					lines_queue.push(lines);
+					lines_vec.emplace_back(lines);
 				}
 				break; 
 			}
@@ -528,10 +529,11 @@ void hack_4p_tetris::send_ingame_bytes()
 	}
 	
 
-	if (!lines_queue.empty())
+	if (!lines_vec.empty())
 	{
-		hack_4p_tetris_lines_packet next = lines_queue.front();
-		lines_queue.pop();
+		hack_4p_tetris_lines_packet next = lines_vec.front();
+		send_data_vec.erase(send_data_vec.begin());
+
 		for (int i = 0; i < v_gb.size(); i++)
 		{
 			if (players_state[i] == IS_IN_WINNER_SCREEN) continue;
@@ -552,29 +554,122 @@ void hack_4p_tetris::send_ingame_bytes()
 
 
 
+
+/* netplay support functions*/
+
+
+size_t hack_4p_tetris::get_state_size(void)
+{
+	size_t ret = 0;
+	serializer s(&ret, serializer::COUNT);
+	serialize(s);
+
+	int size;
+	size = out_height_blocks.size();
+	s_VAR(size);
+	s_ARRAY(out_height_blocks.data());
+
+	size = out_falling_blocks.size();
+	s_VAR(size);
+	s_ARRAY(out_falling_blocks.data());
+
+	size = send_data_vec.size();
+	s_VAR(size);
+	s_ARRAY(send_data_vec.data());
+
+	size = lines_vec.size();
+	s_VAR(size);
+	s_ARRAY(lines_vec.data());
+
+	return ret;
+}
+
+
+
+void hack_4p_tetris::save_state_mem(void* buf)
+{
+	serializer s(buf, serializer::SAVE_BUF);
+	serialize(s);
+
+	int size;
+
+	size = out_height_blocks.size();
+	s_VAR(size);
+	s_ARRAY(out_height_blocks.data());
+
+	size = out_falling_blocks.size();
+	s_VAR(size);
+	s_ARRAY(out_falling_blocks.data());
+	
+	size = send_data_vec.size();
+	s_VAR(size);
+	s_ARRAY(send_data_vec.data());
+
+	size = lines_vec.size();
+	s_VAR(size);
+	s_ARRAY(lines_vec.data());
+
+	
+}
+
+void hack_4p_tetris::restore_state_mem(void* buf)
+{
+	serializer s(buf, serializer::LOAD_BUF);
+	serialize(s);
+
+	int size;
+	byte* tmp;
+
+	s_VAR(size);
+	tmp = new byte[size];
+	s_ARRAY(tmp);
+	out_height_blocks = std::vector<byte>();
+	for (int i = 0; i < size; i++)
+		out_height_blocks.emplace_back(tmp[i]);
+	
+
+	s_VAR(size);
+	tmp = new byte[size];
+	s_ARRAY(tmp);
+	out_falling_blocks = std::vector<byte>();
+	
+	for (int i = 0; i < size; i++)
+		out_falling_blocks.emplace_back(tmp[i]);
+
+
+	s_VAR(size);
+	tmp = new byte[size];
+	s_ARRAY(tmp);
+	send_data_vec = std::vector<byte>();
+
+	for (int i = 0; i < size; i++)
+		send_data_vec.emplace_back(tmp[i]);
+
+	s_VAR(size);
+	hack_4p_tetris_lines_packet* lp = new hack_4p_tetris_lines_packet[size];
+	s_ARRAY(lp);
+	lines_vec = std::vector<hack_4p_tetris_lines_packet>();
+
+	for (int i = 0; i < size; i++)
+		lines_vec.emplace_back(lp[i]);
+
+	
+}
+
+
 void hack_4p_tetris::serialize(serializer& s)
 {
-/* TODO
-	s_VAR(current_state);
-	s_VAR(transfer_speed);
-	s_VAR(seri_occer);
-	s_VAR(transfer_count);
-	s_VAR(phase_byte_count);
-	s_VAR(restart_in);
-	s_VAR(enter_statu
-		s_VAR(packet_size);
-	s_VAR(transfer_rate);
-	s_VAR(first_aa_trans_nr);
-	s_VAR(sync_trans_nr);
-	s_VAR(delay);
-	s_VAR(ready_to_sync_master);
-	s_VAR(master_is_synced);
 
 	s_ARRAY(in_data_buffer);
-	s_ARRAY(trans_buffer.data());
-	s_ARRAY(ans_buffer.data());
-	s_ARRAY(bytes_to_send.data());
-	*/
+	s_ARRAY(falling_block_choice);
+	s_VAR(tetris_state);
+	s_VAR(players_state);
+	s_VAR(current_max_height);
+	s_VAR(lines_from_player_id);
+	s_ARRAY(lines_to_send);
+	s_VAR(next_bytes_to_send);
+	s_VAR(process_counter);
+	s_VAR(process_occer);
 
 
 }

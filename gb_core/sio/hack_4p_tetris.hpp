@@ -24,17 +24,6 @@ enum hack_4p_tetris_player_state
 struct hack_4p_tetris_lines_packet {
 	byte lines;
 	int from;
-
-	// This method lets cereal know which data members to serialize
-	template<class Archive>
-	void serialize(Archive& archive)
-	{
-		archive(
-			lines,
-			from
-		); // serialize things by passing them to the archive
-	}
-
 };
 
 /*
@@ -44,10 +33,10 @@ struct hack_4p_tetris_mem_state {
 	int seri_occer = 2048 * 2048 * 2048;
 
 	byte in_data_buffer[4];
-	std::queue<byte> out_height_blocks_queue;
-	std::queue<byte> out_falling_blocks_queue;
-	std::queue<byte> send_data_queue;
-	std::queue<hack_4p_tetris_lines_packet> lines_queue;
+	std::queue<byte> out_height_blocks;
+	std::queue<byte> out_falling_blocks;
+	std::queue<byte> send_data_vec;
+	std::queue<hack_4p_tetris_lines_packet> lines_vec;
 
 	byte falling_block_choice[10] = {
 		0x00,
@@ -77,10 +66,10 @@ struct hack_4p_tetris_mem_state {
 	{
 		archive(
 			in_data_buffer,
-			out_height_blocks_queue,
-			out_falling_blocks_queue,
-			send_data_queue,
-			lines_queue,
+			out_height_blocks,
+			out_falling_blocks,
+			send_data_vec,
+			lines_vec,
 			falling_block_choice,
 			tetris_state,
 			players_state,
@@ -105,11 +94,11 @@ public:
 
 	void process() override;
 	void reset() override;
-	/*
+	
 	void save_state_mem(void* buf) override;
 	void restore_state_mem(void* buf) override;
 	size_t get_state_size() override;
-	*/
+	
 	void serialize(serializer& s) override;
 
 
@@ -117,7 +106,7 @@ public:
 
 private:
 	void log_traffic(byte id, byte b);
-	void init_send_data_queue();
+	void init_send_data_vec();
 	void clear_data_for_next_round();
 
 	void generate_height_blocks();
@@ -148,10 +137,10 @@ private:
 	*/
 
 	//byte in_data_buffer[4];
-	std::queue<byte> out_height_blocks_queue;
-	std::queue<byte> out_falling_blocks_queue;
-	std::queue<byte> send_data_queue;
-	std::queue<hack_4p_tetris_lines_packet> lines_queue;
+	std::vector<byte> out_height_blocks;
+	std::vector<byte> out_falling_blocks;
+	std::vector<byte> send_data_vec;
+	std::vector<hack_4p_tetris_lines_packet> lines_vec;
 
 	byte falling_block_choice[10] = {
 		0x00,
