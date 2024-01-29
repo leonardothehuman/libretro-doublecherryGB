@@ -205,7 +205,7 @@ public:
 	mbc *get_mbc() { return m_mbc; }
 	renderer *get_renderer() { return m_renderer; }
 	cheat *get_cheat() { return m_cheat; }
-	link_target* get_target() { return target; }
+	gb* get_target() { return target; }
 	gb_regs *get_regs() { return &regs; }
 	gbc_regs *get_cregs() { return &c_regs; }
 
@@ -225,7 +225,7 @@ public:
 
 	void refresh_pal();
 
-	void set_target(link_target* tar) { target = tar; }
+	void set_target(gb* tar) { target = tar; }
 	byte seri_send(byte data);
 
 	void hook_extport(ext_hook *ext);
@@ -242,8 +242,8 @@ private:
 
 	cheat *m_cheat;
 
-	//gb* target;
-	link_target* target;
+	gb* target;
+	//link_target* target;
 
 	gb_regs regs;
 	gbc_regs c_regs;

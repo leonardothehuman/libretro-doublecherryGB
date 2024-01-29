@@ -296,7 +296,7 @@ byte cpu::io_read(word adr)
 		if (ref_gb->get_target()){
 			if ((ref_gb->get_cregs()->RP&0xC0)==0xC0){
 				
-				gb* g = dynamic_cast<gb*>(ref_gb->get_target());
+				gb* g = ref_gb->get_target();
 				dword *que=g->get_cpu()->rp_que;
 				int que_cnt=0;
 				int cur;
@@ -1020,7 +1020,7 @@ void cpu::exec(int clocks)
 		if (total_clock>seri_occer){
 			seri_occer=0x7fffffff;
 			if (ref_gb->get_target()){
-				gb* g = dynamic_cast<gb*>(ref_gb->get_target());
+				gb* g = ref_gb->get_target();
 				byte ret=g->get_cpu()->seri_send(ref_gb->get_regs()->SB);
 				//byte ret = ref_gb->get_target()->send_byte(ref_gb->get_regs()->SB);
 				ref_gb->get_regs()->SB=ret;
