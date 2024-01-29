@@ -64,6 +64,7 @@ void cpu::reset()
 
 	rest_clock=0;
 	total_clock=sys_clock=div_clock=0;
+	clocks_since_last_serial = 0;
 	seri_occer=0x7fffffff;
 	halt=false;
 	speed=false;

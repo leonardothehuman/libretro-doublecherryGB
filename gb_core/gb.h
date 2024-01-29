@@ -23,7 +23,7 @@
 
 
 #include <vector>
-#include <array>
+//#include <array>
 #include <queue>
 #include <deque>
 
@@ -177,14 +177,17 @@ struct rom_info {
 	int gb_type;
 };
 
+/*
 class link_target {
 	friend class gb; 
 
 public:
-	virtual byte seri_send(byte);
+	virtual byte seri_send(byte) = 0;
 };
+*/
 
-class gb : public link_target
+
+class gb //: public link_target
 {
 friend class cpu;
 friend class link_target; 
@@ -226,6 +229,7 @@ public:
 	void refresh_pal();
 
 	void set_target(gb* tar) { target = tar; }
+	//byte seri_send(byte data) override;
 	byte seri_send(byte data);
 
 	void hook_extport(ext_hook *ext);
@@ -550,7 +554,7 @@ public:
 	void set_is_seri_master(bool enable);
 	void log_link_traffic(byte a, byte b);
 
-	byte net_id = 0x00;
+	//byte net_id = 0x00;
 
 private:
 	byte inline io_read(word adr);
@@ -601,6 +605,6 @@ private:
 	bool is_clock_giver = false; 
 	*/
 
-	int clocks_since_last_serial = 0;
+	int clocks_since_last_serial;
 
 };
