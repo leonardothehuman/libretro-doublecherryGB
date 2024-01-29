@@ -111,8 +111,10 @@ void dmy_renderer::refresh() {
    static int16_t stream[SAMPLES_PER_FRAME*2];
    // static int16_t stream[SAMPLES_PER_FRAME];
 
+   
    //if (v_gb[1] && gblink_enable)
-   if (emulated_gbs > 1)
+   //if (emulated_gbs > 1)
+   if(true)
    {
         /*
       // if dual gb mode
@@ -129,6 +131,7 @@ void dmy_renderer::refresh() {
       }
       else if (audio_2p_mode == which_gb)
       */
+
        if (audio_2p_mode == which_gb)
        {
            // only play gb 0 or 1
@@ -145,7 +148,7 @@ void dmy_renderer::refresh() {
          //audio_batch_cb(stream, SAMPLES_PER_FRAME);
 
          //audio_2p_mode &= 3;
-         memset(stream, 0, sizeof(stream));
+         //memset(stream, 0, sizeof(stream));
         }
    }
    else
@@ -154,6 +157,8 @@ void dmy_renderer::refresh() {
       audio_batch_cb(stream, SAMPLES_PER_FRAME); 
    }
    fixed_time = time(NULL);
+
+   
 }
 
 int dmy_renderer::check_pad()
