@@ -10,10 +10,13 @@ public:
 	void process();
 	bool is_ready_to_process();
 	void reset();
+	/*
 	void save_mem_state(void* buf);
 	void restore_mem_state(void* buf);
 	size_t get_state_size();
-
+	*/
+	void serialize(serializer& s) override;
+	
 private:
 	void log_traffic(byte id, byte b);
 	void fill_send_data_queue(char sequence[]);

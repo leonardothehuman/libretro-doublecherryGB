@@ -1,5 +1,6 @@
 #pragma once
 #include "link_master_device.hpp"
+#include "../serializer.h"
 
 
 
@@ -111,6 +112,9 @@ public:
 	void restore_state_mem(void* buf) override;
 	size_t get_state_size() override;
 
+	void serialize(serializer& s);
+
+
 	void log_save_state(char* data, size_t size);
 
 private:
@@ -166,7 +170,9 @@ private:
 
 	std::vector<byte> trans_buffer[4];
 	std::vector<byte> ans_buffer[4];
-	std::queue<byte> bytes_to_send;
+
+	std::vector<byte> bytes_to_send;
+	//std::queue<byte> bytes_to_send;
 	//dmg07_mem_state mem{};
 };
 

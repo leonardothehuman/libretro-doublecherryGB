@@ -105,7 +105,7 @@ int _show_player_screens = 1;
 static size_t _serialize_size[4] = { 0, 0,0,0 };
 
 bool gblink_enable = false;
-int emulated_gbs = 1;
+int emulated_gbs = 4;
 
 int audio_2p_mode = 0;
 // used to make certain core options only take effect once on core startup

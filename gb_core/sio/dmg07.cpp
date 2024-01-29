@@ -29,17 +29,7 @@
 
 dmg07::dmg07(std::vector<gb*> g_gb)  {
 
-
 	v_gb.insert(v_gb.begin(), std::begin(g_gb), std::end(g_gb));
-
-	/*
-	for (int i = 0; i < v_gb.size(); i++)
-	{
-		cpu* cpu = v_gb[i]->get_cpu();
-		cpu->m_dmg07 = this;
-	}
-	*/
-
 }
 
 
@@ -56,7 +46,7 @@ void dmg07::reset()
 	packet_size = 0;
 	transfer_rate = 0x00;
 	transfer_speed = 512 * 8;
-	seri_occer = 2048 * 2048 * 2048;
+	seri_occer = 512 * 8 * 5;
 
 	first_aa_trans_nr = 0;
 	sync_trans_nr = 0;
@@ -227,8 +217,9 @@ void dmg07::handle_answer(int i, byte dat)
 						transfer_speed = 5928 * 3;
 					else if (dat == 0xA0)	// Jinsei Game Densetsz
 						transfer_speed = 5928 * 4;
-					else if(dat == 0x85) // Top Rank Tennis
+					else if (dat == 0x85) // Top Rank Tennis 
 						transfer_speed = 512 * 8;
+					else if (dat == 0xf3) transfer_speed = 70216;
 					else {
 						char ping_speed_multiplayer = dat & 0x0F;
 						if (ping_speed_multiplayer)
@@ -338,7 +329,7 @@ void dmg07::handle_answer(int i, byte dat)
 
 					for (int i = 0; i < (packet_size * 4); i++)
 					{
-						bytes_to_send.push(0xFF);
+						bytes_to_send.emplace_back(0xFF);
 					}
 					restart_in += transfer_count;
 					break;
@@ -465,51 +456,6 @@ void dmg07::clear_all_buffers() {
 	for (byte i = 0; i < dmg07::v_gb.size(); i++) trans_buffer[i].clear();
 }
 
-/*
-
-void dmg07::get_all_SC_reg_data()
-{
-	for (int i = 0; i < v_gb.size(); i++)
-	{
-		byte data = v_gb[i]->get_regs()->SC;
-		in_data_buffer[i] = data;
-	}
-};
-
-void dmg07::get_all_SB_reg_data()
-{
-	for (int i = 0; i < v_gb.size(); i++)
-	{
-		byte data = v_gb[i]->get_regs()->SB;
-		in_data_buffer[i] = data;
-	}
-};
-
-bool dmg07::is_expected_data(byte data)
-{
-	for (int i = 0; i < v_gb.size(); i++)
-	{
-		if (in_data_buffer[i] != data) return false;
-	}
-	return true;
-}
-
-bool dmg07::is_ready_to_process() {
-
-	return (v_gb[0]->get_cpu()->total_clock > seri_occer);
-}
-
-bool dmg07::all_IE_are_handled()
-{
-
-	for (int i = 0; i < v_gb.size(); i++)
-	{
-		if ((v_gb[i]->get_regs()->IF & v_gb[i]->get_regs()->IE & INT_SERIAL)) return false;
-	}
-	return true;
-
-}
-*/
 
 void dmg07::fill_buffer_for_less_than_4p() 
 {
@@ -519,7 +465,7 @@ void dmg07::fill_buffer_for_less_than_4p()
 		{
 			for (int i = 0; i < packet_size; i++)
 			{
-				bytes_to_send.push(0);
+				bytes_to_send.emplace_back(0);
 			}
 			
 		}
@@ -529,8 +475,8 @@ void dmg07::fill_buffer_for_less_than_4p()
 void dmg07::process()
 {
 
-	//if (!is_ready_for_next_tik() || !all_IE_are_handled()) return;
-	if (!is_ready_for_next_tik()) return;
+	if (!is_ready_for_next_tik() || !all_IE_are_handled()) return;
+	//if (!is_ready_for_next_tik()) return;
 	update_seri_occer();
 
 	switch (current_state)
@@ -566,7 +512,7 @@ void dmg07::process()
 					for (byte i = 0; i < v_gb.size(); i++)
 					{
 						for (const auto& e : trans_buffer[i])
-							bytes_to_send.push(e);
+							bytes_to_send.emplace_back(e);
 
 						trans_buffer[i].clear();
 					}
@@ -585,7 +531,7 @@ void dmg07::process()
 					//send packets and get new packets
 
 					byte next_byte = bytes_to_send.front();
-					bytes_to_send.pop();
+					bytes_to_send.erase(bytes_to_send.begin());
 
 					for (byte i = 0; i < v_gb.size(); i++)
 					{
@@ -614,7 +560,7 @@ void dmg07::process()
 						{
 							
 							for (const auto& e : trans_buffer[i])
-								bytes_to_send.push(e); // create bytes_to_send queue
+								bytes_to_send.emplace_back(e); // create bytes_to_send queue
 
 							trans_buffer[i].clear();
 							
@@ -638,54 +584,51 @@ void dmg07::process()
 
 /* netplay support functions*/
 	
-size_t dmg07::get_state_size() {
-
-	/*
-	std::stringstream ss; // any stream can be used
-	cereal::BinaryOutputArchive oarchive(ss); // Create an output archive
-	oarchive(this->; // Write the data to the archive
-	return sizeof(ss.str().data());
-	*/
+/*
+size_t dmg07::get_state_size(void)
+{
+	size_t ret = 0;
+	serializer s(&ret, serializer::COUNT);
+	serialize(s);
+	return ret;
 }
 
-void dmg07::save_state_mem(void* buf) {
-	/*
-	std::stringstream ss; // any stream can be used
-	cereal::BinaryOutputArchive oarchive(ss); // Create an output archive
-	oarchive(this->; // Write the data to the archive
-	
-	dmg07_state_size size{};
-	size.size = ss.str().length();
-	oarchive(size);
-	*/
-
+void dmg07::save_state_mem(void* buf)
+{
 	serializer s(buf, serializer::SAVE_BUF);
-	//s.process((void*)ss.str().data(), ss.str().length());
-	//buf += ss.str().length();
+	serialize(s);
 }
 
 void dmg07::restore_state_mem(void* buf)
 {
-	
-	/*
-	std::stringstream ss2;
-	ss2.write((const char*)buf, 248);
-
-	cereal::BinaryInputArchive iarchive(ss2); // Create an input archive
-	iarchive(this->;
-
-	dmg07_state_size size{};
-	iarchive(size);
-	*/
-
-	//buf += size.size + sizeof(size_t); 
-
-	/*
 	serializer s(buf, serializer::LOAD_BUF);
-	s.process(buf, sizeof(ss.str().data()));
-	*/
-	
-
+	serialize(s);
 }
+*/
 
 
+void dmg07::serialize(serializer& s) 
+{
+	
+	s_VAR(current_state); 
+	s_VAR(transfer_speed);
+	s_VAR(seri_occer);
+	s_VAR(transfer_count);
+	s_VAR(phase_byte_count);
+	s_VAR(restart_in);
+	s_VAR(enter_statu
+	s_VAR(packet_size);
+	s_VAR(transfer_rate);
+	s_VAR(first_aa_trans_nr);
+	s_VAR(sync_trans_nr);
+	s_VAR(delay);
+	s_VAR(ready_to_sync_master);
+	s_VAR(master_is_synced);
+
+	s_ARRAY(in_data_buffer);
+	s_ARRAY(trans_buffer.data());
+	s_ARRAY(ans_buffer.data());
+	s_ARRAY(bytes_to_send.data());
+
+	
+}

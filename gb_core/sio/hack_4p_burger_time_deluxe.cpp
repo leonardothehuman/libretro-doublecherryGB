@@ -240,3 +240,33 @@ void hack_4p_burger_time_deluxe::process() {
 }
 
 
+
+/*
+void dmg07::serialize(serializer& s)
+{
+
+	s_VAR(current_state);
+	s_VAR(transfer_speed);
+	s_VAR(seri_occer);
+	s_VAR(transfer_count);
+	s_VAR(phase_byte_count);
+	s_VAR(restart_in);
+	s_VAR(enter_statu
+		s_VAR(packet_size);
+	s_VAR(transfer_rate);
+	s_VAR(first_aa_trans_nr);
+	s_VAR(sync_trans_nr);
+	s_VAR(delay);
+	s_VAR(ready_to_sync_master);
+	s_VAR(master_is_synced);
+
+	s_ARRAY(in_data_buffer);
+	s_ARRAY(trans_buffer.data());
+	s_ARRAY(ans_buffer.data());
+	s_ARRAY(bytes_to_send.data());
+
+
+}
+
+*/
+

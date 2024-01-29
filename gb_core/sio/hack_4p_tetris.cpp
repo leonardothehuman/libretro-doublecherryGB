@@ -550,36 +550,31 @@ void hack_4p_tetris::send_ingame_bytes()
 
 }
 
-void hack_4p_tetris::save_state_mem(void* buf) 
+
+
+void hack_4p_tetris::serialize(serializer& s)
 {
-	/**
-	std::stringstream ss; // any stream can be used
-	cereal::BinaryOutputArchive oarchive(ss); // Create an output archive
-	oarchive(this->; // Write the data to the archive
-	
-	
-	dmg07_state_size size{};
-	size.size = ss.str().length();
-	oarchive(size);
+/* TODO
+	s_VAR(current_state);
+	s_VAR(transfer_speed);
+	s_VAR(seri_occer);
+	s_VAR(transfer_count);
+	s_VAR(phase_byte_count);
+	s_VAR(restart_in);
+	s_VAR(enter_statu
+		s_VAR(packet_size);
+	s_VAR(transfer_rate);
+	s_VAR(first_aa_trans_nr);
+	s_VAR(sync_trans_nr);
+	s_VAR(delay);
+	s_VAR(ready_to_sync_master);
+	s_VAR(master_is_synced);
 
-
-	serializer s(buf, serializer::SAVE_BUF);
-	s.process((void*)ss.str().data(), ss.str().length());
-	buf += ss.str().length();
-	*/
-}
-void hack_4p_tetris::restore_state_mem(void* buf)
-{
-	/*
-	std::stringstream ss2;
-	ss2.write((const char*)buf, 248);
-
-	cereal::BinaryInputArchive iarchive(ss2); // Create an input archive
-	iarchive(this->;
+	s_ARRAY(in_data_buffer);
+	s_ARRAY(trans_buffer.data());
+	s_ARRAY(ans_buffer.data());
+	s_ARRAY(bytes_to_send.data());
 	*/
 
-}
-
-size_t hack_4p_tetris::get_state_size() {
 
 }

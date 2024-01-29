@@ -1,7 +1,7 @@
 
 #include "link_master_device.hpp"
 
-
+extern bool logging_allowed;
 
 byte link_master_device::send_byte(byte which, byte dat)
 {
@@ -22,19 +22,22 @@ void link_master_device::broadcast_byte(byte dat)
 }
 
 void link_master_device::log_traffic(byte id, byte b) {
-	std::string filePath = "./4p_log.csv";
-	std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
-	if (id < 4)
-	{
-		ofs << "" << std::hex << (int)b << ",";
 
-	}
-	else
-	{
-		ofs << "" << std::hex << (int)b << std::endl;
-	}
+	if (logging_allowed) {
+		std::string filePath = "./4p_log.csv";
+		std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
+		if (id < 4)
+		{
+			ofs << "" << std::hex << (int)b << ",";
 
-	ofs.close();
+		}
+		else
+		{
+			ofs << "" << std::hex << (int)b << std::endl;
+		}
+
+		ofs.close();
+	}
 };
 
 bool link_master_device::is_ready_for_next_tik() {
@@ -44,6 +47,28 @@ bool link_master_device::is_ready_for_next_tik() {
 void link_master_device::update_seri_occer() {
 	seri_occer = v_gb[0]->get_cpu()->get_clock() + transfer_speed;
 }
+
+
+size_t link_master_device::get_state_size(void)
+{
+	size_t ret = 0;
+	serializer s(&ret, serializer::COUNT);
+	serialize(s);
+	return ret;
+}
+
+void link_master_device::save_state_mem(void* buf)
+{
+	serializer s(buf, serializer::SAVE_BUF);
+	serialize(s);
+}
+
+void link_master_device::restore_state_mem(void* buf)
+{
+	serializer s(buf, serializer::LOAD_BUF);
+	serialize(s);
+}
+
 
 //these are all cheating functions cause, that's nothing real link hardware could do,
 //but helpful to get a hack working 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../gb.h"
+#include "../serializer.h"
 
 #include <fstream>
 
@@ -12,12 +13,13 @@ class link_master_device{
 public:
 	virtual void process() = 0;
 	virtual void reset() = 0;
-	void virtual save_state_mem(void* buf) = 0;
-	void virtual restore_state_mem(void* buf) = 0;
-	size_t virtual get_state_size() = 0;
+	void virtual save_state_mem(void* buf);
+	void virtual restore_state_mem(void* buf) ;
+	size_t virtual get_state_size();
+	void virtual serialize(serializer& s) = 0;
 	
 	int transfer_speed = 512 * 8;
-	int seri_occer = 0x7fffffff;
+	int seri_occer = 512*8*5;
 
 protected:
 	virtual byte send_byte(byte which, byte dat);

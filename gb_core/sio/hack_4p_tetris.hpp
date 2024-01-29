@@ -105,9 +105,13 @@ public:
 
 	void process() override;
 	void reset() override;
+	/*
 	void save_state_mem(void* buf) override;
 	void restore_state_mem(void* buf) override;
 	size_t get_state_size() override;
+	*/
+	void serialize(serializer& s) override;
+
 
 	//bool is_ready_to_process();
 

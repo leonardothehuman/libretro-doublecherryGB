@@ -6,7 +6,7 @@ void auto_config_4p_hack(byte* rombuf)
     cart_name[16] = '\0';
     cart_name[17] = '\0';
 
-    if (! strcmp(cart_name, "TETRIS"))
+    if (!strcmp(cart_name, "TETRIS"))
     {
         master_link = new hack_4p_tetris(v_gb);
     }
