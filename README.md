@@ -10,16 +10,16 @@
 
 > DoubleCherryGB is an open source (GPLv2) GB/GBC emulator with 4 Player support, based on the TGBDual libretro core by GIGO and Hii.
 > It emulates the GAMEBOY 4 PLAYER ADAPTER (DMG-07) and also adds 4 Player Link Hacks.
+> It's named after the Double Cherry Item from Super Mario 3D Land.
 
 Check my [website](https://timoelrichs.is-a.dev) for more information, planned features and compatibility list.
 
 <br>
 
-
 ### Features
 
 - GAMEBOY 4 PLAYER ADAPTER (DMG-07) emulation
-- 4-player hacks for non 4-player Games (Tetris and Kwirk)
+- 4-player hacks for 2-player games (Tetris and Kwirk)
 - local splitscreen
 - netplay support
 
@@ -28,11 +28,13 @@ Netplay is now working. Make sure to have all the same amount of emulated gamebo
 
 ![](/screenshots/F-1%20Race.png)
 ![](/screenshots/SuperRC.png)
+![](/screenshots/TopRankTennis.png)
+![](/screenshots/YoshisCookie.png)
+![](/screenshots/WaveRace.png)
 
 ### How to
 
-Download the core from the github release page. 
-This is an early pre-alpha. I want to add the core to the official Libretro infrastructure soon.
+You can download the core via RetroArch Online-Updater on Windows, Linux and Android.
 
 To emulate up to four units, use the core options in your frontend.  
 
