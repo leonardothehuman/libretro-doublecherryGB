@@ -155,13 +155,13 @@ private:
 		0x18
 	};
 
-	hack_4p_tetris_state tetris_state = TITLE_SCREEN;
+	hack_4p_tetris_state tetris_state;
 	hack_4p_tetris_player_state players_state[4];
-	byte current_max_height = 0;
-	int lines_from_player_id = 0;
+	byte current_max_height;
+	int lines_from_player_id;
 	byte lines_to_send[4] = { 0,0,0,0 };
 	byte next_bytes_to_send[4] = { 0,0,0,0 };
-	int process_counter = 0;
-	int process_occer = 5;
+	int process_counter;
+	//int process_occer;
 
 };

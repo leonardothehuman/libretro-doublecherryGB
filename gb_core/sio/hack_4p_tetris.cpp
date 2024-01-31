@@ -43,6 +43,14 @@ hack_4p_tetris::hack_4p_tetris(std::vector<gb*> g_gb) {
 	}
 		
 	init_send_data_vec();
+
+	tetris_state = TITLE_SCREEN;
+
+	current_max_height = 0;
+	lines_from_player_id = 0;
+	process_counter = 0;
+	//process_occer = 5;
+
 }
 
 void hack_4p_tetris::clear_data_for_next_round()
@@ -63,6 +71,11 @@ void hack_4p_tetris::reset()
 
 	seri_occer = 4096 * 1024 * 4;
 	transfer_speed = 4096 * 1024 / 16;
+
+	current_max_height = 0;
+	lines_from_player_id = 0;
+	process_counter = 0;
+	//process_occer = 5;
 
 	clear_data_for_next_round();
 	send_data_vec = std::vector<byte>();
@@ -532,7 +545,7 @@ void hack_4p_tetris::send_ingame_bytes()
 	if (!lines_vec.empty())
 	{
 		hack_4p_tetris_lines_packet next = lines_vec.front();
-		send_data_vec.erase(send_data_vec.begin());
+		lines_vec.erase(lines_vec.begin());
 
 		for (int i = 0; i < v_gb.size(); i++)
 		{
@@ -669,7 +682,7 @@ void hack_4p_tetris::serialize(serializer& s)
 	s_ARRAY(lines_to_send);
 	s_VAR(next_bytes_to_send);
 	s_VAR(process_counter);
-	s_VAR(process_occer);
+	//s_VAR(process_occer);
 
 
 }
