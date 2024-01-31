@@ -185,6 +185,7 @@ public:
 	virtual byte seri_send(byte) = 0;
 	virtual byte get_SB_value() = 0;
 	virtual byte get_SC_value() = 0;
+	virtual void reset() = 0;
 };
 
 class ir_target {
@@ -192,6 +193,7 @@ class ir_target {
 
 public:
 	virtual dword* get_rp_que() = 0;
+	virtual void reset() = 0;
 };
 
 

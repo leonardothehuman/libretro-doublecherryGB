@@ -27,6 +27,8 @@
 #include <cstdlib>
 #include <fstream>
 
+extern bool logging_allowed; 
+
 hack_4p_tetris::hack_4p_tetris(std::vector<gb*> g_gb) {
 
 	v_gb.insert(v_gb.begin(), std::begin(g_gb), std::end(g_gb));
@@ -123,6 +125,7 @@ void hack_4p_tetris::init_send_data_vec() {
 
 void hack_4p_tetris::log_traffic(byte id, byte b)
 {
+	if (!logging_allowed) return; 
 
 	std::string filePath = "./tetrishack_log.txt";
 	std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
