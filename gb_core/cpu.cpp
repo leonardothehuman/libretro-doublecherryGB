@@ -1105,8 +1105,10 @@ void cpu::serialize(serializer &s)
 	s_VAR(_ff6c); s_VAR(_ff72); s_VAR(_ff73); s_VAR(_ff74); s_VAR(_ff75);
 }
 
+/*
 void cpu::set_is_seri_master(bool enable) {
 	
 	//this->is_clock_giver = enable;
 }
+*/
 

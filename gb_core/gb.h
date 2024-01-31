@@ -177,17 +177,19 @@ struct rom_info {
 	int gb_type;
 };
 
-/*
+
 class link_target {
 	friend class gb; 
 
 public:
 	virtual byte seri_send(byte) = 0;
+	virtual byte get_SB_value() = 0;
+	virtual byte get_SC_value() = 0;
 };
-*/
 
 
-class gb //: public link_target
+
+class gb : public link_target
 {
 friend class cpu;
 friend class link_target; 
@@ -208,7 +210,8 @@ public:
 	mbc *get_mbc() { return m_mbc; }
 	renderer *get_renderer() { return m_renderer; }
 	cheat *get_cheat() { return m_cheat; }
-	gb* get_target() { return target; }
+	//gb* get_target() { return target; }
+	link_target* get_target() { return target; }
 	gb_regs *get_regs() { return &regs; }
 	gbc_regs *get_cregs() { return &c_regs; }
 
@@ -228,9 +231,15 @@ public:
 
 	void refresh_pal();
 
-	void set_target(gb* tar) { target = tar; }
-	//byte seri_send(byte data) override;
-	byte seri_send(byte data);
+	//void set_target(gb* tar) { target = tar; }
+	byte seri_send(byte data) override;
+	byte get_SB_value() override {
+		return this->get_regs()->SB;
+	}
+	byte get_SC_value() override {
+		return this->get_regs()->SC;
+	}
+	//byte seri_send(byte data);
 
 	void hook_extport(ext_hook *ext);
 	void unhook_extport();
@@ -551,7 +560,7 @@ public:
 
 	void serialize(serializer &s);
 
-	void set_is_seri_master(bool enable);
+	//void set_is_seri_master(bool enable);
 	void log_link_traffic(byte a, byte b);
 
 	//byte net_id = 0x00;
@@ -566,6 +575,7 @@ private:
 	void log();
 
 	gb *ref_gb;
+	link_target* linked_device;
 	cpu_regs regs;
 
 	byte ram[0x2000*4];
