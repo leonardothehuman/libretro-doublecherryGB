@@ -187,9 +187,16 @@ public:
 	virtual byte get_SC_value() = 0;
 };
 
+class ir_target {
+	friend class gb;
+
+public:
+	virtual dword* get_rp_que() = 0;
+};
 
 
-class gb : public link_target
+
+class gb : public link_target, ir_target
 {
 friend class cpu;
 friend class link_target; 
@@ -210,8 +217,20 @@ public:
 	mbc *get_mbc() { return m_mbc; }
 	renderer *get_renderer() { return m_renderer; }
 	cheat *get_cheat() { return m_cheat; }
+
 	//gb* get_target() { return target; }
-	link_target* get_target() { return target; }
+
+	void set_target(gb* target) { 
+		this->linked_cable_device = target; 
+		this->linked_ir_device = target;
+	};
+
+	link_target* get_linked_target() { return linked_cable_device; }
+	void set_linked_target(link_target* target) { this->linked_cable_device = target; };
+
+	ir_target* get_ir_target() { return linked_ir_device; }
+	void set_ir_target(ir_target* target) { this->linked_ir_device = target; };
+
 	gb_regs *get_regs() { return &regs; }
 	gbc_regs *get_cregs() { return &c_regs; }
 
@@ -239,8 +258,8 @@ public:
 	byte get_SC_value() override {
 		return this->get_regs()->SC;
 	}
-	//byte seri_send(byte data);
 
+	dword* get_rp_que() override;
 	void hook_extport(ext_hook *ext);
 	void unhook_extport();
 
@@ -255,8 +274,9 @@ private:
 
 	cheat *m_cheat;
 
-	gb* target;
-	//link_target* target;
+	//gb* target;
+	link_target* linked_cable_device;
+	ir_target* linked_ir_device;
 
 	gb_regs regs;
 	gbc_regs c_regs;

@@ -34,7 +34,8 @@ gb::gb(renderer *ref,bool b_lcd,bool b_apu)
 	m_mbc=new mbc(this);
 	m_cpu=new cpu(this);
 	m_cheat=new cheat(this);
-	target=NULL;
+	linked_cable_device=NULL;
+	linked_ir_device = NULL;
 
 	m_renderer->reset();
 	m_renderer->set_sound_renderer(b_apu?m_apu->get_renderer():NULL);
@@ -111,6 +112,10 @@ byte gb::seri_send(byte data)
 void gb::set_skip(int frame)
 {
 	skip_buf=frame;
+}
+
+dword* gb::get_rp_que() {
+	return this->get_cpu()->rp_que;
 }
 
 bool gb::load_rom(byte *buf,int size,byte *ram,int ram_size, bool persistent)
