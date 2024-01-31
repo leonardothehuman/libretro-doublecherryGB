@@ -218,6 +218,8 @@ bool retro_load_game(const struct retro_game_info* info)
  
    }
 
+   set_cart_name(rom_data);
+
 //   master_link = new dmg07(v_gb);
 
    
@@ -241,7 +243,7 @@ bool retro_load_game(const struct retro_game_info* info)
        {
            mode = MODE_SINGLE_GAME_DUAL;
            if (!master_link)  master_link = new dmg07(v_gb);
-            auto_config_4p_hack(rom_data);
+            auto_config_4p_hack();
 
            //master_link = new dmg07(v_gb); 
            //master_link = new tetris_4p_hack(v_gb);
@@ -253,7 +255,7 @@ bool retro_load_game(const struct retro_game_info* info)
            mode = MODE_SINGLE_GAME_DUAL;
         
            if (use_multi_adapter && !master_link) master_link = new dmg07(v_gb);
-           auto_config_4p_hack(rom_data);
+           auto_config_4p_hack();
 
            if (!use_multi_adapter && gblink_enable) 
            {

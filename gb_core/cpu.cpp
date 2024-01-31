@@ -294,11 +294,12 @@ byte cpu::io_read(word adr)
 	case 0xFF55://HDMA5(転送実行) // HDMA5 (run forward)
 		return (dma_executing?((dma_rest-1)&0x7f):0xFF);
 	case 0xFF56://RP(赤外線) // RP (infrared)
-		if (ref_gb->get_target()){
+		if (ref_gb->get_ir_target()){
 			if ((ref_gb->get_cregs()->RP&0xC0)==0xC0){
 				
-				gb* g = ref_gb->get_target();
-				dword *que=g->get_cpu()->rp_que;
+				//gb* g = ref_gb->get_target();
+				//dword *que=g->get_cpu()->rp_que;
+				dword* que = ref_gb->get_ir_target()->get_rp_que();
 				int que_cnt=0;
 				int cur;
 				while((que[que_cnt]&0xffff)>rest_clock)	cur=que[que_cnt++]>>16;
@@ -1020,9 +1021,11 @@ void cpu::exec(int clocks)
 	
 		if (total_clock>seri_occer){
 			seri_occer=0x7fffffff;
-			if (ref_gb->get_target()){
-				gb* g = ref_gb->get_target();
-				byte ret=g->get_cpu()->seri_send(ref_gb->get_regs()->SB);
+			if (ref_gb->get_linked_target()){
+
+				//gb* g = ref_gb->get_target();
+				//byte ret=g->get_cpu()->seri_send(ref_gb->get_regs()->SB);
+				byte ret = ref_gb->get_linked_target()->seri_send(ref_gb->get_regs()->SB);
 				//byte ret = ref_gb->get_target()->send_byte(ref_gb->get_regs()->SB);
 				ref_gb->get_regs()->SB=ret;
 				ref_gb->get_regs()->SC&=3;
@@ -1105,8 +1108,10 @@ void cpu::serialize(serializer &s)
 	s_VAR(_ff6c); s_VAR(_ff72); s_VAR(_ff73); s_VAR(_ff74); s_VAR(_ff75);
 }
 
+/*
 void cpu::set_is_seri_master(bool enable) {
 	
 	//this->is_clock_giver = enable;
 }
+*/
 

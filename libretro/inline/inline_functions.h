@@ -1,14 +1,23 @@
 
-void auto_config_4p_hack(byte* rombuf)
+void set_cart_name(byte* rombuf)
 {
-    char cart_name[18];
     memcpy(cart_name, rombuf + 0x134, 16);
     cart_name[16] = '\0';
     cart_name[17] = '\0';
+}
 
+void auto_config_4p_hack()
+{
+    if (!cart_name) return; 
     if (!strcmp(cart_name, "TETRIS"))
     {
         master_link = new hack_4p_tetris(v_gb);
+    }
+    if (!strcmp(cart_name, "KWIRK"))
+    {
+        delete master_link; 
+        master_link = NULL; 
+        linked_target_device = new hack_4p_kwirk(v_gb);
     }
 };
 

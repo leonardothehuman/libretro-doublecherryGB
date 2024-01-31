@@ -85,6 +85,7 @@ static enum mode mode = MODE_SINGLE_GAME;
 std::vector<gb*> v_gb;
 std::vector <dmy_renderer*> render;
 link_master_device* master_link;
+link_target* linked_target_device; 
 bool use_multi_adapter = false;
 bool use_tetris_4p_hack = false;
 bool log_2p_link = false;
@@ -106,6 +107,7 @@ static size_t _serialize_size[4] = { 0, 0,0,0 };
 
 bool gblink_enable = false;
 int emulated_gbs = 4;
+char cart_name[18];
 
 int audio_2p_mode = 0;
 // used to make certain core options only take effect once on core startup
