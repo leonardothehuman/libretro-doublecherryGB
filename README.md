@@ -14,17 +14,20 @@
 Check my [website](https://timoelrichs.is-a.dev) for more information, planned features and compatibility list.
 
 <br>
-<br>
-<br>
+
 
 ### Features
 
-- DMG-07 Emulation
-- Tetris 4Player Hack
+- GAMEBOY 4 PLAYER ADAPTER (DMG-07) emulation
+- 4-player hacks for non 4-player Games (Tetris and Kwirk)
+- local splitscreen
+- netplay support
+
 
 Netplay is now working. Make sure to have all the same amount of emulated gameboys in your core-config.
 
 ![](/screenshots/F-1%20Race.png)
+![](/screenshots/SuperRC.png)
 
 ### How to
 
@@ -37,11 +40,15 @@ Thanks to
 - Shonumi for doing the research and documentation on the dmg-07  https://shonumi.github.io/index.html
 - GIGO and Hii for making TGBDual and zhe libretro port
 
+![](/screenshots/Faceball%202000.png)
+![](/screenshots/Tetris.png)
+![](/screenshots/tetris_winner.png)
+![](/screenshots/Kwirk.png)
+
 Original sources from
 - https://github.com/libretro/tgbdual-libretro
 - http://gigo.retrogames.com/download.html#tgb-dual
 - http://shinh.skr.jp/tgbdualsdl/
 
 
-![](/screenshots/Faceball%202000.png)
-![](/screenshots/Tetris.png)
+
