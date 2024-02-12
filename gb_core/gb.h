@@ -182,7 +182,7 @@ class link_target {
 	friend class gb; 
 
 public:
-	virtual byte seri_send(byte) = 0;
+	virtual byte seri_send(byte) = 0;	
 	virtual byte get_SB_value() = 0;
 	virtual byte get_SC_value() = 0;
 	virtual void reset() = 0;

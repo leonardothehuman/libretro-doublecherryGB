@@ -19,8 +19,17 @@ void auto_config_4p_hack()
         master_link = NULL; 
         linked_target_device = new hack_4p_kwirk(v_gb);
     }
+
 };
 
+void auto_config_1p_link() {
+    if (!strcmp(cart_name, "BATTLE SPACE"))
+    {
+        master_link = new barcodeboy(v_gb);
+        logging_allowed = true; 
+
+    }
+}
 
 char* read_file_to_buffer(const char* filename, size_t* file_size) {
     FILE* file = fopen(filename, "rb");

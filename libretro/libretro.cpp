@@ -226,7 +226,11 @@ bool retro_load_game(const struct retro_game_info* info)
    //set link connections
    switch (emulated_gbs)
    {
-       case 1: mode = MODE_SINGLE_GAME; break;
+       case 1:
+       {
+           auto_config_1p_link();
+           mode = MODE_SINGLE_GAME; break; 
+       }
        case 2:
        {
            //mode = MODE_DUAL_GAME;
