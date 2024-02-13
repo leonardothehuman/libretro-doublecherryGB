@@ -23,11 +23,15 @@ void auto_config_4p_hack()
 };
 
 void auto_config_1p_link() {
-    if (!strcmp(cart_name, "BATTLE SPACE"))
+    if (!cart_name) return;
+    if (!strcmp(cart_name, "BATTLE SPACE") || 
+        !strcmp(cart_name, "MONSTER MAKER") ||
+        !strcmp(cart_name, "KATTOBI ROAD") ||
+        !strcmp(cart_name, "FAMILY JOCKEY2") ||
+        !strcmp(cart_name, "FAMISTA3")
+        )
     {
-        master_link = new barcodeboy(v_gb);
-        logging_allowed = true; 
-
+        master_link = new barcodeboy(v_gb, cart_name);
     }
 }
 
@@ -258,6 +262,16 @@ static void check_variables(void)
     }
     else {
 
+        /*
+        var.key = "doublecherrygb_detect_gba";
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+        {
+            if (!strcmp(var.value, "On"))
+                detect_gba = true; 
+        }
+        */
+     
         int screenw = 160, screenh = 144;
 
         my_av_info->geometry.base_width = screenw;

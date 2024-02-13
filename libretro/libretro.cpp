@@ -215,6 +215,7 @@ bool retro_load_game(const struct retro_game_info* info)
                libretro_supports_persistent_buffer))
                return false;
        }
+       v_gb[i]->set_use_gba(detect_gba);
  
    }
 

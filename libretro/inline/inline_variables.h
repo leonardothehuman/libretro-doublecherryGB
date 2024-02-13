@@ -8,6 +8,7 @@
 
 static const struct retro_variable vars_single[] = {
     { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4" },
+    // { "doublecherrygb_detect_gba", "detect playing on gba (gba enhancements); Off|On" },
     { NULL, NULL },
 };
 
@@ -90,6 +91,7 @@ bool use_multi_adapter = false;
 bool use_tetris_4p_hack = false;
 bool log_2p_link = false;
 bool logging_allowed = false; 
+bool detect_gba = false; 
 
 
 retro_log_printf_t log_cb;

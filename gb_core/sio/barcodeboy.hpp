@@ -9,9 +9,9 @@ class barcodeboy : public link_target, public link_master_device
 	
 
 public:
-	barcodeboy(std::vector<gb*> g_gb);
+	barcodeboy(std::vector<gb*> g_gb, char cart_name[18]);
 	bool is_in_mastermode; 
-
+	void set_barcodes(char cart_name[18]);
 	void process() override;
 	void reset() override;
 	byte get_SB_value() override;
@@ -31,7 +31,7 @@ private:
 	int round; 
 	int barcode_index;
 	std::string current_barcode; 
-	
+	std::vector<std::string> barcodes; 
 };
 
 
