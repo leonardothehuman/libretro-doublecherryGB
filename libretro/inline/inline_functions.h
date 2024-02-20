@@ -19,7 +19,7 @@ void auto_config_4p_hack()
         master_link = NULL; 
         linked_target_device = new hack_4p_kwirk(v_gb);
     }
-
+ 
 };
 
 void auto_config_1p_link() {
@@ -106,6 +106,30 @@ static void check_variables(void)
                 emulated_gbs = 3;
             else if (!strcmp(var.value, "4"))
                 emulated_gbs = 4;
+            else if (!strcmp(var.value, "5"))
+                emulated_gbs = 5;
+            else if (!strcmp(var.value, "6"))
+                emulated_gbs = 6;
+            else if (!strcmp(var.value, "7"))
+                emulated_gbs = 7;
+            else if (!strcmp(var.value, "8"))
+                emulated_gbs = 8;
+            else if (!strcmp(var.value, "9"))
+                emulated_gbs = 9;
+            else if (!strcmp(var.value, "10"))
+                emulated_gbs = 10;
+            else if (!strcmp(var.value, "11"))
+                emulated_gbs = 11;
+            else if (!strcmp(var.value, "12"))
+                emulated_gbs = 12;
+            else if (!strcmp(var.value, "13"))
+                emulated_gbs = 13;
+            else if (!strcmp(var.value, "14"))
+                emulated_gbs = 14;
+            else if (!strcmp(var.value, "15"))
+                emulated_gbs = 15;
+            else if (!strcmp(var.value, "16"))
+                emulated_gbs = 16;
 
         }
     }

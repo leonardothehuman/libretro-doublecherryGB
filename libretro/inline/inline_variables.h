@@ -7,13 +7,13 @@
 #define RETRO_GAME_TYPE_GAMEBOY_LINK_2P 0x101
 
 static const struct retro_variable vars_single[] = {
-    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4" },
+    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
     // { "doublecherrygb_detect_gba", "detect playing on gba (gba enhancements); Off|On" },
     { NULL, NULL },
 };
 
 static const struct retro_variable vars_dual[] = {
-    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4" },
+    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
     { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
     { "tgbdual_screen_placement", "Screen layout; left-right|top-down" },
     { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
@@ -24,7 +24,7 @@ static const struct retro_variable vars_dual[] = {
 };
 
 static const struct retro_variable vars_tripple[] = {
-    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4" },
+    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
     { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
      { "multitgbt_gblink_device", "Link cable device (reload); 4-player adapter" },
      { "tgbdual_screen_placement", "Screen layout; left-right|4-Player Splitscreen|top-down" },
@@ -36,7 +36,7 @@ static const struct retro_variable vars_tripple[] = {
 };
 
 static const struct retro_variable vars_quad[] = {
-    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4" },
+    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
      { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
     { "multitgbt_gblink_device", "Link cable device (reload); 4-player adapter|2x2-player link" },
      { "tgbdual_screen_placement", "Screen layout; 4-Player Splitscreen|left-right|top-down" },
@@ -92,6 +92,7 @@ bool use_tetris_4p_hack = false;
 bool log_2p_link = false;
 bool logging_allowed = false; 
 bool detect_gba = false; 
+int max_gbs = 16;
 
 
 retro_log_printf_t log_cb;
