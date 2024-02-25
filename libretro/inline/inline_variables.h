@@ -19,7 +19,7 @@ static const struct retro_variable vars_dual[] = {
     { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
     { "tgbdual_single_screen_mp", "Show player screens; both players|player 1 only|player 2 only" },
     { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2" },
-    { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
+   // { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
     { NULL, NULL },
 };
 
@@ -28,10 +28,10 @@ static const struct retro_variable vars_tripple[] = {
     { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
      { "multitgbt_gblink_device", "Link cable device (reload); 4-player adapter" },
      { "tgbdual_screen_placement", "Screen layout; left-right|4-Player Splitscreen|top-down" },
-    { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
+    //{ "tgbdual_switch_screens", "Switch player screens; normal|switched" },
     { "tgbdual_single_screen_mp", "Show player screens; both players|player 1 only|player 2 only" },
     { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2|Game Boy #3" },
-     { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
+     //{ "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
     { NULL, NULL },
 };
 
@@ -40,13 +40,12 @@ static const struct retro_variable vars_quad[] = {
      { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
     { "multitgbt_gblink_device", "Link cable device (reload); 4-player adapter|2x2-player link" },
      { "tgbdual_screen_placement", "Screen layout; 4-Player Splitscreen|left-right|top-down" },
-    { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
+   // { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
     { "tgbdual_single_screen_mp", "Show player screens; both players|player 1 only|player 2 only" },
      { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2|Game Boy #3|Game Boy #4" },
-    { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
+   // { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
     { NULL, NULL },
 };
-
 
 static const struct retro_subsystem_memory_info gb1_memory[] = {
     { "srm", RETRO_MEMORY_GAMEBOY_1_SRAM },
@@ -65,14 +64,15 @@ static const struct retro_subsystem_rom_info gb_roms[] = {
 
 };
 
-//TODO: finish 3 and 4 Playrt
+ //subsystem not working, for now disable
 static const struct retro_subsystem_info subsystems[] = {
-   { "2 Player Game Boy Link", "gb_link_2p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
-   { "3 Player Game Boy with 4-Player Adapter", "gb_3p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
-   { "4 Player Game Boy with 4-Player Adapter", "gb_4p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
-   { "4 Player Game Boy 2x 2-Player Link", "gb_2x2p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
+  // { "2 Player Game Boy Link", "gb_link_2p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
+   //{ "3 Player Game Boy with 4-Player Adapter", "gb_3p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
+   //{ "4 Player Game Boy with 4-Player Adapter", "gb_4p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
+   //{ "4 Player Game Boy 2x 2-Player Link", "gb_2x2p", gb_roms, 2, RETRO_GAME_TYPE_GAMEBOY_LINK_2P },
    { NULL },
 };
+
 
 enum mode {
     MODE_SINGLE_GAME,
@@ -106,7 +106,7 @@ bool _screen_vertical = false;
 bool _screen_4p_split = false;
 bool _screen_switched = false;
 int _show_player_screens = 1;
-static size_t _serialize_size[4] = { 0, 0,0,0 };
+static size_t _serialize_size[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
 bool gblink_enable = false;
 int emulated_gbs = 4;

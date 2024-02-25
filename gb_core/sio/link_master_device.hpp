@@ -39,7 +39,7 @@ protected:
 	bool is_expected_data(byte data);
 	bool all_IE_are_handled();
 
-	byte in_data_buffer[4];
+	byte in_data_buffer[16];
 	std::vector<gb*> v_gb;
 
 };

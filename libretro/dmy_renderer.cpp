@@ -320,23 +320,27 @@ void dmy_renderer::render_screen(byte* buf, int width, int height, int depth)
             else if (which_gb < 6) {
                 for (int row = 0; row < height; ++row)
                     memcpy(joined_buf3 + pitch * (3 * row + (switched_gb % 3)), buf + pitch * row, pitch);
-                if (which_gb == 5) {
+                if (which_gb == 5 || which_gb == (emulated_gbs - 1)) {
                     memcpy(joined_buf9 + (sizeof(joined_buf3)), joined_buf3, sizeof(joined_buf3));
                     memset(joined_buf3, 0, sizeof(joined_buf3));
                 }
+
             }
             else if (which_gb < 9) {
                 for (int row = 0; row < height; ++row)
                     memcpy(joined_buf3 + pitch * (3 * row + (switched_gb % 3)), buf + pitch * row, pitch);
                 if (which_gb == (emulated_gbs - 1)) {
                     memcpy(joined_buf9 + (sizeof(joined_buf3) * 2), joined_buf3, sizeof(joined_buf3));
-                    
+
                 }
-                if (which_gb == (emulated_gbs - 1)) {
+            }
+
+            if (which_gb == (emulated_gbs - 1)) {
                     //memcpy(joined_buf16 + sizeof(joined_buf8), joined_buf8, sizeof(joined_buf8));
                     video_cb(joined_buf9, width * 3, height * 3, pitch * 3);
                 }
-            }
+            
+            break;
         }
         else if (_screen_vertical)
         {
@@ -373,16 +377,22 @@ void dmy_renderer::render_screen(byte* buf, int width, int height, int depth)
                     memcpy(joined_buf4 + pitch * (4 * row + (switched_gb%4)), buf + pitch * row, pitch);
                 if (which_gb == 7) {
                     memcpy(joined_buf16 + (sizeof(joined_buf4)), joined_buf4, sizeof(joined_buf4));
-                    memset(joined_buf4, 0, sizeof(joined_buf4));
+                    //memset(joined_buf4, 0, sizeof(joined_buf4));
                 }
+         
             }
             else if (which_gb < 12) {
                 for (int row = 0; row < height; ++row)
                     memcpy(joined_buf4 + pitch * (4 * row + (switched_gb % 4)), buf + pitch * row, pitch);
                 if (which_gb == 11) {
                     memcpy(joined_buf16 + (sizeof(joined_buf4) * 2), joined_buf4, sizeof(joined_buf4));
-                    memset(joined_buf4, 0, sizeof(joined_buf4));
+                    //memset(joined_buf4, 0, sizeof(joined_buf4));
                 }
+                /*
+                if (which_gb == (emulated_gbs - 1)) {
+                    //memcpy(joined_buf16 + sizeof(joined_buf8), joined_buf8, sizeof(joined_buf8));
+                    video_cb(joined_buf16, width * 4, height * 4, pitch * 4);
+                }*/
                     
             }
             else if (which_gb < 16) {

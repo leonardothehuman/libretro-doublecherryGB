@@ -383,7 +383,12 @@ bool retro_load_game(const struct retro_game_info* info)
        case 3:
        {
            mode = MODE_SINGLE_GAME_DUAL;
-           if (!master_link)  master_link = new dmg07(v_gb);
+           if (!master_link) {
+
+               std::vector<gb*> _gbs;
+               _gbs.insert(_gbs.begin(), std::begin(v_gb), std::begin(v_gb)+3);
+               master_link = new dmg07(_gbs);
+           }
             auto_config_4p_hack();
 
            //master_link = new dmg07(v_gb); 
@@ -395,7 +400,15 @@ bool retro_load_game(const struct retro_game_info* info)
        {
            mode = MODE_SINGLE_GAME_DUAL;
         
-           if (use_multi_adapter && !master_link) master_link = new dmg07(v_gb);
+          
+
+           if (use_multi_adapter && !master_link) {
+
+               std::vector<gb*> _gbs;
+               _gbs.insert(_gbs.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
+               master_link = new dmg07(_gbs);
+
+           }
            auto_config_4p_hack();
 
            if (!use_multi_adapter && gblink_enable) 
@@ -421,6 +434,8 @@ bool retro_load_game(const struct retro_game_info* info)
        case 15:
        case 16:
        {
+           mode = MODE_SINGLE_GAME_DUAL;
+
           if (!strcmp(cart_name, "FACEBALL 2000   "))
            {
                delete master_link;
@@ -428,7 +443,30 @@ bool retro_load_game(const struct retro_game_info* info)
                linked_target_device = new faceball2000_cable(v_gb);
                v_gb[0]->set_linked_target(linked_target_device);
 
+               //set gb_type to GBC
+               for (int i = 0; i < emulated_gbs; i++)
+               {
+                   v_gb[0]->get_rom()->get_info()->gb_type = 2;
+               }
+               break;
            }
+          if (!strcmp(cart_name, "KWIRK"))
+          {
+              delete master_link;
+              master_link = NULL;
+              linked_target_device = new hack_4p_kwirk(v_gb);
+              break; 
+          }
+          if (!strcmp(cart_name, "TETRIS"))
+          {
+              master_link = new hack_4p_tetris(v_gb);
+              break;
+          }
+          
+          //if (use_multi_adapter && !master_link) {
+
+              master_link = new dmg07x4(v_gb, emulated_gbs);
+        //  }
 
            break;
        }
@@ -714,7 +752,7 @@ size_t retro_serialize_size(void)
       }
    //}
    //return _serialize_size[0] + _serialize_size[1];
-    return _all_size + 0x300;
+    return _all_size + 0x600;
 }
 
 void log_save_state(uint8_t* data, size_t size)

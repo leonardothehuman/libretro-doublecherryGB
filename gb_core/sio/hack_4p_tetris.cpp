@@ -82,6 +82,53 @@ void hack_4p_tetris::reset()
 	clear_data_for_next_round();
 	send_data_vec = std::vector<byte>();
 	init_send_data_vec();
+
+	for (int i = 0; i < 16; i++)
+	{
+		players_state[i] = IS_ALIVE;
+	
+		lines_to_send[i] = 0;
+		next_bytes_to_send[i] = 0;
+		win_counter[i] = 0;
+	}
+}
+
+void hack_4p_tetris::hard_reset() {
+
+	for (size_t i = 0; i < v_gb.size(); i++)
+	{
+		v_gb[i]->reset();
+	}
+	tetris_state = TITLE_SCREEN;
+
+	seri_occer = 4096 * 1024 * 4;
+	transfer_speed = 4096 * 1024 / 16;
+
+	for (int i = 0; i < 16; i++)
+	{
+		players_state[i] = IS_ALIVE;
+
+		lines_to_send[i] = 0;
+		next_bytes_to_send[i] = 0;
+		win_counter[i] = 0;
+	}
+
+	for (size_t i = 0; i < v_gb.size(); i++)
+	{
+		players_state[i] = IS_ALIVE;
+		//cpu* cpu = v_gb[i]->get_cpu();
+	}
+
+	init_send_data_vec();
+
+	tetris_state = TITLE_SCREEN;
+
+	current_max_height = 0;
+	lines_from_player_id = 0;
+	process_counter = 0;
+
+
+
 }
 
 void hack_4p_tetris::init_send_data_vec() {
@@ -277,6 +324,10 @@ void hack_4p_tetris::process() {
 		if (++process_counter < 154 * 60 * 5) return;
 		process_counter = 0;
 	
+		if (winner_winner_chicken_dinner()) {
+			hard_reset();
+			break; 
+		}
 		// would be better to handle actually answers
 		send_data_vec.emplace_back(0x60);   
 		send_data_vec.emplace_back(0x02);   
@@ -420,6 +471,19 @@ void hack_4p_tetris::broadcast_byte(byte dat)
 }
 */
 
+int hack_4p_tetris::player_alive_count() {
+	int alive_count = 0;
+
+	for (int i = 0; i < v_gb.size(); i++)
+	{
+		if (players_state[i] == IS_ALIVE || players_state[i] == IS_SENDING_LINES)
+		{
+			alive_count++;
+		}
+	}
+	return alive_count; 
+}
+
 int hack_4p_tetris::check_winner_id()
 {
 	int alive_count = 0;
@@ -439,6 +503,15 @@ int hack_4p_tetris::check_winner_id()
 	return 0;
 }
 
+bool hack_4p_tetris::winner_winner_chicken_dinner() {
+
+	for (int i = 0; i < v_gb.size(); i++)
+	{
+		if (win_counter[i] == 4) return true; 
+	}
+	return false; 
+}
+
 void hack_4p_tetris::update_ingame_states()
 {
 	current_max_height = 0;
@@ -453,6 +526,7 @@ void hack_4p_tetris::update_ingame_states()
 			if (in_data_buffer[i] == 0x34)
 			{
 				players_state[i] = IS_LOOSER; // ;D need new states
+				win_counter[i]++;
 				next_bytes_to_send[i] = 0x43;
 			}
 			else {
@@ -550,12 +624,39 @@ void hack_4p_tetris::send_ingame_bytes()
 		hack_4p_tetris_lines_packet next = lines_vec.front();
 		lines_vec.erase(lines_vec.begin());
 
+		//choose random players id to get lines
+		int players_alive = player_alive_count();
+		int quarter_player_alive = (int)(players_alive / 4) ? (int)(players_alive / 4) : 1;
+		int players_got_lines = 0;
+		bool done = players_got_lines >= quarter_player_alive;
+		int max_trys = v_gb.size() * 4;
+		int current_try = 0;
+
+		std::srand(std::time(0));
+		while (!done) {
+
+				if (current_try++ >= max_trys) done = true;
+				
+				int randomIndex = std::rand() % v_gb.size();
+		
+				if (players_state[randomIndex] == IS_IN_WINNER_SCREEN)  continue;
+				if (randomIndex == next.from) continue;
+				if (next_bytes_to_send[randomIndex]) continue;
+
+				next_bytes_to_send[randomIndex] = next.lines;
+				done = ++players_got_lines >= quarter_player_alive;
+				
+		}
+	
+		/*
 		for (int i = 0; i < v_gb.size(); i++)
 		{
-			if (players_state[i] == IS_IN_WINNER_SCREEN) continue;
+			if (!((players_state[i] == IS_ALIVE) || (players_state[i] == IS_SENDING_LINES)))  continue;
 			if (next.from == i) continue;
 			if (!next_bytes_to_send[i]) next_bytes_to_send[i] = next.lines; // ?? do lines get lost??
-		}
+		}*/
+
+
 	}
 
 	for (int i = 0; i < v_gb.size(); i++)

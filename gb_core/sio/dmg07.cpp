@@ -417,12 +417,12 @@ void dmg07::send_sync_bytes()
 		*/
 	
 		if (transfer_rate == 0xF0)  //Janshiro Games
-			transfer_speed = 5928 * 3;
+			transfer_speed = 6144 * 3;
 		else if (transfer_rate == 0xA0)	// Jinsei Game Densetsi
-			transfer_speed = 5928 * 4;
+			transfer_speed = 6144 * 4;
 		else {
 			byte speed_multiplier = ((transfer_rate & 0x80) >> 7) | ((transfer_rate & 0x40) >> 5);
-			transfer_speed = 5928 * ((int)speed_multiplier + 1);
+			transfer_speed = 6144 * ((int)speed_multiplier + 1);
 		}
 	
 		/*
