@@ -6,6 +6,13 @@
 
 #define RETRO_GAME_TYPE_GAMEBOY_LINK_2P 0x101
 
+unsigned int num_clients = 0;
+unsigned short my_client_id = -1; 
+static retro_netpacket_send_t netpacket_send_fn_ptr = NULL;
+static retro_netpacket_poll_receive_t netpacket_pollrcv_fn_ptr = NULL;
+
+
+
 static const struct retro_variable vars_single[] = {
     { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4" },
     // { "doublecherrygb_detect_gba", "detect playing on gba (gba enhancements); Off|On" },

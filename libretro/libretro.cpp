@@ -74,6 +74,9 @@ void retro_init(void)
    unsigned level = 4;
    struct retro_log_callback log;
 
+   // This interface is actually optional
+   //environ_cb(RETRO_ENVIRONMENT_SET_NETPACKET_INTERFACE, (void*)&netpacket_iface_off);
+
    if(environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
       log_cb = log.log;
    else
@@ -718,4 +721,8 @@ void retro_set_environment(retro_environment_t cb)
          (void*)content_overrides);
 }
 
-// end boilerplate
+
+
+
+
+
