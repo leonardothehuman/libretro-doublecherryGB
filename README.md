@@ -57,8 +57,8 @@ after both players sat down on the table and you see the please wait! screen, yo
 this is because all the pokemondata is transfered. After that you should be able to trade pokemon.
 
 If you like to support me
-patreon.com/double_cherry_projects
-https://www.buymeacoffee.com/timoelrichs
+https://patreon.com/double_cherry_projects<br>
+https://www.buymeacoffee.com/timoelrichs<br>
 
 Thanks to
 - Shonumi for doing the research and documentation on the dmg-07  https://shonumi.github.io/index.html
