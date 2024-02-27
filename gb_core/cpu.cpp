@@ -38,11 +38,11 @@ extern int emulated_gbs;
 //extern unsigned int num_clients;
 //extern static u32 num_clients;
 
-/*
+
 // Callbacks used to send and force-receive data.
 void netpacket_send(unsigned short client_id, const void* buf, size_t len);
 void netpacket_poll_receive();
-*/
+
 
 cpu::cpu(gb *ref)
 {
@@ -1038,7 +1038,7 @@ void cpu::exec(int clocks)
 			if (emulated_gbs == 1 && (num_clients == 1 || my_client_id == 1)) {
 				int id = my_client_id ? 0 : 1;
 				byte data[1] = { ref_gb->get_regs()->SB };
-				//netpacket_send(id, data, 1);
+				netpacket_send(id, data, 1);
 				return;
 			}
 

@@ -310,7 +310,7 @@ static void check_variables(void)
 }
 
 
-/*
+
 
 // Netplay (Netpacket) interface
 
@@ -383,4 +383,3 @@ const struct retro_netpacket_callback netpacket_iface = {
   "DoubleCherryGB netpack V1.0",   // core version char* 
 };
 
-*/

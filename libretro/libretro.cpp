@@ -101,8 +101,6 @@ void retro_init(void)
    unsigned level = 4;
    struct retro_log_callback log;
 
-   // This interface is actually optional
-   //environ_cb(RETRO_ENVIRONMENT_SET_NETPACKET_INTERFACE, (void*)&netpacket_iface_off);
 
    if(environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
       log_cb = log.log;
@@ -368,6 +366,9 @@ bool retro_load_game(const struct retro_game_info* info)
    {
        case 1:
        {
+           // This interface is actually optional
+            environ_cb(RETRO_ENVIRONMENT_SET_NETPACKET_INTERFACE, (void*)&netpacket_iface);
+
            auto_config_1p_link();
            mode = MODE_SINGLE_GAME; break; 
        }
