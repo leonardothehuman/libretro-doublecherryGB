@@ -205,3 +205,7 @@ void barcodeboy::serialize(serializer& s)
 
 
 }
+
+void barcodeboy::save_state_mem(void* buf) {};
+void barcodeboy::restore_state_mem(void* buf) {};
+size_t  barcodeboy::get_state_size() { return 0; };

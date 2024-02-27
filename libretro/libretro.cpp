@@ -39,25 +39,52 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
     //TODO FIX 4-Player Splitscreen at start
 
    int w = 160, h = 144;
-   info->geometry.max_width = w * 4; // changed w * 4
-   info->geometry.max_height = h * 4; // chaned w * 4
+   info->geometry.max_width = w * max_gbs; // changed w * 4
+   info->geometry.max_height = h * max_gbs; // chaned w * 4
 
-
-   if (emulated_gbs > 1 && _show_player_screens == 2)
+   
+  // if (emulated_gbs < 5 && _show_player_screens == 2)
    {
       // screen orientation for dual gameboy mode
-       if (emulated_gbs > 2 && _screen_4p_split)
+       if (_screen_4p_split)
        {
-           h *= 2;
-           w *= 2; 
+           h *= 1;
+           w *= 1; 
        }
        else if(_screen_vertical)
          h *= emulated_gbs;
-        else
+       else
          w *= emulated_gbs;
    }
+   /*
+   else if (emulated_gbs < 10 && _show_player_screens == 2)
+   {
+       // screen orientation for dual gameboy mode
+       if (_screen_4p_split)
+       {
+           h *= 1;
+           w *= 1;
+       }
+       else if (_screen_vertical)
+           h *= emulated_gbs;
+       else
+           w *= emulated_gbs;
+   }
+   else if (emulated_gbs <= 16 && _show_player_screens == 2)
+   {
+       // screen orientation for dual gameboy mode
+       if (_screen_4p_split)
+       {
+           h *= 1;
+           w *= 1;
+       }
+       else if (_screen_vertical)
+           h *= emulated_gbs;
+       else
+           w *= emulated_gbs;
+   }
+   */
 
-   
    info->timing.fps            = 4194304.0 / 70224.0;
    info->timing.sample_rate    = 44100.0f;
    info->geometry.base_width   = w;
@@ -146,7 +173,116 @@ bool retro_load_game(const struct retro_game_info* info)
        { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
        { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
 
+       { 4, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 4, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 4, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 4, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 4, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 4, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 4, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 4, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 5, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 5, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 5, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 5, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 5, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 5, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 5, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 5, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 6, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 6, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 6, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 6, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 6, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 6, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 6, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 6, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 7, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 7, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 7, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 7, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 7, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 7, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 7, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 7, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 8, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 8, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 8, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 8, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 8, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 8, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 8, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 8, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 9, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 9, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 9, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 9, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 9, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 9, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 9, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 9, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 10, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 10, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 10, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 10, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 10, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 10, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 10, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 10, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 11, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 11, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 11, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 11, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 11, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 11, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 11, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 11, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 12, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 12, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 12, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 12, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 12, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 12, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 12, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 12, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 13, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 13, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 13, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 13, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 13, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 13, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 13, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 13, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 14, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 14, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 14, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 14, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 14, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 14, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 14, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 14, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
+       { 15, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+       { 15, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+       { 15, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+       { 15, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+       { 15, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+       { 15, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+       { 15, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+       { 15, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+
        { 0 },
+
     };
 
     if (!info)
@@ -184,7 +320,7 @@ bool retro_load_game(const struct retro_game_info* info)
 
 
     //create gameboy instances
-    for (byte i = 0; i < 4; i++)
+    for (byte i = 0; i < max_gbs; i++)
     {
         render.emplace_back(new dmy_renderer(i));
         v_gb.emplace_back(new gb(render[i], true, true));
@@ -202,7 +338,7 @@ bool retro_load_game(const struct retro_game_info* info)
 
  
    // load roms
-   for (byte i = 0; i < 4; i++)
+   for (byte i = 0; i < max_gbs; i++)
    {
        /*
        //if (!save_file[i])
@@ -226,7 +362,7 @@ bool retro_load_game(const struct retro_game_info* info)
 
 //   master_link = new dmg07(v_gb);
 
-   
+ 
    //set link connections
    switch (emulated_gbs)
    {
@@ -250,7 +386,12 @@ bool retro_load_game(const struct retro_game_info* info)
        case 3:
        {
            mode = MODE_SINGLE_GAME_DUAL;
-           if (!master_link)  master_link = new dmg07(v_gb);
+           if (!master_link) {
+
+               std::vector<gb*> _gbs;
+               _gbs.insert(_gbs.begin(), std::begin(v_gb), std::begin(v_gb)+3);
+               master_link = new dmg07(_gbs);
+           }
             auto_config_4p_hack();
 
            //master_link = new dmg07(v_gb); 
@@ -262,9 +403,14 @@ bool retro_load_game(const struct retro_game_info* info)
        {
            mode = MODE_SINGLE_GAME_DUAL;
         
-           if (use_multi_adapter && !master_link) master_link = new dmg07(v_gb);
-           auto_config_4p_hack();
+           if (use_multi_adapter && !master_link) {
 
+               std::vector<gb*> _gbs;
+               _gbs.insert(_gbs.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
+               master_link = new dmg07(_gbs);
+
+           }
+          
            if (!use_multi_adapter && gblink_enable) 
            {
                v_gb[0]->set_target(v_gb[1]);
@@ -272,7 +418,69 @@ bool retro_load_game(const struct retro_game_info* info)
                v_gb[2]->set_target(v_gb[3]);
                v_gb[3]->set_target(v_gb[2]);
            }
-           
+           auto_config_4p_hack();
+
+           if (!strcmp(cart_name, "KWIRK"))
+           {
+               delete master_link;
+               master_link = NULL;
+               linked_target_device = new hack_4p_kwirk(v_gb);
+               break;
+           }
+           if (!strcmp(cart_name, "TETRIS"))
+           {
+               master_link = new hack_4p_tetris(v_gb);
+               break;
+           }
+           break;
+       }
+       case 5:
+       case 6:
+       case 7:
+       case 8:
+       case 9:
+       case 10:
+       case 11:
+       case 12:
+       case 13:
+       case 14:
+       case 15:
+       case 16:
+       {
+           mode = MODE_SINGLE_GAME_DUAL;
+
+          if (!strcmp(cart_name, "FACEBALL 2000   "))
+           {
+               delete master_link;
+               master_link = NULL;
+               linked_target_device = new faceball2000_cable(v_gb);
+               v_gb[0]->set_linked_target(linked_target_device);
+
+               //set gb_type to GBC
+               for (int i = 0; i < emulated_gbs; i++)
+               {
+                   v_gb[0]->get_rom()->get_info()->gb_type = 2;
+               }
+               break;
+           }
+          if (!strcmp(cart_name, "KWIRK"))
+          {
+              delete master_link;
+              master_link = NULL;
+              linked_target_device = new hack_4p_kwirk(v_gb);
+              break; 
+          }
+          if (!strcmp(cart_name, "TETRIS"))
+          {
+              master_link = new hack_4p_tetris(v_gb);
+              break;
+          }
+          
+          //if (use_multi_adapter && !master_link) {
+
+              master_link = new dmg07x4(v_gb, emulated_gbs);
+        //  }
+
            break;
        }
    }
@@ -548,7 +756,7 @@ size_t retro_serialize_size(void)
     size_t _all_size = 0;
       //for(i = 0; i < emulated_gbs; ++i)
     //for(i = 0; i < emulated_gbs; ++i)
-    for(int i = 0; i < 4; ++i)
+    for(int i = 0; i < max_gbs; ++i)
       {
         if (v_gb[i]) {
             _serialize_size[i] = v_gb[i]->get_state_size();
@@ -557,7 +765,7 @@ size_t retro_serialize_size(void)
       }
    //}
    //return _serialize_size[0] + _serialize_size[1];
-    return _all_size + 0x300;
+    return _all_size + 0xFF00;
 }
 
 void log_save_state(uint8_t* data, size_t size)
@@ -586,7 +794,7 @@ bool retro_serialize(void *data, size_t size)
       unsigned i;
       uint8_t *ptr = (uint8_t*)data;
     
-      for(int i = 0; i < 4; ++i)
+      for(int i = 0; i < max_gbs; ++i)
       {
          if (v_gb[i])
          {
@@ -610,7 +818,7 @@ bool retro_unserialize(const void *data, size_t size)
       unsigned i;
       uint8_t *ptr = (uint8_t*)data;
      
-      for(i = 0; i < 4; ++i)
+      for(i = 0; i < max_gbs; ++i)
       {
          if (v_gb[i])
          {

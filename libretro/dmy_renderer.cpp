@@ -30,6 +30,7 @@
 
 extern std::vector<gb* > v_gb;
 extern int emulated_gbs;
+extern int max_gbs; 
 
 extern retro_log_printf_t log_cb;
 extern retro_video_refresh_t video_cb;
@@ -191,6 +192,9 @@ void dmy_renderer::render_screen(byte* buf, int width, int height, int depth)
     static byte joined_buf[160*144*2*2]; // two screens' worth of 16-bit data
     static byte joined_buf3[160 * 144 * 3 * 2]; // three screens' worth of 16-bit data
     static byte joined_buf4[160 * 144 * 4 * 2]; // four screens' worth of 16-bit data
+    static byte joined_buf8[160 * 144 * 8 * 2];
+    static byte joined_buf9[160 * 144 * 9 * 2]; // three screens' worth of 16-bit data
+    static byte joined_buf16[160 * 144 * 16 * 2];
 
     const int size_single_screen = sizeof(joined_buf) / 2;
 
@@ -270,8 +274,7 @@ void dmy_renderer::render_screen(byte* buf, int width, int height, int depth)
     }
     case 4:
     {
-       
-        if (_screen_4p_split) 
+        if (_screen_4p_split)
         {
             if (which_gb < 2) {
                 for (int row = 0; row < height; ++row)
@@ -290,15 +293,132 @@ void dmy_renderer::render_screen(byte* buf, int width, int height, int depth)
         else if (_screen_vertical)
         {
             memcpy(joined_buf4 + switched_gb * size_single_screen, buf, size_single_screen);
-            if (which_gb == 3)
-                video_cb(joined_buf4, width, height * 4, pitch);
+            if (which_gb == emulated_gbs - 1)
+                video_cb(joined_buf4, width, height * emulated_gbs, pitch);
         }
         else
         {
             for (int row = 0; row < height; ++row)
-                memcpy(joined_buf4 + pitch * (4 * row + switched_gb), buf + pitch * row, pitch);
-            if (which_gb == 3)
-                video_cb(joined_buf4, width * 4, height, pitch * 4);
+                memcpy(joined_buf4 + pitch * (emulated_gbs * row + switched_gb), buf + pitch * row, pitch);
+            if (which_gb == emulated_gbs - 1)
+                video_cb(joined_buf4, width * emulated_gbs, height, pitch * emulated_gbs);
+        }
+        break;
+    }
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    {
+        if (_screen_4p_split)
+        {
+            if (which_gb < 3) {
+                for (int row = 0; row < height; ++row)
+                    memcpy(joined_buf9 + pitch * (3 * row + switched_gb), buf + pitch * row, pitch);
+            }
+            else if (which_gb < 6) {
+                for (int row = 0; row < height; ++row)
+                    memcpy(joined_buf3 + pitch * (3 * row + (switched_gb % 3)), buf + pitch * row, pitch);
+                if (which_gb == 5 || which_gb == (emulated_gbs - 1)) {
+                    memcpy(joined_buf9 + (sizeof(joined_buf3)), joined_buf3, sizeof(joined_buf3));
+                    memset(joined_buf3, 0, sizeof(joined_buf3));
+                }
+
+            }
+            else if (which_gb < 9) {
+                for (int row = 0; row < height; ++row)
+                    memcpy(joined_buf3 + pitch * (3 * row + (switched_gb % 3)), buf + pitch * row, pitch);
+                if (which_gb == (emulated_gbs - 1)) {
+                    memcpy(joined_buf9 + (sizeof(joined_buf3) * 2), joined_buf3, sizeof(joined_buf3));
+
+                }
+            }
+
+            if (which_gb == (emulated_gbs - 1)) {
+                    //memcpy(joined_buf16 + sizeof(joined_buf8), joined_buf8, sizeof(joined_buf8));
+                    video_cb(joined_buf9, width * 3, height * 3, pitch * 3);
+                }
+            
+            break;
+        }
+        else if (_screen_vertical)
+        {
+            memcpy(joined_buf16 + switched_gb * size_single_screen, buf, size_single_screen);
+            if (which_gb == emulated_gbs - 1)
+                video_cb(joined_buf16, width, height * emulated_gbs, pitch);
+        }
+        else
+        {
+            for (int row = 0; row < height; ++row)
+                memcpy(joined_buf16 + pitch * (emulated_gbs * row + switched_gb), buf + pitch * row, pitch);
+            if (which_gb == emulated_gbs - 1)
+                video_cb(joined_buf16, width * emulated_gbs, height, pitch * emulated_gbs);
+        }
+        break;
+    }
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    {
+       
+        if (_screen_4p_split)
+        {
+            if (which_gb < 4) {
+                for (int row = 0; row < height; ++row)
+                    memcpy(joined_buf16 + pitch * (4 * row + switched_gb), buf + pitch * row, pitch);
+            }
+            else if (which_gb < 8) {
+                for (int row = 0; row < height; ++row)
+                    memcpy(joined_buf4 + pitch * (4 * row + (switched_gb%4)), buf + pitch * row, pitch);
+                if (which_gb == 7) {
+                    memcpy(joined_buf16 + (sizeof(joined_buf4)), joined_buf4, sizeof(joined_buf4));
+                    //memset(joined_buf4, 0, sizeof(joined_buf4));
+                }
+         
+            }
+            else if (which_gb < 12) {
+                for (int row = 0; row < height; ++row)
+                    memcpy(joined_buf4 + pitch * (4 * row + (switched_gb % 4)), buf + pitch * row, pitch);
+                if (which_gb == 11) {
+                    memcpy(joined_buf16 + (sizeof(joined_buf4) * 2), joined_buf4, sizeof(joined_buf4));
+                    //memset(joined_buf4, 0, sizeof(joined_buf4));
+                }
+                /*
+                if (which_gb == (emulated_gbs - 1)) {
+                    //memcpy(joined_buf16 + sizeof(joined_buf8), joined_buf8, sizeof(joined_buf8));
+                    video_cb(joined_buf16, width * 4, height * 4, pitch * 4);
+                }*/
+                    
+            }
+            else if (which_gb < 16) {
+                for (int row = 0; row < height; ++row)
+                    memcpy(joined_buf4 + pitch * (4 * row + (switched_gb % 4)), buf + pitch * row, pitch);
+                if (which_gb == (emulated_gbs-1))
+                    memcpy(joined_buf16 + (sizeof(joined_buf4) * 3), joined_buf4, sizeof(joined_buf4));
+            }
+            if (which_gb == (emulated_gbs-1)) {
+                //memcpy(joined_buf16 + sizeof(joined_buf8), joined_buf8, sizeof(joined_buf8));
+                video_cb(joined_buf16, width * 4, height * 4, pitch * 4);
+            }
+        }
+
+        else if (_screen_vertical)
+        {
+            memcpy(joined_buf16 + switched_gb * size_single_screen, buf, size_single_screen);
+            if (which_gb == emulated_gbs-1)
+                video_cb(joined_buf16, width, height * emulated_gbs, pitch);
+        }
+        else
+        {
+            for (int row = 0; row < height; ++row)
+                memcpy(joined_buf16 + pitch * (emulated_gbs * row + switched_gb), buf + pitch * row, pitch);
+            if (which_gb == emulated_gbs-1)
+                video_cb(joined_buf16, width * emulated_gbs, height, pitch * emulated_gbs);
         }
         break; 
     }
