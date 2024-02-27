@@ -7,8 +7,8 @@
 **author:** Tim Oelrichs<br>
 **email:** timoelrichs@gmail.com<br>
 **website:** [timoelrichs.is-a.dev](https://timoelrichs.is-a.dev)<br>
-patreon.com/double_cherry_projects
-https://www.buymeacoffee.com/timoelrichs
+https://patreon.com/double_cherry_projects<br>
+https://www.buymeacoffee.com/timoelrichs<br>
 
 
 > DoubleCherryGB is an open source (GPLv2) GB/GBC emulator with up to 16 Player support, based on the TGBDual libretro core by GIGO and Hii.
