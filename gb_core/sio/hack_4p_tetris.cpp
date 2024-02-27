@@ -28,6 +28,7 @@
 #include <fstream>
 
 extern bool logging_allowed; 
+extern int emulated_gbs;
 
 hack_4p_tetris::hack_4p_tetris(std::vector<gb*> g_gb) {
 
@@ -38,7 +39,7 @@ hack_4p_tetris::hack_4p_tetris(std::vector<gb*> g_gb) {
 	seri_occer = 4096 * 1024 * 4;
 	transfer_speed = 4096 * 1024 / 16;
 
-	for (size_t i = 0; i < v_gb.size(); i++)
+	for (size_t i = 0; i < emulated_gbs; i++)
 	{
 		players_state[i] = IS_ALIVE;
 		//cpu* cpu = v_gb[i]->get_cpu();
@@ -57,7 +58,7 @@ hack_4p_tetris::hack_4p_tetris(std::vector<gb*> g_gb) {
 
 void hack_4p_tetris::clear_data_for_next_round()
 {
-	for (size_t i = 0; i < v_gb.size(); i++)
+	for (size_t i = 0; i < emulated_gbs; i++)
 	{
 		players_state[i] = IS_ALIVE;
 		//cpu* cpu = v_gb[i]->get_cpu();
@@ -95,7 +96,7 @@ void hack_4p_tetris::reset()
 
 void hack_4p_tetris::hard_reset() {
 
-	for (size_t i = 0; i < v_gb.size(); i++)
+	for (size_t i = 0; i < emulated_gbs; i++)
 	{
 		v_gb[i]->reset();
 	}
@@ -113,7 +114,7 @@ void hack_4p_tetris::hard_reset() {
 		win_counter[i] = 0;
 	}
 
-	for (size_t i = 0; i < v_gb.size(); i++)
+	for (size_t i = 0; i < emulated_gbs; i++)
 	{
 		players_state[i] = IS_ALIVE;
 		//cpu* cpu = v_gb[i]->get_cpu();
@@ -199,7 +200,7 @@ bool hack_4p_tetris::is_ready_to_process() {
 
 bool hack_4p_tetris::all_IE_are_handled() 
 {
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		if ((v_gb[i]->get_regs()->IF & v_gb[i]->get_regs()->IE & INT_SERIAL)) return false;
 	}
@@ -418,7 +419,7 @@ void hack_4p_tetris::generate_falling_blocks()
 /*
 void hack_4p_tetris::get_all_SC_reg_data()
 {
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		byte data = v_gb[i]->get_regs()->SC;
 		in_data_buffer[i] = data;
@@ -427,7 +428,7 @@ void hack_4p_tetris::get_all_SC_reg_data()
 
 void hack_4p_tetris::get_all_SB_reg_data()
 {
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		byte data = v_gb[i]->get_regs()->SB;
 		in_data_buffer[i] = data;
@@ -436,7 +437,7 @@ void hack_4p_tetris::get_all_SB_reg_data()
 
 bool hack_4p_tetris::is_expected_data(byte data)
 {
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		if (in_data_buffer[i] != data) return false; 
 	}
@@ -464,7 +465,7 @@ void hack_4p_tetris::send_byte(byte which, byte dat)
 
 void hack_4p_tetris::broadcast_byte(byte dat)
 {
-	for (byte i = 0x00; i < (byte)v_gb.size(); i++)
+	for (byte i = 0x00; i < (byte)emulated_gbs; i++)
 	{
 		send_byte(i, dat);
 	}
@@ -474,7 +475,7 @@ void hack_4p_tetris::broadcast_byte(byte dat)
 int hack_4p_tetris::player_alive_count() {
 	int alive_count = 0;
 
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		if (players_state[i] == IS_ALIVE || players_state[i] == IS_SENDING_LINES)
 		{
@@ -489,7 +490,7 @@ int hack_4p_tetris::check_winner_id()
 	int alive_count = 0;
 	int last_alive_id = 0;
 
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		if (players_state[i] == IS_ALIVE)
 		{
@@ -505,7 +506,7 @@ int hack_4p_tetris::check_winner_id()
 
 bool hack_4p_tetris::winner_winner_chicken_dinner() {
 
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		if (win_counter[i] == 4) return true; 
 	}
@@ -516,7 +517,7 @@ void hack_4p_tetris::update_ingame_states()
 {
 	current_max_height = 0;
 
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		switch (players_state[i])
 		{
@@ -603,7 +604,7 @@ void hack_4p_tetris::update_ingame_states()
 
 bool hack_4p_tetris::all_are_in_winnerscreen() {
 
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		if (players_state[i] != IS_IN_WINNER_SCREEN) return false;
 	}
@@ -629,7 +630,7 @@ void hack_4p_tetris::send_ingame_bytes()
 		int quarter_player_alive = (int)(players_alive / 4) ? (int)(players_alive / 4) : 1;
 		int players_got_lines = 0;
 		bool done = players_got_lines >= quarter_player_alive;
-		int max_trys = v_gb.size() * 4;
+		int max_trys = emulated_gbs * 4;
 		int current_try = 0;
 
 		std::srand(std::time(0));
@@ -637,7 +638,7 @@ void hack_4p_tetris::send_ingame_bytes()
 
 				if (current_try++ >= max_trys) done = true;
 				
-				int randomIndex = std::rand() % v_gb.size();
+				int randomIndex = std::rand() % emulated_gbs;
 		
 				if (players_state[randomIndex] == IS_IN_WINNER_SCREEN)  continue;
 				if (randomIndex == next.from) continue;
@@ -649,7 +650,7 @@ void hack_4p_tetris::send_ingame_bytes()
 		}
 	
 		/*
-		for (int i = 0; i < v_gb.size(); i++)
+		for (int i = 0; i < emulated_gbs; i++)
 		{
 			if (!((players_state[i] == IS_ALIVE) || (players_state[i] == IS_SENDING_LINES)))  continue;
 			if (next.from == i) continue;
@@ -659,7 +660,7 @@ void hack_4p_tetris::send_ingame_bytes()
 
 	}
 
-	for (int i = 0; i < v_gb.size(); i++)
+	for (int i = 0; i < emulated_gbs; i++)
 	{
 		if (!next_bytes_to_send[i]) next_bytes_to_send[i] = current_max_height;
 		if (players_state[i] != IS_IN_WINNER_SCREEN) 	send_byte(i, next_bytes_to_send[i]);
@@ -712,19 +713,19 @@ void hack_4p_tetris::save_state_mem(void* buf)
 
 	size = out_height_blocks.size();
 	s_VAR(size);
-	s_ARRAY(out_height_blocks.data());
+	if(size)s_ARRAY(out_height_blocks.data());
 
 	size = out_falling_blocks.size();
 	s_VAR(size);
-	s_ARRAY(out_falling_blocks.data());
+	if (size)s_ARRAY(out_falling_blocks.data());
 	
 	size = send_data_vec.size();
 	s_VAR(size);
-	s_ARRAY(send_data_vec.data());
+	if (size)s_ARRAY(send_data_vec.data());
 
 	size = lines_vec.size();
 	s_VAR(size);
-	s_ARRAY(lines_vec.data());
+	if (size)s_ARRAY(lines_vec.data());
 
 	
 }
@@ -736,40 +737,46 @@ void hack_4p_tetris::restore_state_mem(void* buf)
 
 	int size;
 	byte* tmp;
-
-	s_VAR(size);
-	tmp = new byte[size];
-	s_ARRAY(tmp);
 	out_height_blocks = std::vector<byte>();
-	for (int i = 0; i < size; i++)
-		out_height_blocks.emplace_back(tmp[i]);
-	
-
-	s_VAR(size);
-	tmp = new byte[size];
-	s_ARRAY(tmp);
 	out_falling_blocks = std::vector<byte>();
-	
-	for (int i = 0; i < size; i++)
-		out_falling_blocks.emplace_back(tmp[i]);
-
-
-	s_VAR(size);
-	tmp = new byte[size];
-	s_ARRAY(tmp);
 	send_data_vec = std::vector<byte>();
-
-	for (int i = 0; i < size; i++)
-		send_data_vec.emplace_back(tmp[i]);
-
-	s_VAR(size);
-	hack_4p_tetris_lines_packet* lp = new hack_4p_tetris_lines_packet[size];
-	s_ARRAY(lp);
 	lines_vec = std::vector<hack_4p_tetris_lines_packet>();
 
-	for (int i = 0; i < size; i++)
-		lines_vec.emplace_back(lp[i]);
+	s_VAR(size);
+	if (size) {
+		tmp = new byte[size];
+		s_ARRAY(tmp);
 
+		for (int i = 0; i < size; i++)
+			out_height_blocks.emplace_back(tmp[i]);
+	}
+	
+	s_VAR(size);
+	if (size) {
+		tmp = new byte[size];
+		s_ARRAY(tmp);
+		for (int i = 0; i < size; i++)
+			out_falling_blocks.emplace_back(tmp[i]);
+	}
+
+	s_VAR(size);
+	if (size) {
+		tmp = new byte[size];
+		s_ARRAY(tmp);
+
+		for (int i = 0; i < size; i++)
+			send_data_vec.emplace_back(tmp[i]);
+	}
+
+
+	s_VAR(size);
+	if (size) {
+		hack_4p_tetris_lines_packet* lp = new hack_4p_tetris_lines_packet[size];
+		s_ARRAY(lp);
+
+		for (int i = 0; i < size; i++)
+			lines_vec.emplace_back(lp[i]);
+	}
 	
 }
 

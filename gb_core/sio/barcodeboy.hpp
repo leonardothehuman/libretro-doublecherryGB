@@ -16,11 +16,11 @@ public:
 	void reset() override;
 	byte get_SB_value() override;
 	byte get_SC_value() override;
-	/*
-	virtual save_state_mem(void* buf);
-	void virtual restore_state_mem(void* buf);
-	size_t virtual get_state_size();
-	*/
+	
+	void virtual save_state_mem(void* buf) override;
+	void virtual restore_state_mem(void* buf) override;
+	size_t virtual get_state_size() override;
+	
 	void virtual serialize(serializer& s) override;
 	
 

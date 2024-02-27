@@ -32,6 +32,13 @@
 dmg07::dmg07(std::vector<gb*> g_gb)  {
 
 	v_gb.insert(v_gb.begin(), std::begin(g_gb), std::end(g_gb));
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		trans_buffer[i] = std::vector<byte>();
+		ans_buffer[i] = std::vector<byte>();
+	}
+	reset();
 }
 
 
@@ -622,14 +629,14 @@ void dmg07::save_state_mem(void* buf)
 	{
 		size = trans_buffer[i].size();
 		s_VAR(size);
-		s_ARRAY(trans_buffer[i].data());
+		if(size) s_ARRAY(trans_buffer[i].data());
 		size = ans_buffer[i].size();
 		s_VAR(size);
-		s_ARRAY(ans_buffer[i].data());
+		if (size) s_ARRAY(ans_buffer[i].data());
 	}
 	size = bytes_to_send.size();
 	s_VAR(size);
-	s_ARRAY(bytes_to_send.data());
+	if (size) s_ARRAY(bytes_to_send.data());
 
 	serialize(s);
 }
@@ -640,40 +647,50 @@ void dmg07::restore_state_mem(void* buf)
 
 	int size;
 	byte* tmp;
+	
 	for (int i = 0; i < 4; i++)
 	{
-		s_VAR(size);
-		tmp = new byte[size];
-		s_ARRAY(tmp);
 		trans_buffer[i] = std::vector<byte>();
-		for (int j = 0; j < size; j++)
-		{
-			trans_buffer[i].emplace_back(tmp[j]);
-		}
+		ans_buffer[i] = std::vector<byte>();
 
 		s_VAR(size);
-		tmp = new byte[size];
-		s_ARRAY(tmp);
+		if (size) {
+			tmp = new byte[size];
+			s_ARRAY(tmp);
 
-		ans_buffer[i] = std::vector<byte>();
-		for (int k = 0; k < size; k++)
-		{
-			ans_buffer[i].emplace_back(tmp[k]);
-		};
+			for (int j = 0; j < size; j++)
+			{
+				trans_buffer[i].emplace_back(tmp[j]);
+			}
+		}
+		
+		s_VAR(size);
+		if (size) {
+			tmp = new byte[size];
+			s_ARRAY(tmp);
 
+
+			for (int k = 0; k < size; k++)
+			{
+				ans_buffer[i].emplace_back(tmp[k]);
+			};
+		}
+	
 	}
 
-	s_VAR(size);
-	tmp = new byte[size];
-	s_ARRAY(tmp);
-
 	bytes_to_send = std::vector<byte>();
-	for (size_t i = 0; i < size; i++)
-	{
-		bytes_to_send.emplace_back(tmp[i]);
-	};
+	s_VAR(size);
+	if (size) {
+		tmp = new byte[size];
+		s_ARRAY(tmp);
 
-	delete tmp; 
+		for (size_t i = 0; i < size; i++)
+		{
+			bytes_to_send.emplace_back(tmp[i]);
+		};
+	}
+	
+	//delete tmp; 
 	serialize(s);
 }
 

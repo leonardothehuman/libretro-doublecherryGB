@@ -8,9 +8,9 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	case 2:
 	case 3:
 	case 4:
-	case 5: {
-		emulated_dmg07s = 1;
-
+	case 5: 
+	{
+		
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 3);
 		v_dmg07.push_back(new dmg07(_gbs1));
@@ -23,8 +23,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 		  
 	case 6:
 	{
-		emulated_dmg07s = 2;
-
+	
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 3);
 		v_dmg07.push_back(new dmg07(_gbs1));
@@ -37,7 +36,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	
 	case 7:
 	{
-		emulated_dmg07s = 2;
+		//emulated_dmg07s = 2;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -49,7 +48,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 		break;
 	}
 	case 8: {
-		emulated_dmg07s = 2;
+		//emulated_dmg07s = 2;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -62,7 +61,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	}
 	
 	case 9: {
-		emulated_dmg07s = 3;
+	//	emulated_dmg07s = 3;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 3);
@@ -191,7 +190,6 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	}
 	case 16:
 	{
-		emulated_dmg07s = 4;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -213,18 +211,20 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	
 	}
 
+	for(dmg07* dmg07 : v_dmg07)
+	{
+		dmg07->use_v_gb_size = true; 
+	}
+
 }
 
 void dmg07x4::process() {
-	/*
+		
 	for(dmg07* dmg07 : v_dmg07)
 	{
 		dmg07->process();
-	}*/
-	for (int i = 0; i < v_dmg07.size(); i++)
-	{
-		v_dmg07[i]->process();
 	}
+	
 }
 
 void dmg07x4::reset() {
@@ -236,8 +236,25 @@ void dmg07x4::reset() {
 
 
 void dmg07x4::serialize(serializer& s) {
-	for(dmg07* dmg07 : v_dmg07)
-	{
-		dmg07->serialize(s);
-	}
+
+	
 }
+
+
+void dmg07x4::save_state_mem(void* buf) {
+
+	for (size_t i = 0; i < v_dmg07.size(); i++)
+	{
+		v_dmg07[i]->save_state_mem(buf);
+	}
+};
+
+
+void dmg07x4::restore_state_mem(void* buf) {
+
+	for (size_t i = 0; i < v_dmg07.size(); i++)
+	{
+		v_dmg07[i]->save_state_mem(buf);
+	}
+};
+size_t dmg07x4::get_state_size() { return 0; };

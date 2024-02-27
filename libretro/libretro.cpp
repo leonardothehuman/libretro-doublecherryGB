@@ -400,8 +400,6 @@ bool retro_load_game(const struct retro_game_info* info)
        {
            mode = MODE_SINGLE_GAME_DUAL;
         
-          
-
            if (use_multi_adapter && !master_link) {
 
                std::vector<gb*> _gbs;
@@ -409,8 +407,7 @@ bool retro_load_game(const struct retro_game_info* info)
                master_link = new dmg07(_gbs);
 
            }
-           auto_config_4p_hack();
-
+          
            if (!use_multi_adapter && gblink_enable) 
            {
                v_gb[0]->set_target(v_gb[1]);
@@ -418,7 +415,20 @@ bool retro_load_game(const struct retro_game_info* info)
                v_gb[2]->set_target(v_gb[3]);
                v_gb[3]->set_target(v_gb[2]);
            }
-           
+           auto_config_4p_hack();
+
+           if (!strcmp(cart_name, "KWIRK"))
+           {
+               delete master_link;
+               master_link = NULL;
+               linked_target_device = new hack_4p_kwirk(v_gb);
+               break;
+           }
+           if (!strcmp(cart_name, "TETRIS"))
+           {
+               master_link = new hack_4p_tetris(v_gb);
+               break;
+           }
            break;
        }
        case 5:
@@ -752,7 +762,7 @@ size_t retro_serialize_size(void)
       }
    //}
    //return _serialize_size[0] + _serialize_size[1];
-    return _all_size + 0x600;
+    return _all_size + 0xFF00;
 }
 
 void log_save_state(uint8_t* data, size_t size)
