@@ -152,7 +152,7 @@ private:
 	int transfer_count = 0;
 	int phase_byte_count = 0;
 
-	int last_trans_nr[4];
+	int last_trans_nr[4] = { 0,0,0,0 };
 	int restart_in = 0;
 	byte enter_status = 0x00;
 
