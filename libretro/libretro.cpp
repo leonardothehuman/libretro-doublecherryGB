@@ -28,7 +28,7 @@ void retro_get_system_info(struct retro_system_info *info)
 #ifndef GIT_VERSION
 #define GIT_VERSION ""
 #endif
-   info->library_version  = "v0.1.0" GIT_VERSION;
+   info->library_version  = "v0.16.0" GIT_VERSION;
    info->need_fullpath    = false;
    info->valid_extensions = "gb|dmg|gbc|cgb|sgb";
 }
@@ -48,8 +48,20 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
       // screen orientation for dual gameboy mode
        if (_screen_4p_split)
        {
-           h *= 1;
-           w *= 1; 
+
+           if (emulated_gbs < 5) {
+               h *= 2;
+               w *= 2;
+           }
+           else if (emulated_gbs < 10) {
+               h *= 3;
+               w *= 3;
+           }
+           else{
+               h *= 4;
+               w *= 4;
+           }
+          
        }
        else if(_screen_vertical)
          h *= emulated_gbs;
