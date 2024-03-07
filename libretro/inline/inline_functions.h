@@ -234,22 +234,70 @@ static void check_variables(void)
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
-            if (!strcmp(var.value, "both players"))
-                _show_player_screens = 2;
+            //TODO make this cleaner and shorter
+            if (!strcmp(var.value, "all players"))
+                _show_player_screens = emulated_gbs;
             else if (!strcmp(var.value, "player 1 only"))
                 _show_player_screens = 0;
             else if (!strcmp(var.value, "player 2 only"))
                 _show_player_screens = 1;
+            else if (!strcmp(var.value, "player 3 only"))
+                _show_player_screens = 2;
+            else if (!strcmp(var.value, "player 4 only"))
+                _show_player_screens = 3;
+            else if (!strcmp(var.value, "player 5 only"))
+                _show_player_screens = 4;
+            else if (!strcmp(var.value, "player 6 only"))
+                _show_player_screens = 5;
+            else if (!strcmp(var.value, "player 7 only"))
+                _show_player_screens = 6;
+            else if (!strcmp(var.value, "player 8 only"))
+                _show_player_screens = 7;
+            else if (!strcmp(var.value, "player 9 only"))
+                _show_player_screens = 8;
+            else if (!strcmp(var.value, "player 10 only"))
+                _show_player_screens = 9;
+            else if (!strcmp(var.value, "player 11 only"))
+                _show_player_screens = 10;
+            else if (!strcmp(var.value, "player 12 only"))
+                _show_player_screens = 11;
+            else if (!strcmp(var.value, "player 13 only"))
+                _show_player_screens = 12;
+            else if (!strcmp(var.value, "player 14 only"))
+                _show_player_screens = 13;
+            else if (!strcmp(var.value, "player 15 only"))
+                _show_player_screens = 14;
+            else if (!strcmp(var.value, "player 16 only"))
+                _show_player_screens = 15;
+
+            if (_show_player_screens != emulated_gbs) {
+                audio_2p_mode = _show_player_screens;
+                var.key = "tgbdual_audio_output";
+                var.value = "Game Boy #" +  audio_2p_mode+1;
+                environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
+            }
         }
         else
-            _show_player_screens = 2;
+            _show_player_screens = emulated_gbs;
 
 
         int screenw = 160, screenh = 144;
 
         if (_screen_4p_split) {
-            screenw *= 2;
-            screenh *= 2;
+
+            if (emulated_gbs < 5) {
+                screenw *= 2;
+                screenh *= 2;
+            }
+            else if (emulated_gbs < 10) {
+                screenw *= 3;
+                screenh *= 3;
+            }
+            else {
+                screenw *= 4;
+                screenh *= 4;
+            }
+          
         }
         else if (emulated_gbs > 1 && _show_player_screens == 2)
         {
@@ -273,14 +321,47 @@ static void check_variables(void)
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
-            if (!strcmp(var.value, "Game Boy #1"))
-                audio_2p_mode = 0;
-            else if (!strcmp(var.value, "Game Boy #2"))
-                audio_2p_mode = 1;
-            else if (!strcmp(var.value, "Game Boy #3"))
-                audio_2p_mode = 2;
-            else if (!strcmp(var.value, "Game Boy #4"))
-                audio_2p_mode = 3;
+            if (_show_player_screens != emulated_gbs) {
+                audio_2p_mode = _show_player_screens;
+                var.key = "tgbdual_audio_output";
+                var.value = "Game Boy #" + audio_2p_mode + 1;
+                environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
+            }
+            else {
+                //TODO make this cleaner and shorter
+                if (!strcmp(var.value, "Game Boy #1"))
+                    audio_2p_mode = 0;
+                else if (!strcmp(var.value, "Game Boy #2"))
+                    audio_2p_mode = 1;
+                else if (!strcmp(var.value, "Game Boy #3"))
+                    audio_2p_mode = 2;
+                else if (!strcmp(var.value, "Game Boy #4"))
+                    audio_2p_mode = 3;
+                else if (!strcmp(var.value, "Game Boy #5"))
+                    audio_2p_mode = 4;
+                else if (!strcmp(var.value, "Game Boy #6"))
+                    audio_2p_mode = 5;
+                else if (!strcmp(var.value, "Game Boy #7"))
+                    audio_2p_mode = 6;
+                else if (!strcmp(var.value, "Game Boy #8"))
+                    audio_2p_mode = 7;
+                else if (!strcmp(var.value, "Game Boy #9"))
+                    audio_2p_mode = 8;
+                else if (!strcmp(var.value, "Game Boy #10"))
+                    audio_2p_mode = 9;
+                else if (!strcmp(var.value, "Game Boy #11"))
+                    audio_2p_mode = 10;
+                else if (!strcmp(var.value, "Game Boy #12"))
+                    audio_2p_mode = 11;
+                else if (!strcmp(var.value, "Game Boy #13"))
+                    audio_2p_mode = 12;
+                else if (!strcmp(var.value, "Game Boy #14"))
+                    audio_2p_mode = 13;
+                else if (!strcmp(var.value, "Game Boy #15"))
+                    audio_2p_mode = 14;
+                else if (!strcmp(var.value, "Game Boy #16"))
+                    audio_2p_mode = 15;
+            }
         }
         else
             _screen_switched = false;
