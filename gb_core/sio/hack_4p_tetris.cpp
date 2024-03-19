@@ -21,6 +21,9 @@
 //-------------------------------------------------
 
 #include "hack_4p_tetris.hpp"
+#include "../../libretro/libretro.h"
+#include <string>
+#include <sstream>
 #include <vector>
 #include <queue>
 #include <ctime>
@@ -29,6 +32,8 @@
 
 extern bool logging_allowed; 
 extern int emulated_gbs;
+extern retro_environment_t environ_cb;
+extern unsigned libretro_msg_interface_version;
 
 hack_4p_tetris::hack_4p_tetris(std::vector<gb*> g_gb) {
 
@@ -529,6 +534,32 @@ void hack_4p_tetris::update_ingame_states()
 				players_state[i] = IS_LOOSER; // ;D need new states
 				win_counter[i]++;
 				next_bytes_to_send[i] = 0x43;
+
+				std::ostringstream oss;
+				oss << (i + 1);
+				std::string msg_str = "congrats to player " + oss.str() + "!";
+
+				if (libretro_msg_interface_version >= 1)
+				{	
+					struct retro_message_ext msg = {
+					   msg_str.data(),
+					   1000,
+					   1,
+					   RETRO_LOG_INFO,
+					   RETRO_MESSAGE_TARGET_OSD,
+					   RETRO_MESSAGE_TYPE_NOTIFICATION,
+					   -1
+					};
+					environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE_EXT, &msg);
+				}
+				else
+				{
+					struct retro_message msg = {
+						msg_str.data(),
+					   120
+					};
+					environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
+				}
 			}
 			else {
 				next_bytes_to_send[i] = 0x34;
@@ -567,6 +598,38 @@ void hack_4p_tetris::update_ingame_states()
 			{
 				players_state[i] = IS_KO;
 				next_bytes_to_send[i] = 0xaa; // send ko for draw, cause only winning counts
+
+				std::ostringstream oss;
+				oss << (i + 1);
+				std::string msg_str = "Player " + oss.str() + " KO! ";
+				oss.str("");
+				oss << player_alive_count();
+				msg_str = msg_str + oss.str() + " players left";
+
+
+				if (libretro_msg_interface_version >= 1)
+				{
+					
+					struct retro_message_ext msg = {
+					   msg_str.data(),
+					   1000,
+					   1,
+					   RETRO_LOG_INFO,
+					   RETRO_MESSAGE_TARGET_OSD,
+					   RETRO_MESSAGE_TYPE_NOTIFICATION,
+					   -1
+					};
+					environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE_EXT, &msg);
+				}
+				else
+				{
+					struct retro_message msg = {
+						msg_str.data(),
+					   120
+					};
+					environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
+				}
+
 				break;
 			}
 

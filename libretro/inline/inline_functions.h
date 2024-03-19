@@ -89,6 +89,10 @@ void check_for_new_players() {
 
 static void check_variables(void)
 {
+    libretro_msg_interface_version = 0;
+    environ_cb(RETRO_ENVIRONMENT_GET_MESSAGE_INTERFACE_VERSION,
+        &libretro_msg_interface_version);
+
     struct retro_variable var;
 
     var.key = "multitgb_emulated_gameboys";
@@ -445,6 +449,9 @@ static bool netpacket_connected(unsigned short client_id) {
         return false;
 
     num_clients++;
+    
+    //test if when can change back to normal netplay
+    environ_cb(RETRO_ENVIRONMENT_SET_NETPACKET_INTERFACE, NULL);
     return true;
 }
 

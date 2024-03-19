@@ -379,7 +379,7 @@ bool retro_load_game(const struct retro_game_info* info)
        case 1:
        {
            // This interface is actually optional
-            environ_cb(RETRO_ENVIRONMENT_SET_NETPACKET_INTERFACE, (void*)&netpacket_iface);
+           environ_cb(RETRO_ENVIRONMENT_SET_NETPACKET_INTERFACE, (void*)&netpacket_iface);
 
            auto_config_1p_link();
            mode = MODE_SINGLE_GAME; break; 
@@ -936,7 +936,7 @@ void retro_set_environment(retro_environment_t cb)
       { NULL, false, false }
    };
    environ_cb = cb;
-   cb(RETRO_ENVIRONMENT_SET_SUBSYSTEM_INFO, (void*)subsystems);
+   //cb(RETRO_ENVIRONMENT_SET_SUBSYSTEM_INFO, (void*)subsystems);
    /* Request a persistent content data buffer */
    cb(RETRO_ENVIRONMENT_SET_CONTENT_INFO_OVERRIDE,
          (void*)content_overrides);
