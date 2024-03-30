@@ -462,18 +462,12 @@ bool retro_load_game(const struct retro_game_info* info)
        {
            mode = MODE_SINGLE_GAME_DUAL;
 
-          if (!strcmp(cart_name, "FACEBALL 2000   "))
+          if (!strncmp(cart_name, "FACEBALL 2000", 13))
            {
                delete master_link;
                master_link = NULL;
                linked_target_device = new faceball2000_cable(v_gb);
                v_gb[0]->set_linked_target(linked_target_device);
-
-               //set gb_type to GBC
-               for (int i = 0; i < emulated_gbs; i++)
-               {
-                   v_gb[0]->get_rom()->get_info()->gb_type = 2;
-               }
                break;
            }
           if (!strcmp(cart_name, "KWIRK"))
