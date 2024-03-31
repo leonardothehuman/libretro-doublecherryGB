@@ -279,6 +279,7 @@ static void check_variables(void)
                 var.key = "tgbdual_audio_output";
                 var.value = "Game Boy #" +  audio_2p_mode+1;
                 environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
+
             }
         }
         else
