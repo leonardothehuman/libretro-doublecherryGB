@@ -431,36 +431,7 @@ bool retro_load_game(const struct retro_game_info *info)
 
         break;
     }
-    }
-
-          if (!strncmp(cart_name, "FACEBALL 2000", 13))
-           {
-               delete master_link;
-               master_link = NULL;
-               linked_target_device = new faceball2000_cable(v_gb);
-               v_gb[0]->set_linked_target(linked_target_device);
-               break;
-           }
-          if (!strcmp(cart_name, "KWIRK"))
-          {
-              delete master_link;
-              master_link = NULL;
-              linked_target_device = new hack_4p_kwirk(v_gb);
-              break; 
-          }
-          if (!strcmp(cart_name, "TETRIS"))
-          {
-              master_link = new hack_4p_tetris(v_gb);
-              break;
-          }
-          
-          //if (use_multi_adapter && !master_link) {
-
-              master_link = new dmg07x4(v_gb, emulated_gbs);
-        //  }
-
-           break;
-       }
+  
    }
 
      check_variables();
