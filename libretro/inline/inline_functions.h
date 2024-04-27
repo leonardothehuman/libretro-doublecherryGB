@@ -95,12 +95,13 @@ static void check_variables(void)
 
     struct retro_variable var;
 
-    var.key = "multitgb_emulated_gameboys";
+    var.key = "dcgb_emulated_gameboys";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
     {
        
-        if (!already_checked_options) { // only apply this setting on init
+        if (!already_checked_options) 
+        { // only apply this setting on init
             if (!strcmp(var.value, "1"))
             {
                 emulated_gbs = 1;
@@ -140,12 +141,26 @@ static void check_variables(void)
         }
     }
 
+    
+    var.key = "dcgb_number_of_local_screens";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
 
+        //if (!already_checked_options) 
+        { 
+            if (!strcmp(var.value, "1"))
+                _number_of_local_screens = 1;
+
+            if (!strcmp(var.value, "2"))
+                _number_of_local_screens = 2;
+        }
+     }
 
     //TODO FOR 3PLAYERS
     if (emulated_gbs > 2) {
         // check 4Player Mode
-        var.key = "multitgbt_gblink_device";
+        var.key = "dcgbt_gblink_device";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -172,7 +187,7 @@ static void check_variables(void)
     if (emulated_gbs > 1)
     {
         // check whether link cable mode is enabled
-        var.key = "tgbdual_gblink_enable";
+        var.key = "dcgb_gblink_enable";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -187,7 +202,7 @@ static void check_variables(void)
             gblink_enable = false;
 
         // check whether link cable mode is enabled
-        var.key = "tgbdual_log_link";
+        var.key = "dcgb_log_link";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -197,7 +212,7 @@ static void check_variables(void)
         }
 
 
-        var.key = "tgbdual_screen_placement";
+        var.key = "dcgb_screen_placement";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -211,7 +226,7 @@ static void check_variables(void)
                 _screen_vertical = true;
                 _screen_4p_split = false;
             }
-            else if (!strcmp(var.value, "4-Player Splitscreen"))
+            else if (!strcmp(var.value, "splitscreen"))
             {
                 _screen_vertical = false;
                 _screen_4p_split = true;
@@ -221,7 +236,7 @@ static void check_variables(void)
             _screen_vertical = false;
 
         // check whether player 1 and 2's screen placements are swapped
-        var.key = "tgbdual_switch_screens";
+        var.key = "dcgb_switch_screens";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -234,61 +249,61 @@ static void check_variables(void)
             _screen_switched = false;
 
         // check whether to show both players' screens, p1 only, or p2 only
-        var.key = "tgbdual_single_screen_mp";
+        var.key = "dcgb_single_screen_mp";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
             //TODO make this cleaner and shorter
             if (!strcmp(var.value, "all players"))
-                _show_player_screens = emulated_gbs;
+                _show_player_screen = emulated_gbs;
             else if (!strcmp(var.value, "player 1 only"))
-                _show_player_screens = 0;
+                _show_player_screen = 0;
             else if (!strcmp(var.value, "player 2 only"))
-                _show_player_screens = 1;
+                _show_player_screen = 1;
             else if (!strcmp(var.value, "player 3 only"))
-                _show_player_screens = 2;
+                _show_player_screen = 2;
             else if (!strcmp(var.value, "player 4 only"))
-                _show_player_screens = 3;
+                _show_player_screen = 3;
             else if (!strcmp(var.value, "player 5 only"))
-                _show_player_screens = 4;
+                _show_player_screen = 4;
             else if (!strcmp(var.value, "player 6 only"))
-                _show_player_screens = 5;
+                _show_player_screen = 5;
             else if (!strcmp(var.value, "player 7 only"))
-                _show_player_screens = 6;
+                _show_player_screen = 6;
             else if (!strcmp(var.value, "player 8 only"))
-                _show_player_screens = 7;
+                _show_player_screen = 7;
             else if (!strcmp(var.value, "player 9 only"))
-                _show_player_screens = 8;
+                _show_player_screen = 8;
             else if (!strcmp(var.value, "player 10 only"))
-                _show_player_screens = 9;
+                _show_player_screen = 9;
             else if (!strcmp(var.value, "player 11 only"))
-                _show_player_screens = 10;
+                _show_player_screen = 10;
             else if (!strcmp(var.value, "player 12 only"))
-                _show_player_screens = 11;
+                _show_player_screen = 11;
             else if (!strcmp(var.value, "player 13 only"))
-                _show_player_screens = 12;
+                _show_player_screen = 12;
             else if (!strcmp(var.value, "player 14 only"))
-                _show_player_screens = 13;
+                _show_player_screen = 13;
             else if (!strcmp(var.value, "player 15 only"))
-                _show_player_screens = 14;
+                _show_player_screen = 14;
             else if (!strcmp(var.value, "player 16 only"))
-                _show_player_screens = 15;
+                _show_player_screen = 15;
 
-            if (_show_player_screens != emulated_gbs) {
-                audio_2p_mode = _show_player_screens;
-                var.key = "tgbdual_audio_output";
+            if (_show_player_screen != emulated_gbs) {
+                audio_2p_mode = _show_player_screen;
+                var.key = "dcgb_audio_output";
                 var.value = "Game Boy #" +  audio_2p_mode+1;
                 environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
 
             }
         }
         else
-            _show_player_screens = emulated_gbs;
+            _show_player_screen = emulated_gbs;
 
 
         int screenw = 160, screenh = 144;
 
-        if (_screen_4p_split) {
+        if (_screen_4p_split && (_number_of_local_screens == 1 || _show_player_screen == emulated_gbs)) {
 
             if (emulated_gbs < 5) {
                 screenw *= 2;
@@ -304,12 +319,19 @@ static void check_variables(void)
             }
           
         }
-        else if (emulated_gbs > 1 && _show_player_screens == 2)
+        else if (emulated_gbs > 1 && _show_player_screen == 2 && _number_of_local_screens == 1)
         {
             if (_screen_vertical)
                 screenh *= emulated_gbs;
             else
                 screenw *= emulated_gbs;
+        }
+        else if (_number_of_local_screens > 1)
+        {
+            if (_screen_vertical)
+                screenh *= _number_of_local_screens;
+            else
+                screenw *= _number_of_local_screens;
         }
 
 
@@ -322,13 +344,13 @@ static void check_variables(void)
 
 
         // check whether which audio should play
-        var.key = "tgbdual_audio_output";
+        var.key = "dcgb_audio_output";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
-            if (_show_player_screens != emulated_gbs) {
-                audio_2p_mode = _show_player_screens;
-                var.key = "tgbdual_audio_output";
+            if (_show_player_screen != emulated_gbs) {
+                audio_2p_mode = _show_player_screen;
+                var.key = "dcgb_audio_output";
                 var.value = "Game Boy #" + audio_2p_mode + 1;
                 environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
             }
