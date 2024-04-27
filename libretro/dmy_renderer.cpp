@@ -425,7 +425,7 @@ void dmy_renderer::render_screen(byte* buf, int width, int height, int depth)
                         memcpy(joined_buf4 + pitch * (4 * row + (switched_gb % 4)), buf + pitch * row, pitch);
                     if (which_gb == 11) {
                         memcpy(joined_buf16 + (sizeof(joined_buf4) * 2), joined_buf4, sizeof(joined_buf4));
-                        //memset(joined_buf4, 0, sizeof(joined_buf4));
+                        memset(joined_buf4, 0, sizeof(joined_buf4));
                     }
                     /*
                     if (which_gb == (emulated_gbs - 1)) {
