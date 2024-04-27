@@ -38,7 +38,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
     info->geometry.max_width = w * max_gbs;
     info->geometry.max_height = h * max_gbs;
 
-    if (_show_player_screens == emulated_gbs) {
+    if (_show_player_screen == emulated_gbs) {
 
         if (_screen_4p_split)
         {
@@ -65,6 +65,34 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
         else
             w *= emulated_gbs;
     }
+
+    else if (_number_of_local_screens > 1) { 
+        if (_screen_4p_split && _number_of_local_screens > 2)
+        {
+
+            if (_number_of_local_screens <= 4)
+            {
+                h *= 2;
+                w *= 2;
+            }
+            else if (_number_of_local_screens <= 9)
+            {
+                h *= 3;
+                w *= 3;
+            }
+            else
+            {
+                h *= 4;
+                w *= 4;
+            }
+
+        }
+        else if (_screen_vertical)
+            h *= _number_of_local_screens;
+        else
+            w *= _number_of_local_screens;
+    }
+      
  
     info->timing.fps = 4194304.0 / 70224.0;
     info->timing.sample_rate = 44100.0f;

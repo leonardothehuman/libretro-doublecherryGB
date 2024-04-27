@@ -14,43 +14,43 @@ static retro_netpacket_poll_receive_t netpacket_pollrcv_fn_ptr = NULL;
 
 
 static const struct retro_variable vars_single[] = {
-    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
+    { "dcgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
     // { "doublecherrygb_detect_gba", "detect playing on gba (gba enhancements); Off|On" },
     { NULL, NULL },
 };
 
 static const struct retro_variable vars_dual[] = {
-    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
-    { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
-    { "tgbdual_screen_placement", "Screen layout; left-right|top-down" },
-   // { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
-    { "tgbdual_single_screen_mp", "Show player screens; all players|player 1 only|player 2 only" },
-    { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2" },
-   // { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
+    { "dcgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
+    { "dcgb_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
+    { "dcgb_screen_placement", "Screen layout; left-right|top-down" },
+   // { "dcgb_switch_screens", "Switch player screens; normal|switched" },
+    { "dcgb_single_screen_mp", "Show player screens; all players|player 1 only|player 2 only" },
+    { "dcgb_audio_output", "Audio output; Game Boy #1|Game Boy #2" },
+   // { "dcgb_log_link", "Log Link Cable Communication; Off|On" },
     { NULL, NULL },
 };
 
 static const struct retro_variable vars_tripple[] = {
-    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
-    { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
-     { "multitgbt_gblink_device", "Link cable device (reload); 4-player adapter" },
-     { "tgbdual_screen_placement", "Screen layout; left-right|4-Player Splitscreen|top-down" },
-    //{ "tgbdual_switch_screens", "Switch player screens; normal|switched" },
-    { "tgbdual_single_screen_mp", "Show player screens; all players|player 1 only|player 2 only|player 3 only" },
-    { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2|Game Boy #3" },
-     //{ "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
+    { "dcgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
+    { "dcgb_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
+     { "dcgbt_gblink_device", "Link cable device (reload); 4-player adapter" },
+     { "dcgb_screen_placement", "Screen layout; left-right|splitscreen|top-down" },
+    //{ "dcgb_switch_screens", "Switch player screens; normal|switched" },
+    { "dcgb_single_screen_mp", "Show player screens; all players|player 1 only|player 2 only|player 3 only" },
+    { "dcgb_audio_output", "Audio output; Game Boy #1|Game Boy #2|Game Boy #3" },
+     //{ "dcgb_log_link", "Log Link Cable Communication; Off|On" },
     { NULL, NULL },
 };
 
 static const struct retro_variable vars_quad[] = {
-    { "multitgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
-     { "tgbdual_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
-    { "multitgbt_gblink_device", "Link cable device (reload); 4-player adapter|2x2-player link" },
-     { "tgbdual_screen_placement", "Screen layout; 4-Player Splitscreen" },
-   // { "tgbdual_switch_screens", "Switch player screens; normal|switched" },
-    { "tgbdual_single_screen_mp", "Show player screens; all players|player 1 only|player 2 only|player 3 only|player 4 only|player 5 only|player 6 only|player 7 only|player 8 only|player 9 only|player 10 only|player 11 only|player 12 only|player 13 only|player 14 only|player 15 only|player 16 only" },
-     { "tgbdual_audio_output", "Audio output; Game Boy #1|Game Boy #2|Game Boy #3|Game Boy #4|Game Boy #5|Game Boy #6|Game Boy #7|Game Boy #8|Game Boy #9|Game Boy #10|Game Boy #11|Game Boy #12|Game Boy #13|Game Boy #14|Game Boy #15|Game Boy #16" },
-   // { "tgbdual_log_link", "Log Link Cable Communication; Off|On" },
+    { "dcgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
+     { "dcgb_gblink_enable", "Link cable emulation (reload); disabled|enabled" },
+    { "dcgbt_gblink_device", "Link cable device (reload); 4-player adapter|2x2-player link" },
+     { "dcgb_screen_placement", "Screen layout; splitscreen|top-down|left-right|" },
+    { "dcgb_number_of_local_screens", "Netplay: Nummer of local players (splitscreen); 1|2" },
+    { "dcgb_single_screen_mp", "Show player screens; all players|player 1 only|player 2 only|player 3 only|player 4 only|player 5 only|player 6 only|player 7 only|player 8 only|player 9 only|player 10 only|player 11 only|player 12 only|player 13 only|player 14 only|player 15 only|player 16 only" },
+     { "dcgb_audio_output", "Audio output; Game Boy #1|Game Boy #2|Game Boy #3|Game Boy #4|Game Boy #5|Game Boy #6|Game Boy #7|Game Boy #8|Game Boy #9|Game Boy #10|Game Boy #11|Game Boy #12|Game Boy #13|Game Boy #14|Game Boy #15|Game Boy #16" },
+   // { "dcgb_log_link", "Log Link Cable Communication; Off|On" },
     { NULL, NULL },
 };
 
@@ -113,7 +113,8 @@ retro_input_state_t input_state_cb;
 bool _screen_vertical = false;
 bool _screen_4p_split = false;
 bool _screen_switched = false;
-int _show_player_screens = 1;
+int _show_player_screen = 1;
+int _number_of_local_screens = 1;
 static size_t _serialize_size[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
 bool gblink_enable = false;
