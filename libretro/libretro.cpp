@@ -113,6 +113,13 @@ void retro_init(void)
     else
         log_cb = NULL;
 
+    struct retro_led_interface led;
+
+    environ_cb(RETRO_ENVIRONMENT_GET_LED_INTERFACE, &led);
+    
+   
+   
+
     environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))

@@ -11,7 +11,9 @@ unsigned short my_client_id = -1;
 static retro_netpacket_send_t netpacket_send_fn_ptr = NULL;
 static retro_netpacket_poll_receive_t netpacket_pollrcv_fn_ptr = NULL;
 
+static struct retro_rumble_interface rumble;
 
+bool power_antenna_on = false;
 
 static const struct retro_variable vars_single[] = {
     { "dcgb_emulated_gameboys", "Number of emulated Gameboys (reload); 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16" },
