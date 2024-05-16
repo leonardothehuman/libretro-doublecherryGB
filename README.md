@@ -21,14 +21,16 @@ Check my [website](https://timoelrichs.is-a.dev) for more information, planned f
 
 ### Features
 
-- GAMEBOY 4 PLAYER ADAPTER (DMG-07) emulation
-- up to 16-Player Faceball 2000 emulation (1-15 without bugfix-patch, 16 players needs patched rom)
-- up to 16-Player Tetris Battle Royal (no modified rom needed)
-- up to 16-Player Kwirk Multiplayer (no modified rom needed)
+- GAMEBOY 4 PLAYER ADAPTER (DMG-07) emulation (F1-Race, Wave Race, Yoshi's Cookie...)
+- up to 16-Player Faceball 2000 emulation (1-15 without bugfix-patch, 16 players needs patched rom https://github.com/Zarithya/Faceball2000DX))
+- up to 16-Player Tetris Battle Royal Hack (no modified rom needed)
+- up to 16-Player Kwirk Multiplayer Hack (no modified rom needed)
+- up to 16 Player 4x4Player Adapter
+- Of course up to 16 Player Singleplayer for Speedrun-battles or if you have arguing kids :D
 - local splitscreen
 - netplay support
-- Barcodeboy Emulation
-- easy Pokemon online trading (Retroarch 1.17 needed)
+- BARCODEBOY Emulation full support (all barcodes are hardcoded and will autoload the next after scan)  
+- easy Pokemon Gen1 and Gen2 online trading via Lobby without subsystem (Retroarch 1.17 needed) 
 
 Netplay is working. Make sure to have all the same amount of emulated gameboys in your core options.
 
@@ -44,13 +46,18 @@ Netplay is working. Make sure to have all the same amount of emulated gameboys i
 You can download the core via RetroArch Online-Updater on Windows, Linux and Android.
 To emulate up to 16 units, use the core options in your frontend.  
 
-### Easy pokemon online trading
+### Easy gen1/gen2 pokemon online trading
+
+Why is this easier? 
+You just load up one Gameboy and one rom. No subsystem requiered. 
+You can find trading partners over the netplay lobby (netplay -> refresh Host List)
+Also works in LAN.
 
 Retroarch 1.17 is needed, because this feature uses the new netpacket api.
 only the linkcable data is transfered over network, so you won't see the others players screen.
 
 - set the emulated gameboys to 1 and start or join a netplay. 
-- a second player can join any time, you don't need the same roms. 
+- a second player can join any time
 
 go to the cable club and talk to the cable club npc. 
 after both players sat down on the table and you see the please wait! screen, you will experince an big slowdown (up to 15 sec)
@@ -62,7 +69,7 @@ https://www.buymeacoffee.com/timoelrichs<br>
 
 Thanks to
 - Shonumi for doing the research and documentation on the dmg-07  https://shonumi.github.io/index.html
-- GIGO and Hii for making TGBDual and zhe libretro port
+- GIGO and Hii for making TGBDual and the libretro port
 
 ![](/screenshots/Faceball%202000.png)
 ![](/screenshots/Tetris.png)
