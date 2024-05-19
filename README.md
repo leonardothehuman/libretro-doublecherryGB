@@ -52,14 +52,16 @@ To emulate up to 16 units, use the core options in your frontend.
 #### Easy gen1/gen2 pokemon online trading
 
 As you may not know, the TGBdual and Sameboy Gameboy link cable subsystem is not meant for netplay and does only work on your local maschine.
+There are workarounds with savefile exchange. [OnionOS](https://onionui.github.io/docs/multiplayer/easynetplay-pokemon) and Koriki CFW for the miyoo mini have features to automate this process.
+But these require a supported retrohandheld and is only possible local via personal hotspot.
 For online trading gambatte was the only option, because it has its own link over network implementation.
 
 With RetroArch 1.17 we got a new netpacket API meant and made for DOSBox Pure core to let players do retro-lan-partys over the RetroArch netplay feature.
 This doesn't use the savestate syncronisation, but allows to send netpackets.
 gpSP was the first core besides DosBoxPure to use this feature for the emulation of the GBA Wireless Adapter. 
-Ninoh-Fox, the creator of the [koriko cfw](https://github.com/Rparadise-Team/Koriki) for the miyoo mini, asked me, if i could implement this into DoubleCherryGB to enable trading for GB/GBC and i did.
+Ninoh-Fox, the creator of the [koriko cfw](https://github.com/Rparadise-Team/Koriki) for the miyoo mini, asked me, if i could implement this feature into DoubleCherryGB to enable trading for GB/GBC and i did.
 
-Why is this easier? 
+Why is this easier? No setup and no workarounds. No need to own the same roms (region, edition). Shoulö work cross platform.
 You can find trading partners over the netplay lobby (netplay -> refresh Host List), and can use the netplay text-chat by pressing ^ on your keyboard.
 Also works in LAN. 
 
@@ -70,17 +72,18 @@ Only the linkcable data is transfered over network, so you won't see the others 
 
 - make sure emulated gameboys is set to 1 in the Core Options 
 - load your rom
-- start or join a netplay. (a second player can join any time)
+- start or join a netplay (a second player can join any time)
 
 The netpacket api is activated when you set emulated gameboys to 1. This is only meant for trading purposes and may be too slow for actual Multiplayer.
-For Multiplayer-sessions please set the amount of emulated gameboys to 2 or higher, because this will active the old savestate sync for lagfree netplay.  
+For Multiplayer-sessions please set the amount of emulated gameboys to 2 or higher, because this will activate the old savestate sync for lagfree netplay.  
 
 Trading should work with other GB/GBC Games as well:
 
 - Pokemon R/B/Y/S/G/C
-- Pokemon Trading Card Game 1/2
+- Pokemon Trading Card Game 1 and 2
 - RoboPon Sun/Star
-- Telefang Speed / Power
+- Telefang Speed/Power
+- Dragon Warrior (Quest) Monster
 - Dragon Warrior (Quest) Monster 2 Tara's Adventure / Cobi's Journey
 - Monster Rancher Battle Card Game
 - Zelda OoA / OoS ring trade
@@ -98,7 +101,7 @@ https://www.buymeacoffee.com/timoelrichs<br>
 Thanks to
 - Shonumi for doing the research and technical documentation for Gameboy and many peripherals/accessories/add-ons  https://shonumi.github.io/index.html
 - PSYRaven for the netpacket api and davidgf for his implemtation on gpSP
-- Ninoh-Fox for his work Koriki cfw
+- Ninoh-Fox for his work on Koriki cfw
 - GIGO and Hii for making TGBDual and the libretro port
 
 ![](/screenshots/Faceball%202000.png)
