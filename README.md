@@ -21,6 +21,7 @@ Check my [website](https://timoelrichs.is-a.dev) for more information, planned f
 
 ### Features
 
+- Link Cable over network, easy Pokemon Gen1 and Gen2 online trading via Lobby (Retroarch 1.17 needed) 
 - GAMEBOY 4 PLAYER ADAPTER (DMG-07) emulation (F1-Race, Wave Race, Yoshi's Cookie...) [compatibility list](https://peppermint-theater-276.notion.site/4-player-adapter-compatibility-8d33abe17f1d4bf5a361b368af6622b7)
 - up to 16-Player Faceball 2000 emulation (1-15 without bugfix-patch, 16 players needs [patched](https://github.com/Zarithya/Faceball2000DX) rom)
 - up to 16-Player Tetris Battle Royal Hack (virtual link device, no modified rom needed)
@@ -30,7 +31,7 @@ Check my [website](https://timoelrichs.is-a.dev) for more information, planned f
 - local splitscreen
 - netplay support
 - BARCODEBOY Emulation full support (all barcodes are hardcoded and will autoload the next after scan)  
-- Link Cable over network, easy Pokemon Gen1 and Gen2 online trading via Lobby (Retroarch 1.17 needed) 
+
 
 Netplay is working. Make sure to have all the same amount of emulated gameboys in your core options.
 
@@ -61,7 +62,7 @@ This doesn't use the savestate syncronisation, but allows to send netpackets.
 gpSP was the first core besides DosBoxPure to use this feature for the emulation of the GBA Wireless Adapter. 
 Ninoh-Fox, the creator of the [koriko cfw](https://github.com/Rparadise-Team/Koriki) for the miyoo mini, asked me, if i could implement this feature into DoubleCherryGB to enable trading for GB/GBC and i did.
 
-Why is this easier? No setup and no workarounds. No need to own the same roms (region, edition). Shoulö work cross platform.
+Why is this easier? No setup and no workarounds. No need to own the same roms (region, edition). Should work cross platform.
 You can find trading partners over the netplay lobby (netplay -> refresh Host List), and can use the netplay text-chat by pressing ^ on your keyboard.
 Also works in LAN. 
 
