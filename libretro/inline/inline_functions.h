@@ -33,6 +33,8 @@ void auto_config_1p_link() {
     {
         master_link = new barcodeboy(v_gb, cart_name);
     }
+    //TODO if power_antenna game
+    v_gb[0]->set_linked_target(new power_antenna());
 }
 
 

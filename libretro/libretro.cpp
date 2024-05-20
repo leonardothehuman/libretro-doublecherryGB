@@ -113,11 +113,10 @@ void retro_init(void)
     else
         log_cb = NULL;
 
-    struct retro_led_interface led;
-
-    environ_cb(RETRO_ENVIRONMENT_GET_LED_INTERFACE, &led);
-    
    
+    environ_cb(RETRO_ENVIRONMENT_GET_LED_INTERFACE, &led);
+    led_state_cb = led.set_led_state;
+    
    
 
     environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
@@ -600,41 +599,17 @@ void retro_run(void)
         }
         if (master_link)
             master_link->process();
+
+        if (power_antenna_last_state != power_antenna_on)
+        {
+            power_antenna_last_state = power_antenna_on;
+            led_state_cb(0, power_antenna_on);
+        }
     }
 
-    /*
-    //GBREMIXER test condition link collected first ruppee
-    if (v_gb[0]->get_cpu()->get_ram()[0x1B5E] == 1)
-    {
+  
 
-        //open new save savestate test
-        // open the file
-        const char* savestate_filename = "C:\\Users\\TimZen\\Downloads\\RetroArch\\RetroArch-Win64\\\\states\\Legend of Zelda, The - Link's Awakening DX (USA, Europe) (Rev 2) (SGB Enhanced) (GB Compatible).state2";
-        size_t state_size;
-
-        // Read the savestate into a buffer
-        char* state_buffer = read_file_to_buffer(savestate_filename, &state_size);
-        if (state_buffer == NULL) {
-            return;
-        }
-        retro_reset();
-
-        // Unserialize the savestate using Libretro API
-        if (!retro_unserialize(state_buffer, retro_serialize_size())) {
-            printf("Failed to unserialize the savestate\n");
-            free(state_buffer);
-            return;
-        }
-
-        // Successfully unserialized the savestate, now you can proceed with emulation
-
-        // Free the allocated buffer
-        free(state_buffer);
-
-
-
-    }
-    */
+    
 }
 
 void *retro_get_memory_data(unsigned id)

@@ -22,6 +22,7 @@
 
 #include "power_antenna.hpp"
 
+
 byte power_antenna::seri_send(byte data) 
 {
 	if (data == 0x00) {

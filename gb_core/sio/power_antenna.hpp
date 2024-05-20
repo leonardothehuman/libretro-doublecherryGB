@@ -28,10 +28,11 @@ extern bool power_antenna_on;
 class power_antenna : public link_target {
 
 public:
-	
+	power_antenna() {};
 	byte seri_send(byte data) override;
 	byte get_SB_value() override { return 0xFF; };
 	byte get_SC_value() override { return 0x80; };
+	void reset() override {};
 	
 	
 };
