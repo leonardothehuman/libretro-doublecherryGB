@@ -12,6 +12,7 @@ static retro_netpacket_send_t netpacket_send_fn_ptr = NULL;
 static retro_netpacket_poll_receive_t netpacket_pollrcv_fn_ptr = NULL;
 
 static struct retro_rumble_interface rumble;
+static retro_set_rumble_state_t rumbleCallback;
 struct retro_led_interface led;
 static retro_set_led_state_t led_state_cb;
 

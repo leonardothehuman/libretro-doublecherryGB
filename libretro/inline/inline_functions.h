@@ -6,6 +6,32 @@ void set_cart_name(byte* rombuf)
     cart_name[17] = '\0';
 }
 
+void display_message(std::string msg_str)
+{
+
+if (libretro_msg_interface_version >= 1)
+{
+    struct retro_message_ext msg = {
+       msg_str.data(),
+       1000,
+       1,
+       RETRO_LOG_INFO,
+       RETRO_MESSAGE_TARGET_OSD,
+       RETRO_MESSAGE_TYPE_NOTIFICATION,
+       -1
+    };
+    environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE_EXT, &msg);
+}
+else
+{
+    struct retro_message msg = {
+        msg_str.data(),
+       120
+    };
+    environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
+}
+}
+
 void auto_config_4p_hack()
 {
     if (!cart_name) return; 
@@ -24,6 +50,8 @@ void auto_config_4p_hack()
 
 void auto_config_1p_link() {
     if (!cart_name) return;
+
+    //link barcodeboy
     if (!strcmp(cart_name, "BATTLE SPACE") || 
         !strcmp(cart_name, "MONSTER MAKER") ||
         !strcmp(cart_name, "KATTOBI ROAD") ||
@@ -32,9 +60,18 @@ void auto_config_1p_link() {
         )
     {
         master_link = new barcodeboy(v_gb, cart_name);
+        display_message("Barcodeboy emulation enabled");
     }
-    //TODO if power_antenna game
-    v_gb[0]->set_linked_target(new power_antenna());
+    //link power_antenna/bugsensor
+    if (!strcmp(cart_name, "TELEFANG", 8) ||
+        !strcmp(cart_name, "BUGSITE", 7)
+        )
+    {
+        master_link = null;
+        v_gb[0]->set_linked_target(new power_antenna());
+        display_message("Power Antenna/Bugsensor emulation enabled");
+    }
+   
 }
 
 
@@ -88,6 +125,8 @@ void check_for_new_players() {
     }
 
 }
+
+static void _setRumble(struct mRumble* rumble, int enable);
 
 static void check_variables(void)
 {

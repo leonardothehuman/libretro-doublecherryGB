@@ -117,7 +117,14 @@ void retro_init(void)
     environ_cb(RETRO_ENVIRONMENT_GET_LED_INTERFACE, &led);
     led_state_cb = led.set_led_state;
     
-   
+    struct retro_rumble_interface rumbleInterface;
+    if (environCallback(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumbleInterface)) {
+        rumbleCallback = rumbleInterface.set_rumble_state;
+        rumble.setRumble = _setRumble;
+    }
+    else {
+        rumbleCallback = 0;
+    }
 
     environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
 
@@ -332,7 +339,7 @@ bool retro_load_game(const struct retro_game_info *info)
         rom_size = info->size;
     }
 
-    // create gameboy instances
+    //create gameboy instances
     for (byte i = 0; i < max_gbs; i++)
     {
         render.emplace_back(new dmy_renderer(i));
@@ -340,7 +347,7 @@ bool retro_load_game(const struct retro_game_info *info)
         _serialize_size[i] = 0;
     }
 
-    // load roms
+    //load roms
     for (byte i = 0; i < max_gbs; i++)
     {
             if (!v_gb[i]->load_rom(rom_data, rom_size, NULL, 0,libretro_supports_persistent_buffer))
@@ -349,9 +356,10 @@ bool retro_load_game(const struct retro_game_info *info)
         v_gb[i]->set_use_gba(detect_gba);
     }
 
+    //set cart name for autoconfig
     set_cart_name(rom_data);
 
-    // set link connections
+    //set link connections
     switch (emulated_gbs)
     {
     case 1:
