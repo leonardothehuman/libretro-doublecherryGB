@@ -6,24 +6,59 @@ void set_cart_name(byte* rombuf)
     cart_name[17] = '\0';
 }
 
+
+void display_message(std::string msg_str, unsigned int seconds)
+{
+    seconds %= 10;
+
+if (libretro_msg_interface_version >= 1)
+{
+    struct retro_message_ext msg = {
+       msg_str.data(),
+       seconds * 1000,
+       1,
+       RETRO_LOG_INFO,
+       RETRO_MESSAGE_TARGET_OSD,
+       RETRO_MESSAGE_TYPE_NOTIFICATION_ALT,
+       -1
+    };
+    environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE_EXT, &msg);
+}
+else
+{
+    struct retro_message msg = {
+        msg_str.data(),
+       seconds * 60
+    };
+    environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
+}
+}
+void display_message(std::string msg_str) { display_message(msg_str, 5); }
+
 void auto_config_4p_hack()
 {
     if (!cart_name) return; 
     if (!strcmp(cart_name, "TETRIS"))
     {
         master_link = new hack_4p_tetris(v_gb);
+        display_message("TETRIS Battle Royal Multiplayer Hack Adapter plugged in");
+        return;
     }
     if (!strcmp(cart_name, "KWIRK"))
     {
         delete master_link; 
         master_link = NULL; 
         linked_target_device = new hack_4p_kwirk(v_gb);
+        display_message("KWIRK Multiplayer Hack Adapter plugged in");
+        return;
     }
- 
+    
 };
 
 void auto_config_1p_link() {
     if (!cart_name) return;
+
+    //link barcodeboy
     if (!strcmp(cart_name, "BATTLE SPACE") || 
         !strcmp(cart_name, "MONSTER MAKER") ||
         !strcmp(cart_name, "KATTOBI ROAD") ||
@@ -32,7 +67,20 @@ void auto_config_1p_link() {
         )
     {
         master_link = new barcodeboy(v_gb, cart_name);
+        display_message("Game supports BARCODE BOY! BARCODE BOY plugged in");
+        return; 
     }
+    //link power_antenna/bugsensor
+    if (!strncmp(cart_name, "TELEFANG", 8) ||
+        !strncmp(cart_name, "BUGSITE", 7)
+        )
+    {
+        master_link = NULL;
+        v_gb[0]->set_linked_target(new power_antenna());
+        display_message("Game supports POWER ANTENNA/BUGSENSOR! POWER ANTENNA/BUGSENSOR plugged in");
+        return; 
+    }
+   
 }
 
 
@@ -87,6 +135,7 @@ void check_for_new_players() {
 
 }
 
+
 static void check_variables(void)
 {
     libretro_msg_interface_version = 0;
@@ -94,6 +143,18 @@ static void check_variables(void)
         &libretro_msg_interface_version);
 
     struct retro_variable var;
+
+    var.key = "dcgb_power_antenna_use_rumble";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        if (!strcmp(var.value, "Off"))
+            power_antenna_use_rumble = 0;
+        else if (!strcmp(var.value, "Weak"))
+            power_antenna_use_rumble = 1;
+        else if (!strcmp(var.value, "Strong"))
+            power_antenna_use_rumble = 2;
+    }
 
     var.key = "dcgb_emulated_gameboys";
     var.value = NULL;
@@ -483,7 +544,6 @@ static void netpacket_disconnected(unsigned short client_id) {
 }
 
 
-
 const struct retro_netpacket_callback netpacket_iface = {
   netpacket_start,          // start
   netpacket_receive,        // receive
@@ -493,4 +553,20 @@ const struct retro_netpacket_callback netpacket_iface = {
   netpacket_disconnected,   // disconnected
   "DoubleCherryGB netpack V1.0",   // core version char* 
 };
+
+void log_save_state(uint8_t* data, size_t size)
+{
+    if (logging_allowed)
+    {
+        std::string filePath = "./dmg07_savesate_log.bin";
+        std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
+
+        for (int i = 0; i < size; i++)
+        {
+            ofs << data[i];
+        }
+
+        ofs.close();
+    }
+}
 
