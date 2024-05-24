@@ -13,13 +13,15 @@ class link_master_device{
 public:
 	virtual void process() = 0;
 	virtual void reset() = 0;
-	void virtual save_state_mem(void* buf);
-	void virtual restore_state_mem(void* buf) ;
+	void virtual save_state_mem(void* buf) = 0;
+	void virtual restore_state_mem(void* buf) = 0;
 	size_t virtual get_state_size();
 	void virtual serialize(serializer& s) = 0;
 	
 	int transfer_speed = 512 * 8;
 	int seri_occer = 512*8*5;
+	byte in_data_buffer[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+	bool use_v_gb_size = false;
 
 protected:
 	virtual byte send_byte(byte which, byte dat);
@@ -39,8 +41,9 @@ protected:
 	bool is_expected_data(byte data);
 	bool all_IE_are_handled();
 
-	byte in_data_buffer[4];
+	
 	std::vector<gb*> v_gb;
+	
 
 };
 
