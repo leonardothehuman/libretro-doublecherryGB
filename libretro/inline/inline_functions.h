@@ -6,18 +6,20 @@ void set_cart_name(byte* rombuf)
     cart_name[17] = '\0';
 }
 
-void display_message(std::string msg_str)
+
+void display_message(std::string msg_str, unsigned int seconds)
 {
+    seconds %= 10;
 
 if (libretro_msg_interface_version >= 1)
 {
     struct retro_message_ext msg = {
        msg_str.data(),
-       1000,
+       seconds * 1000,
        1,
        RETRO_LOG_INFO,
        RETRO_MESSAGE_TARGET_OSD,
-       RETRO_MESSAGE_TYPE_NOTIFICATION,
+       RETRO_MESSAGE_TYPE_NOTIFICATION_ALT,
        -1
     };
     environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE_EXT, &msg);
@@ -26,11 +28,12 @@ else
 {
     struct retro_message msg = {
         msg_str.data(),
-       120
+       seconds * 60
     };
     environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
 }
 }
+void display_message(std::string msg_str) { display_message(msg_str, 5); }
 
 void auto_config_4p_hack()
 {
@@ -38,14 +41,18 @@ void auto_config_4p_hack()
     if (!strcmp(cart_name, "TETRIS"))
     {
         master_link = new hack_4p_tetris(v_gb);
+        display_message("TETRIS Battle Royal Multiplayer Hack Adapter plugged in");
+        return;
     }
     if (!strcmp(cart_name, "KWIRK"))
     {
         delete master_link; 
         master_link = NULL; 
         linked_target_device = new hack_4p_kwirk(v_gb);
+        display_message("KWIRK Multiplayer Hack Adapter plugged in");
+        return;
     }
- 
+    
 };
 
 void auto_config_1p_link() {
@@ -60,7 +67,8 @@ void auto_config_1p_link() {
         )
     {
         master_link = new barcodeboy(v_gb, cart_name);
-        //display_message("Barcodeboy emulation enabled");
+        display_message("Game supports BARCODE BOY! BARCODE BOY plugged in");
+        return; 
     }
     //link power_antenna/bugsensor
     if (!strncmp(cart_name, "TELEFANG", 8) ||
@@ -69,7 +77,8 @@ void auto_config_1p_link() {
     {
         master_link = NULL;
         v_gb[0]->set_linked_target(new power_antenna());
-        //display_message("Power Antenna/Bugsensor emulation enabled");
+        display_message("Game supports POWER ANTENNA/BUGSENSOR! POWER ANTENNA/BUGSENSOR plugged in");
+        return; 
     }
    
 }
@@ -126,23 +135,6 @@ void check_for_new_players() {
 
 }
 
-static void _setRumble(struct mRumble* rumble, int enable)
-{
-    //UNUSED(rumble);
-    /*
-    if (!rumbleInitDone) {
-        _initRumble();
-    }*/
-    if (!rumble_state_cb) {
-        return;
-    }
-    if (enable) {
-        rumble_state_cb(0, RETRO_RUMBLE_WEAK, 0xFFFF);
-    }
-    else {
-        rumble_state_cb(0, RETRO_RUMBLE_WEAK, 0);
-    }
-}
 
 static void check_variables(void)
 {
@@ -151,6 +143,18 @@ static void check_variables(void)
         &libretro_msg_interface_version);
 
     struct retro_variable var;
+
+    var.key = "dcgb_power_antenna_use_rumble";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        if (!strcmp(var.value, "Off"))
+            power_antenna_use_rumble = 0;
+        else if (!strcmp(var.value, "Weak"))
+            power_antenna_use_rumble = 1;
+        else if (!strcmp(var.value, "Strong"))
+            power_antenna_use_rumble = 2;
+    }
 
     var.key = "dcgb_emulated_gameboys";
     var.value = NULL;

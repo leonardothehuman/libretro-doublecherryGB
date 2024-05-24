@@ -33,6 +33,9 @@ public:
 	byte get_SB_value() override { return 0xFF; };
 	byte get_SC_value() override { return 0x80; };
 	void reset() override {};
+
+	bool power_antenna_last_state = false; 
+	bool power_antenna_on = false; 
 	
 	
 };

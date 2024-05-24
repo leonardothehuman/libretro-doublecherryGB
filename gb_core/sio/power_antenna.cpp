@@ -21,17 +21,34 @@
 //-------------------------------------------------
 
 #include "power_antenna.hpp"
+#include "../../libretro/libretro.h"
 
+extern retro_set_rumble_state_t rumble_state_cb;
+extern retro_set_led_state_t led_state_cb;
+extern unsigned int power_antenna_use_rumble;
 
 byte power_antenna::seri_send(byte data) 
 {
 	if (data == 0x00) {
 		power_antenna_on = false;
+		if(rumble_state_cb) rumble_state_cb(0, RETRO_RUMBLE_WEAK, 0);
 	}
 	else if (!power_antenna_on)
 	{
 		power_antenna_on = true;
 		
+	}
+
+	if (power_antenna_last_state != power_antenna_on)
+	{
+		power_antenna_last_state = power_antenna_on;
+
+		//control LED DRIVER
+		led_state_cb(0, power_antenna_on);
+
+		//set rumble
+		if(power_antenna_use_rumble)
+			rumble_state_cb(0, (retro_rumble_effect)(power_antenna_use_rumble % 2), power_antenna_on * 0xffff);
 	}
 
 	return power_antenna_on ? 0xF3 : 0xF2;
