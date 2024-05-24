@@ -117,13 +117,13 @@ void retro_init(void)
     environ_cb(RETRO_ENVIRONMENT_GET_LED_INTERFACE, &led);
     led_state_cb = led.set_led_state;
     
-    struct retro_rumble_interface rumbleInterface;
-    if (environCallback(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumbleInterface)) {
-        rumbleCallback = rumbleInterface.set_rumble_state;
-        rumble.setRumble = _setRumble;
+    //struct retro_rumble_interface rumbleInterface;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumble)) {
+        rumble_state_cb = rumble.set_rumble_state;
+        //rumble.setRumble = _setRumble;
     }
     else {
-        rumbleCallback = 0;
+        rumble_state_cb = 0;
     }
 
     environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
@@ -353,7 +353,7 @@ bool retro_load_game(const struct retro_game_info *info)
             if (!v_gb[i]->load_rom(rom_data, rom_size, NULL, 0,libretro_supports_persistent_buffer))
                 return false;
        
-        v_gb[i]->set_use_gba(detect_gba);
+        //v_gb[i]->set_use_gba(detect_gba);
     }
 
     //set cart name for autoconfig
@@ -476,7 +476,7 @@ bool retro_load_game(const struct retro_game_info *info)
   
    }
 
-     check_variables();
+    check_variables();
 
    return true;
 }
@@ -608,10 +608,12 @@ void retro_run(void)
         if (master_link)
             master_link->process();
 
+        
         if (power_antenna_last_state != power_antenna_on)
         {
             power_antenna_last_state = power_antenna_on;
             led_state_cb(0, power_antenna_on);
+            rumble_state_cb(0, RETRO_RUMBLE_WEAK, power_antenna_on);
         }
     }
 
@@ -722,22 +724,6 @@ size_t retro_serialize_size(void)
     }
 
     return _all_size + 0xFF00;
-}
-
-void log_save_state(uint8_t *data, size_t size)
-{
-    if (logging_allowed)
-    {
-        std::string filePath = "./dmg07_savesate_log.bin";
-        std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
-
-        for (int i = 0; i < size; i++)
-        {
-            ofs << data[i];
-        }
-
-        ofs.close();
-    }
 }
 
 bool retro_serialize(void *data, size_t size)

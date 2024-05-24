@@ -60,16 +60,16 @@ void auto_config_1p_link() {
         )
     {
         master_link = new barcodeboy(v_gb, cart_name);
-        display_message("Barcodeboy emulation enabled");
+        //display_message("Barcodeboy emulation enabled");
     }
     //link power_antenna/bugsensor
-    if (!strcmp(cart_name, "TELEFANG", 8) ||
-        !strcmp(cart_name, "BUGSITE", 7)
+    if (!strncmp(cart_name, "TELEFANG", 8) ||
+        !strncmp(cart_name, "BUGSITE", 7)
         )
     {
-        master_link = null;
+        master_link = NULL;
         v_gb[0]->set_linked_target(new power_antenna());
-        display_message("Power Antenna/Bugsensor emulation enabled");
+        //display_message("Power Antenna/Bugsensor emulation enabled");
     }
    
 }
@@ -126,7 +126,23 @@ void check_for_new_players() {
 
 }
 
-static void _setRumble(struct mRumble* rumble, int enable);
+static void _setRumble(struct mRumble* rumble, int enable)
+{
+    //UNUSED(rumble);
+    /*
+    if (!rumbleInitDone) {
+        _initRumble();
+    }*/
+    if (!rumble_state_cb) {
+        return;
+    }
+    if (enable) {
+        rumble_state_cb(0, RETRO_RUMBLE_WEAK, 0xFFFF);
+    }
+    else {
+        rumble_state_cb(0, RETRO_RUMBLE_WEAK, 0);
+    }
+}
 
 static void check_variables(void)
 {
@@ -524,7 +540,6 @@ static void netpacket_disconnected(unsigned short client_id) {
 }
 
 
-
 const struct retro_netpacket_callback netpacket_iface = {
   netpacket_start,          // start
   netpacket_receive,        // receive
@@ -534,4 +549,20 @@ const struct retro_netpacket_callback netpacket_iface = {
   netpacket_disconnected,   // disconnected
   "DoubleCherryGB netpack V1.0",   // core version char* 
 };
+
+void log_save_state(uint8_t* data, size_t size)
+{
+    if (logging_allowed)
+    {
+        std::string filePath = "./dmg07_savesate_log.bin";
+        std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
+
+        for (int i = 0; i < size; i++)
+        {
+            ofs << data[i];
+        }
+
+        ofs.close();
+    }
+}
 
