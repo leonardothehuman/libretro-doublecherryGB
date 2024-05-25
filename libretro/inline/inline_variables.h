@@ -1,3 +1,5 @@
+#pragma once
+#include "../dcgb_hotkey_target.hpp"
 
 #define RETRO_MEMORY_GAMEBOY_1_SRAM ((1 << 8) | RETRO_MEMORY_SAVE_RAM)
 #define RETRO_MEMORY_GAMEBOY_1_RTC ((2 << 8) | RETRO_MEMORY_RTC)
@@ -17,6 +19,11 @@ retro_set_rumble_state_t rumble_state_cb;
 retro_set_led_state_t led_state_cb;
 
 unsigned int power_antenna_use_rumble = 0;
+
+int dcgb_hotkey_pressed = -1;
+dcgb_hotkey_target* hotkey_target = NULL; 
+
+
 
 
 static const struct retro_variable vars_single[] = {

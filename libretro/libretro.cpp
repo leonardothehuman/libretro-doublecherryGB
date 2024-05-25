@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "libretro.h"
 
+#pragma once
 #include "../gb_core/sio/sio_devices.hpp"
 #include "inline/inline_variables.h"
 #include "inline/inline_functions.h"
@@ -445,6 +446,12 @@ void retro_run(void)
         check_variables();
 
     input_poll_cb();
+
+    if (hotkey_target) {
+        check_special_hotkey();
+        if(dcgb_hotkey_pressed >= 0) 
+           hotkey_target->handle_special_hotkey(dcgb_hotkey_pressed);
+    }
 
     for (int line = 0; line < 154; line++)
     {

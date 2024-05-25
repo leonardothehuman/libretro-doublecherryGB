@@ -1,3 +1,5 @@
+#pragma once
+#include "libretro.h"
 
 void set_cart_name(byte* rombuf)
 {
@@ -66,7 +68,9 @@ void auto_config_1p_link() {
         !strcmp(cart_name, "FAMISTA3")
         )
     {
-        master_link = new barcodeboy(v_gb, cart_name);
+        barcodeboy* bcb = new barcodeboy(v_gb, cart_name);
+        master_link = bcb; 
+        hotkey_target = bcb;
         display_message("Game supports BARCODE BOY! BARCODE BOY plugged in");
         return; 
     }
@@ -82,8 +86,6 @@ void auto_config_1p_link() {
     }
    
 }
-
-
 
 char* read_file_to_buffer(const char* filename, size_t* file_size) {
     FILE* file = fopen(filename, "rb");
@@ -134,7 +136,6 @@ void check_for_new_players() {
     }
 
 }
-
 
 static void check_variables(void)
 {
@@ -478,6 +479,33 @@ static void check_variables(void)
     }
 }
 
+void check_special_hotkey() {
+
+    int16_t key_state; 
+    //check upper numkeys
+    for (int i = 0; i < 10; i++)
+    {
+        key_state = input_state_cb(0, RETRO_DEVICE_KEYBOARD, 0, 48 + i);
+        if (key_state)
+        {
+            dcgb_hotkey_pressed = i;
+            return; 
+        }
+    }
+    //check numpad keys
+    for (int i = 0; i < 10; i++)
+    {
+        key_state = input_state_cb(0, RETRO_DEVICE_KEYBOARD, 0, 256 + i);
+        if (key_state)
+        {
+            dcgb_hotkey_pressed = i;
+            return;
+        }
+    }
+
+    dcgb_hotkey_pressed = -1; 
+   
+}
 
 
 
