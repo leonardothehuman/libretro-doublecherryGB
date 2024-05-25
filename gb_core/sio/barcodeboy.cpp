@@ -2,7 +2,8 @@
 
 extern void display_message(std::string msg_str);
 
-std::vector<std::string> battle_space_barcodes{
+//converted to ugly C98 style for ios compatability :-|
+std::string battle_space_barcodes_array[10] = {
 	"4907981000301", //Berserker
 	"4908052808369", //Valkyrie
 	"4916911302309", //Grizzly Bear
@@ -15,7 +16,9 @@ std::vector<std::string> battle_space_barcodes{
 	"4909062206350" //Warrior
 };
 
-std::vector<std::string> battle_space_barcode_names{
+std::vector<std::string> battle_space_barcodes(battle_space_barcodes_array, battle_space_barcodes_array + 10);
+
+std::string battle_space_barcode_names_array[10] = {
 	"Berserker",
 	"Valkyrie",
 	"Grizzly Bear",
@@ -28,7 +31,9 @@ std::vector<std::string> battle_space_barcode_names{
 	"Warrior"
 };
 
-std::vector<std::string> monster_maker_barcodes{
+std::vector<std::string> battle_space_barcode_names(battle_space_barcode_names_array, battle_space_barcode_names_array + 10);
+
+std::string monster_maker_barcodes_array[6] ={
 	"9998017308336", //Archer Lorian	
 	"9447410810323", //Archer Elysice
 	"9052091324955", //Knight Lauren
@@ -37,7 +42,10 @@ std::vector<std::string> monster_maker_barcodes{
 	"9362462085911" //Warrior Tamron
 };
 
-std::vector<std::string> monster_maker_barcode_names{
+std::vector<std::string> monster_maker_barcodes(monster_maker_barcodes_array, monster_maker_barcodes_array + 6);
+
+std::string monster_maker_barcode_names_array[6]
+{
 	"Archer Lorian",	
 	"Archer Elysice",
 	"Knight Lauren",
@@ -46,7 +54,11 @@ std::vector<std::string> monster_maker_barcode_names{
 	"Warrior Tamron"
 };
 
-std::vector<std::string> kattobi_road_barcodes{
+std::vector<std::string> monster_maker_barcode_names(monster_maker_barcode_names_array, monster_maker_barcode_names_array + 6);
+
+
+std::string kattobi_road_barcodes_array[6] =
+{
 	"4902105002063", //Truck			
 	"4901121110004", //Sedan			
 	"4903301160625", //Racecar		
@@ -55,7 +67,10 @@ std::vector<std::string> kattobi_road_barcodes{
 	"4987084410924" //F1-style racecar
 };
 
-std::vector<std::string> kattobi_road_barcode_names{
+std::vector<std::string> kattobi_road_barcodes(kattobi_road_barcodes_array, kattobi_road_barcodes_array + 6);
+
+std::string kattobi_road_barcode_names_array[6] =
+{
 	"Truck",	
 	"Sedan",		
 	"Racecar",	
@@ -64,21 +79,31 @@ std::vector<std::string> kattobi_road_barcode_names{
 	"F1-style racecar",
 };
 
-std::vector<std::string> famista3_barcodes{
+std::vector<std::string> kattobi_road_barcode_names(kattobi_road_barcode_names_array, kattobi_road_barcode_names_array + 6);
+
+
+std::string famista3_barcodes_array[4] =
+{
 	"8357933639923", //Home-Run Batter			
 	"7814374127798", //Senior Batter			
 	"9880692151263", //Swift Batter		
 	"1414213562177" //Pitcher
 };
 
-std::vector<std::string> famista3_barcode_names{
+std::vector<std::string> famista3_barcodes(famista3_barcodes_array, famista3_barcodes_array + 4);
+
+std::string famista3_barcode_names_array[4] =
+{
 	"Home-Run Batter",			
 	"Senior Batter",		
 	"Swift Batter",		
 	"Pitcher"
 };
 
-std::vector<std::string> familiy_jockey2_barcodes{
+std::vector<std::string> famista3_barcode_names(famista3_barcode_names_array, famista3_barcode_names_array + 4);
+
+std::string familiy_jockey2_barcodes_array[8] =
+{
 	"5893713522816", //A1
 	"2378649896765", //A2			
 	"9845554422318", //A4	
@@ -88,7 +113,11 @@ std::vector<std::string> familiy_jockey2_barcodes{
 	"7164625542390", //C3
 	"6319537443513" //C5
 };
-std::vector<std::string> familiy_jockey2_barcode_names{
+
+std::vector<std::string> familiy_jockey2_barcodes(familiy_jockey2_barcodes_array, familiy_jockey2_barcodes_array + 8);
+
+std::string familiy_jockey2_barcode_names_array[8] =
+{
 	"A1",
 	"A2",	
 	"A4",
@@ -99,6 +128,7 @@ std::vector<std::string> familiy_jockey2_barcode_names{
 	"C5"
 };
 
+std::vector<std::string> familiy_jockey2_barcode_names(familiy_jockey2_barcode_names_array, familiy_jockey2_barcode_names_array + 8);
 
 
 barcodeboy::barcodeboy(std::vector<gb*> g_gb, char cart_name[18]) {
