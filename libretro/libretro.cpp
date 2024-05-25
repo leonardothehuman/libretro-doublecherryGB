@@ -199,8 +199,9 @@ bool retro_load_game(const struct retro_game_info *info)
     //create gameboy instances
     for (byte i = 0; i < max_gbs; i++)
     {
-        render.emplace_back(new dmy_renderer(i));
-        v_gb.emplace_back(new gb(render[i], true, true));
+        
+        render.push_back(new dmy_renderer(i));
+        v_gb.push_back(new gb(render[i], true, true));
         _serialize_size[i] = 0;
     }
 

@@ -24,6 +24,7 @@
 #include "gb.h"
 #include "../libretro/libretro.h"
 #include <string.h>
+#include <iostream>
 #include <fstream>
 
 #define Z_FLAG 0x40
