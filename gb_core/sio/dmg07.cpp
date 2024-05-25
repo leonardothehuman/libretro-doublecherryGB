@@ -1,6 +1,6 @@
 /*--------------------------------------------------
 
-   DoubleCherryGB - Gameboy Emulator - 4Players (based on TGBDual)
+   DoubleCherryGB - Gameboy Emulator (based on TGBDual)
   Copyright (C) 2023  Tim Oelrichs
 
    This program is free software; you can redistribute it and/or
