@@ -111,9 +111,9 @@ If you don't have a keyboard, the the barcode cards will be changed randomly.
 These are devices, that came with the games **Keitai Denjuu Telefang** and **Network Adventure Bugsite**  and are plugged into the linkport. It's simply a led that flashes when, something special happens ingame.
 DoubleCherryGB uses the controller rumble and the retroarch led api to simulate the led flashing on an overlay.
 
-![](https://i.postimg.cc/T339MJ9n/Telefang-Speed-Version-Bugsensor-overlay.gif)
+![](/screenshots/Bugsensor-overlay.gif)
 
-[Here](https://github.com/TimOelrichs/doublecherryGB-libretro/blob/master/overlay/gb-bugsensor.zip) is the example overlay i used over the mega-bezels gbc shader. But you can also make your own.
+[Here](https://github.com/TimOelrichs/doublecherryGB-libretro/blob/master/overlays/gb-bugsensor.zip) is the example overlay i used over the mega-bezels gbc shader. But you can also make your own.
 
 You need to edit your **retroarch.cfg** file the get the overlay to work. (See https://docs.libretro.com/guides/led-drivers/)
 
