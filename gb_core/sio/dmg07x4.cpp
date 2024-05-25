@@ -211,27 +211,28 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	
 	}
 
-	for(dmg07* dmg07 : v_dmg07)
+	for (int i = 0; i < v_dmg07.size(); i++)
 	{
-		dmg07->use_v_gb_size = true; 
+		v_dmg07[i]->use_v_gb_size = true; 
 	}
 
 }
 
 void dmg07x4::process() {
 		
-	for(dmg07* dmg07 : v_dmg07)
+	for (int i = 0; i < v_dmg07.size(); i++)
 	{
-		dmg07->process();
-	}
-	
+		v_dmg07[i]->process();
+	}	
 }
 
 void dmg07x4::reset() {
-	for(dmg07* dmg07 : v_dmg07)
+
+	for (int i = 0; i < v_dmg07.size(); i++)
 	{
-		dmg07->reset();
+		v_dmg07[i]->reset();
 	}
+
 }
 
 
