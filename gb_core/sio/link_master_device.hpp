@@ -11,6 +11,13 @@ class link_master_device{
 
 	
 public:
+	link_master_device() {
+		transfer_speed = 512 * 8;
+		seri_occer = 512 * 8 * 5;
+		byte tmp[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+		memcpy(in_data_buffer, tmp, sizeof in_data_buffer);
+		use_v_gb_size = false;
+	}
 	virtual void process() = 0;
 	virtual void reset() = 0;
 	void virtual save_state_mem(void* buf) = 0;
@@ -18,10 +25,10 @@ public:
 	size_t virtual get_state_size();
 	void virtual serialize(serializer& s) = 0;
 	
-	int transfer_speed = 512 * 8;
-	int seri_occer = 512*8*5;
-	byte in_data_buffer[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-	bool use_v_gb_size = false;
+	int transfer_speed;
+	int seri_occer;
+	byte in_data_buffer[16];
+	bool use_v_gb_size;
 
 protected:
 	virtual byte send_byte(byte which, byte dat);

@@ -44,7 +44,7 @@ std::string monster_maker_barcodes_array[6] ={
 
 std::vector<std::string> monster_maker_barcodes(monster_maker_barcodes_array, monster_maker_barcodes_array + 6);
 
-std::string monster_maker_barcode_names_array[6]
+std::string monster_maker_barcode_names_array[6] =
 {
 	"Archer Lorian",	
 	"Archer Elysice",
