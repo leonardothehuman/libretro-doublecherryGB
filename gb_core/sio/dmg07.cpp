@@ -1,6 +1,6 @@
 /*--------------------------------------------------
 
-   DoubleCherryGB - Gameboy Emulator - 4Players (based on TGBDual)
+   DoubleCherryGB - Gameboy Emulator (based on TGBDual)
   Copyright (C) 2023  Tim Oelrichs
 
    This program is free software; you can redistribute it and/or
@@ -160,13 +160,13 @@ void dmg07::handle_answer(int i, byte dat)
 		{
 			if (dat == 0x88)
 			{
-				ans_buffer[i].emplace_back(dat);
+				ans_buffer[i].push_back(dat);
 				//last_trans_nr[i] = transfer_count;
 			}
 
 			if (dat == 0xAA && i == 0) //&& ((transfer_count % 4) == 0) )
 			{
-				ans_buffer[i].emplace_back(dat);
+				ans_buffer[i].push_back(dat);
 				first_aa_trans_nr = transfer_count % 4;
 				current_state = SYNC_PHASE;
 
@@ -179,7 +179,7 @@ void dmg07::handle_answer(int i, byte dat)
 		{
 			if (dat == ans_buffer[i].at(0)) //&& //last_trans_nr[i] == (transfer_count - 1))
 			{
-				ans_buffer[i].emplace_back(dat);
+				ans_buffer[i].push_back(dat);
 				//last_trans_nr[i] = transfer_count;
 
 				if (dat == 0x88)
@@ -191,7 +191,7 @@ void dmg07::handle_answer(int i, byte dat)
 			else if (dat == 0xAA && i == 0)//&& ((transfer_count % 4) == 0))
 			{
 				ans_buffer[i].clear();
-				ans_buffer[i].emplace_back(dat);
+				ans_buffer[i].push_back(dat);
 				first_aa_trans_nr = transfer_count % 4;
 				current_state = SYNC_PHASE;
 
@@ -207,14 +207,14 @@ void dmg07::handle_answer(int i, byte dat)
 			if (dat == 0xAA && ans_buffer[i].at(0) == 0xAA && ans_buffer[i].at(1) == 0xAA && i == 0) //&& //last_trans_nr[i] == (transfer_count - 1))
 			{
 				current_state = SYNC_PHASE;
-				ans_buffer[i].emplace_back(dat);
+				ans_buffer[i].push_back(dat);
 				break;
 
 
 			}
 			else if (ans_buffer[i].at(0) == 0x88 && ans_buffer[i].at(1) == 0x88)
 			{
-				ans_buffer[i].emplace_back(dat);
+				ans_buffer[i].push_back(dat);
 				//last_trans_nr[i] = transfer_count;
 				
 				if (!transfer_rate)
@@ -252,7 +252,7 @@ void dmg07::handle_answer(int i, byte dat)
 			else if (dat == 0xAA && i == 0)//&& ((transfer_count % 4) == 0))
 			{
 				ans_buffer[i].clear();
-				ans_buffer[i].emplace_back(dat);
+				ans_buffer[i].push_back(dat);
 				first_aa_trans_nr = transfer_count % 4;
 				current_state = SYNC_PHASE;
 
@@ -282,7 +282,7 @@ void dmg07::handle_answer(int i, byte dat)
 			else if (dat == 0xAA && i == 0)
 			{
 				ans_buffer[i].clear();
-				ans_buffer[i].emplace_back(dat);
+				ans_buffer[i].push_back(dat);
 				first_aa_trans_nr = transfer_count % 4;
 				current_state = SYNC_PHASE;
 
@@ -322,7 +322,7 @@ void dmg07::handle_answer(int i, byte dat)
 			{
 				if (dat == 0xFF && transfer_count % 4 == 0)
 				{
-					ans_buffer[i].emplace_back(dat);
+					ans_buffer[i].push_back(dat);
 					//last_trans_nr[i] = transfer_count;
 				}
 				break;
@@ -338,7 +338,7 @@ void dmg07::handle_answer(int i, byte dat)
 
 					for (int i = 0; i < (packet_size * 4); i++)
 					{
-						bytes_to_send.emplace_back(0xFF);
+						bytes_to_send.push_back(0xFF);
 					}
 					restart_in += transfer_count;
 					break;
@@ -474,7 +474,7 @@ void dmg07::fill_buffer_for_less_than_4p()
 		{
 			for (int i = 0; i < packet_size; i++)
 			{
-				bytes_to_send.emplace_back(0);
+				bytes_to_send.push_back(0);
 			}
 			
 		}
@@ -509,7 +509,7 @@ void dmg07::process()
 
 					if (trans_buffer[i].size() < packet_size)
 					{
-						trans_buffer[i].emplace_back(ret);
+						trans_buffer[i].push_back(ret);
 	
 					}
 
@@ -521,7 +521,7 @@ void dmg07::process()
 					for (byte i = 0; i < v_gb.size(); i++)
 					{
 						for (const auto& e : trans_buffer[i])
-							bytes_to_send.emplace_back(e);
+							bytes_to_send.push_back(e);
 
 						trans_buffer[i].clear();
 					}
@@ -551,7 +551,7 @@ void dmg07::process()
 
 						if (trans_buffer[i].size() < packet_size && delay > 0)
 						{
-							trans_buffer[i].emplace_back(ret);
+							trans_buffer[i].push_back(ret);
 						}
 					}
 					delay++;
@@ -569,7 +569,7 @@ void dmg07::process()
 						{
 							
 							for (const auto& e : trans_buffer[i])
-								bytes_to_send.emplace_back(e); // create bytes_to_send queue
+								bytes_to_send.push_back(e); // create bytes_to_send queue
 
 							trans_buffer[i].clear();
 							
@@ -660,7 +660,7 @@ void dmg07::restore_state_mem(void* buf)
 
 			for (int j = 0; j < size; j++)
 			{
-				trans_buffer[i].emplace_back(tmp[j]);
+				trans_buffer[i].push_back(tmp[j]);
 			}
 		}
 		
@@ -672,7 +672,7 @@ void dmg07::restore_state_mem(void* buf)
 
 			for (int k = 0; k < size; k++)
 			{
-				ans_buffer[i].emplace_back(tmp[k]);
+				ans_buffer[i].push_back(tmp[k]);
 			};
 		}
 	
@@ -686,7 +686,7 @@ void dmg07::restore_state_mem(void* buf)
 
 		for (size_t i = 0; i < size; i++)
 		{
-			bytes_to_send.emplace_back(tmp[i]);
+			bytes_to_send.push_back(tmp[i]);
 		};
 	}
 	

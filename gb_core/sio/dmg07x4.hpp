@@ -14,5 +14,5 @@ public:
 
 private:
 	std::vector<dmg07*> v_dmg07;
-	int emulated_dmg07s = 2;
+	//int emulated_dmg07s = 2;
 };

@@ -77,7 +77,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 		break;
 	}
 	case 10:{
-		emulated_dmg07s = 3;
+		//emulated_dmg07s = 3;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -93,7 +93,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 		break;
 	}
 	case 11: {
-		emulated_dmg07s = 3;
+		//emulated_dmg07s = 3;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -110,7 +110,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	}
 	case 12:
 	{
-		emulated_dmg07s = 3;
+		//emulated_dmg07s = 3;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -127,7 +127,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	}
 	case 13:
 	{
-		emulated_dmg07s = 4;
+		//emulated_dmg07s = 4;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -148,7 +148,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	}
 	case 14:
 	{
-		emulated_dmg07s = 4;
+		//emulated_dmg07s = 4;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -169,7 +169,7 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	}
 	case 15:
 	{
-		emulated_dmg07s = 4;
+		//emulated_dmg07s = 4;
 
 		std::vector<gb*> _gbs1;
 		_gbs1.insert(_gbs1.begin(), std::begin(v_gb), std::begin(v_gb) + 4);
@@ -211,27 +211,28 @@ dmg07x4::dmg07x4(std::vector<gb*> v_gb, int players) {
 	
 	}
 
-	for(dmg07* dmg07 : v_dmg07)
+	for (int i = 0; i < v_dmg07.size(); i++)
 	{
-		dmg07->use_v_gb_size = true; 
+		v_dmg07[i]->use_v_gb_size = true; 
 	}
 
 }
 
 void dmg07x4::process() {
 		
-	for(dmg07* dmg07 : v_dmg07)
+	for (int i = 0; i < v_dmg07.size(); i++)
 	{
-		dmg07->process();
-	}
-	
+		v_dmg07[i]->process();
+	}	
 }
 
 void dmg07x4::reset() {
-	for(dmg07* dmg07 : v_dmg07)
+
+	for (int i = 0; i < v_dmg07.size(); i++)
 	{
-		dmg07->reset();
+		v_dmg07[i]->reset();
 	}
+
 }
 
 

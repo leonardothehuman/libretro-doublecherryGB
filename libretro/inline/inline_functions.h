@@ -1,3 +1,5 @@
+#pragma once
+#include "libretro.h"
 
 void set_cart_name(byte* rombuf)
 {
@@ -6,24 +8,59 @@ void set_cart_name(byte* rombuf)
     cart_name[17] = '\0';
 }
 
+
+void display_message(std::string msg_str, unsigned int seconds)
+{
+    seconds %= 10;
+
+if (libretro_msg_interface_version >= 1)
+{
+    struct retro_message_ext msg = {
+       msg_str.data(),
+       seconds * 1000,
+       1,
+       RETRO_LOG_INFO,
+       RETRO_MESSAGE_TARGET_OSD,
+       RETRO_MESSAGE_TYPE_NOTIFICATION_ALT,
+       -1
+    };
+    environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE_EXT, &msg);
+}
+else
+{
+    struct retro_message msg = {
+        msg_str.data(),
+       seconds * 60
+    };
+    environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
+}
+}
+void display_message(std::string msg_str) { display_message(msg_str, 5); }
+
 void auto_config_4p_hack()
 {
     if (!cart_name) return; 
     if (!strcmp(cart_name, "TETRIS"))
     {
         master_link = new hack_4p_tetris(v_gb);
+        display_message("TETRIS Battle Royal Multiplayer Hack Adapter plugged in");
+        return;
     }
     if (!strcmp(cart_name, "KWIRK"))
     {
         delete master_link; 
         master_link = NULL; 
         linked_target_device = new hack_4p_kwirk(v_gb);
+        display_message("KWIRK Multiplayer Hack Adapter plugged in");
+        return;
     }
- 
+    
 };
 
 void auto_config_1p_link() {
     if (!cart_name) return;
+
+    //link barcodeboy
     if (!strcmp(cart_name, "BATTLE SPACE") || 
         !strcmp(cart_name, "MONSTER MAKER") ||
         !strcmp(cart_name, "KATTOBI ROAD") ||
@@ -31,11 +68,24 @@ void auto_config_1p_link() {
         !strcmp(cart_name, "FAMISTA3")
         )
     {
-        master_link = new barcodeboy(v_gb, cart_name);
+        barcodeboy* bcb = new barcodeboy(v_gb, cart_name);
+        master_link = bcb; 
+        hotkey_target = bcb;
+        display_message("Game supports BARCODE BOY! BARCODE BOY plugged in");
+        return; 
     }
+    //link power_antenna/bugsensor
+    if (!strncmp(cart_name, "TELEFANG", 8) ||
+        !strncmp(cart_name, "BUGSITE", 7)
+        )
+    {
+        master_link = NULL;
+        v_gb[0]->set_linked_target(new power_antenna());
+        display_message("Game supports POWER ANTENNA/BUGSENSOR! POWER ANTENNA/BUGSENSOR plugged in");
+        return; 
+    }
+   
 }
-
-
 
 char* read_file_to_buffer(const char* filename, size_t* file_size) {
     FILE* file = fopen(filename, "rb");
@@ -95,12 +145,25 @@ static void check_variables(void)
 
     struct retro_variable var;
 
-    var.key = "multitgb_emulated_gameboys";
+    var.key = "dcgb_power_antenna_use_rumble";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        if (!strcmp(var.value, "Off"))
+            power_antenna_use_rumble = 0;
+        else if (!strcmp(var.value, "Weak"))
+            power_antenna_use_rumble = 1;
+        else if (!strcmp(var.value, "Strong"))
+            power_antenna_use_rumble = 2;
+    }
+
+    var.key = "dcgb_emulated_gameboys";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
     {
        
-        if (!already_checked_options) { // only apply this setting on init
+        if (!already_checked_options) 
+        { // only apply this setting on init
             if (!strcmp(var.value, "1"))
             {
                 emulated_gbs = 1;
@@ -140,12 +203,26 @@ static void check_variables(void)
         }
     }
 
+    
+    var.key = "dcgb_number_of_local_screens";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
 
+        //if (!already_checked_options) 
+        { 
+            if (!strcmp(var.value, "1"))
+                _number_of_local_screens = 1;
+
+            if (!strcmp(var.value, "2"))
+                _number_of_local_screens = 2;
+        }
+     }
 
     //TODO FOR 3PLAYERS
     if (emulated_gbs > 2) {
         // check 4Player Mode
-        var.key = "multitgbt_gblink_device";
+        var.key = "dcgbt_gblink_device";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -172,7 +249,7 @@ static void check_variables(void)
     if (emulated_gbs > 1)
     {
         // check whether link cable mode is enabled
-        var.key = "tgbdual_gblink_enable";
+        var.key = "dcgb_gblink_enable";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -187,7 +264,7 @@ static void check_variables(void)
             gblink_enable = false;
 
         // check whether link cable mode is enabled
-        var.key = "tgbdual_log_link";
+        var.key = "dcgb_log_link";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -197,7 +274,7 @@ static void check_variables(void)
         }
 
 
-        var.key = "tgbdual_screen_placement";
+        var.key = "dcgb_screen_placement";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -211,7 +288,7 @@ static void check_variables(void)
                 _screen_vertical = true;
                 _screen_4p_split = false;
             }
-            else if (!strcmp(var.value, "4-Player Splitscreen"))
+            else if (!strcmp(var.value, "splitscreen"))
             {
                 _screen_vertical = false;
                 _screen_4p_split = true;
@@ -221,7 +298,7 @@ static void check_variables(void)
             _screen_vertical = false;
 
         // check whether player 1 and 2's screen placements are swapped
-        var.key = "tgbdual_switch_screens";
+        var.key = "dcgb_switch_screens";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
@@ -234,61 +311,61 @@ static void check_variables(void)
             _screen_switched = false;
 
         // check whether to show both players' screens, p1 only, or p2 only
-        var.key = "tgbdual_single_screen_mp";
+        var.key = "dcgb_single_screen_mp";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
             //TODO make this cleaner and shorter
             if (!strcmp(var.value, "all players"))
-                _show_player_screens = emulated_gbs;
+                _show_player_screen = emulated_gbs;
             else if (!strcmp(var.value, "player 1 only"))
-                _show_player_screens = 0;
+                _show_player_screen = 0;
             else if (!strcmp(var.value, "player 2 only"))
-                _show_player_screens = 1;
+                _show_player_screen = 1;
             else if (!strcmp(var.value, "player 3 only"))
-                _show_player_screens = 2;
+                _show_player_screen = 2;
             else if (!strcmp(var.value, "player 4 only"))
-                _show_player_screens = 3;
+                _show_player_screen = 3;
             else if (!strcmp(var.value, "player 5 only"))
-                _show_player_screens = 4;
+                _show_player_screen = 4;
             else if (!strcmp(var.value, "player 6 only"))
-                _show_player_screens = 5;
+                _show_player_screen = 5;
             else if (!strcmp(var.value, "player 7 only"))
-                _show_player_screens = 6;
+                _show_player_screen = 6;
             else if (!strcmp(var.value, "player 8 only"))
-                _show_player_screens = 7;
+                _show_player_screen = 7;
             else if (!strcmp(var.value, "player 9 only"))
-                _show_player_screens = 8;
+                _show_player_screen = 8;
             else if (!strcmp(var.value, "player 10 only"))
-                _show_player_screens = 9;
+                _show_player_screen = 9;
             else if (!strcmp(var.value, "player 11 only"))
-                _show_player_screens = 10;
+                _show_player_screen = 10;
             else if (!strcmp(var.value, "player 12 only"))
-                _show_player_screens = 11;
+                _show_player_screen = 11;
             else if (!strcmp(var.value, "player 13 only"))
-                _show_player_screens = 12;
+                _show_player_screen = 12;
             else if (!strcmp(var.value, "player 14 only"))
-                _show_player_screens = 13;
+                _show_player_screen = 13;
             else if (!strcmp(var.value, "player 15 only"))
-                _show_player_screens = 14;
+                _show_player_screen = 14;
             else if (!strcmp(var.value, "player 16 only"))
-                _show_player_screens = 15;
+                _show_player_screen = 15;
 
-            if (_show_player_screens != emulated_gbs) {
-                audio_2p_mode = _show_player_screens;
-                var.key = "tgbdual_audio_output";
+            if (_show_player_screen != emulated_gbs) {
+                audio_2p_mode = _show_player_screen;
+                var.key = "dcgb_audio_output";
                 var.value = "Game Boy #" +  audio_2p_mode+1;
                 environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
 
             }
         }
         else
-            _show_player_screens = emulated_gbs;
+            _show_player_screen = emulated_gbs;
 
 
         int screenw = 160, screenh = 144;
 
-        if (_screen_4p_split) {
+        if (_screen_4p_split && (_number_of_local_screens == 1 || _show_player_screen == emulated_gbs)) {
 
             if (emulated_gbs < 5) {
                 screenw *= 2;
@@ -304,12 +381,19 @@ static void check_variables(void)
             }
           
         }
-        else if (emulated_gbs > 1 && _show_player_screens == 2)
+        else if (emulated_gbs > 1 && _show_player_screen == 2 && _number_of_local_screens == 1)
         {
             if (_screen_vertical)
                 screenh *= emulated_gbs;
             else
                 screenw *= emulated_gbs;
+        }
+        else if (_number_of_local_screens > 1)
+        {
+            if (_screen_vertical)
+                screenh *= _number_of_local_screens;
+            else
+                screenw *= _number_of_local_screens;
         }
 
 
@@ -322,13 +406,13 @@ static void check_variables(void)
 
 
         // check whether which audio should play
-        var.key = "tgbdual_audio_output";
+        var.key = "dcgb_audio_output";
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
         {
-            if (_show_player_screens != emulated_gbs) {
-                audio_2p_mode = _show_player_screens;
-                var.key = "tgbdual_audio_output";
+            if (_show_player_screen != emulated_gbs) {
+                audio_2p_mode = _show_player_screen;
+                var.key = "dcgb_audio_output";
                 var.value = "Game Boy #" + audio_2p_mode + 1;
                 environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
             }
@@ -395,6 +479,33 @@ static void check_variables(void)
     }
 }
 
+void check_special_hotkey() {
+
+    int16_t key_state; 
+    //check upper numkeys
+    for (int i = 0; i < 10; i++)
+    {
+        key_state = input_state_cb(0, RETRO_DEVICE_KEYBOARD, 0, 48 + i);
+        if (key_state)
+        {
+            dcgb_hotkey_pressed = i;
+            return; 
+        }
+    }
+    //check numpad keys
+    for (int i = 0; i < 10; i++)
+    {
+        key_state = input_state_cb(0, RETRO_DEVICE_KEYBOARD, 0, 256 + i);
+        if (key_state)
+        {
+            dcgb_hotkey_pressed = i;
+            return;
+        }
+    }
+
+    dcgb_hotkey_pressed = -1; 
+   
+}
 
 
 
@@ -461,7 +572,6 @@ static void netpacket_disconnected(unsigned short client_id) {
 }
 
 
-
 const struct retro_netpacket_callback netpacket_iface = {
   netpacket_start,          // start
   netpacket_receive,        // receive
@@ -471,4 +581,20 @@ const struct retro_netpacket_callback netpacket_iface = {
   netpacket_disconnected,   // disconnected
   "DoubleCherryGB netpack V1.0",   // core version char* 
 };
+
+void log_save_state(uint8_t* data, size_t size)
+{
+    if (logging_allowed)
+    {
+        std::string filePath = "./dmg07_savesate_log.bin";
+        std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
+
+        for (int i = 0; i < size; i++)
+        {
+            ofs << data[i];
+        }
+
+        ofs.close();
+    }
+}
 
