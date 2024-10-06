@@ -506,6 +506,16 @@ void *retro_get_memory_data(unsigned id)
     return NULL;
 }
 
+int retro_dblchry_emulated_count(){
+    return emulated_gbs;
+}
+size_t retro_dblchry_get_sram_size(int slot){
+    return v_gb[slot]->get_rom()->get_sram_size();
+}
+void *retro_dblchry_get_sram_ptr(int slot){
+    return v_gb[slot]->get_rom()->get_sram();
+}
+
 size_t retro_get_memory_size(unsigned id)
 {
     switch (mode)
